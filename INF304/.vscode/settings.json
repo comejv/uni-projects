@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.rmd": "markdown",
+        "concepts": "c",
+        "cstdio": "c",
+        "type_traits": "c",
+        "new": "c",
+        "typeinfo": "c"
+    }
+}

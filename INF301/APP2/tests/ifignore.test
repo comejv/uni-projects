@@ -1,0 +1,22 @@
+# Test "if not" (+ ignore)
+# Note: la commande I est introduite. Celle ci [I]gnore le premier
+# element de la pile (et donc le supprime).
+Programme:
+
+{GA} {DA} X I !
+
+Map 1:
+.~..
+.C~.
+.@..
+....
+
+
+Programme:
+
+A {A} AA {GA} {A} {DA} I ! I !
+
+Map 1:
+.~~~~~~.
+.C....@.
+.~~~~~~.

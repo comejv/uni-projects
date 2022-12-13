@@ -1,0 +1,47 @@
+Programme:
+
+ADADA
+
+Map 1:
+
+....
+.C..
+.@..
+....
+
+
+Programme:
+
+ADAGAGADA
+
+Map 2:
+
+......
+.C..@.
+......
+......
+
+Programme:
+
+ADAAGAAGAADA
+
+Map 3:
+
+.......
+.C.~.@.
+...~...
+.......
+.......
+
+# test sans palindrome pour verifier que la sequence est dans le bon ordre
+Programme:
+
+GADAADAGAA
+
+Map 4:
+
+....~..
+.C~..@.
+.~.~~..
+.......
+.......

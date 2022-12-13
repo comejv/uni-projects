@@ -1,0 +1,16 @@
+# Dans cet exercice 'challenge', nous avons introduit une mystérieuse commande 
+# 'Z' donc l'effet n'est pas expliqué.
+# Le but est de deviner son effet puis de l'implanter correctement dans 
+# l'interpréteur pour valider cet exercice...
+
+
+Programme:
+{AA} {DAAG} 1 {AGAAGA} {ADAADA} 1 0 {AAGAAAAAADA} {AAAGAAAADAA} Z ? Z ? Z ?
+
+Map 1:
+........
+~~~..~~.
+.C~~.~@.
+..~..~~~
+........
+

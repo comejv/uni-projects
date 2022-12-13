@@ -1,0 +1,45 @@
+Programme:
+
+1P 0P A
+
+Map 1:
+....
+.C@.
+....
+
+
+Programme:
+
+A 1P AA 1P A
+
+Map 2:
+
+.......
+.CM.M@.
+.......
+
+
+Programme:
+
+A 1P DA 1P GGA 0P AD 1P A
+
+Map 3:
+
+.....
+..M@.
+.C...
+..M..
+.....
+
+
+Programme:
+
+1 0 1 1  A P DA P GGA P AD P A
+
+Map 4:
+
+.....
+..M@.
+.C...
+..M..
+.....

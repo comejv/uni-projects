@@ -1,0 +1,156 @@
+Recommandations sur l'utilisation des fichiers pour l'APP2.
+A lire absolument !
+
+
+****************************************************************
+**  Pour tout le monde                                        **
+****************************************************************
+
+Renseignez ici les noms des membres de votre binôme :
+
+Nom1 - prénom1 : Emile Guillaume
+Nom2 - prénom2 : Côme VINCENT
+
+Si vous avez des commentaires, remarques etc. pour le rendu, vous pouvez les 
+mettre ici:
+
+** programme pour le Labyrinthe **
+{7M {GA} {D}?}9999***B
+
+Ici on fait une sorte de programme un peu brute, en partant du principe qu'en
+longeant un mur (gauche ici) on arrivera toujours à la sortie. Les préconditions
+pour que cela marche sont :
+- tous les murs sont continues (il faut pouvoir tracer un chemin ininterrompu entre
+le mur du départ et le mur leplus proche de l'arrivée)
+- l'arrivée est adjacente à un mur
+
+Le fichier test de Labyrinthe semble les respecter, et notre programme passe le test
+d'appolab.
+
+
+** Analyse de la complexité de notre programme : **
+Dans main il est important que les fonctions conversion et interprete soient de faible
+complexité. Voici leurs analyses :
+
+# conversion
+On a ici une fonction qui crée une cellule dans une liste chainée pour chaque caractère
+trouvé dans le texte donné en argument. On a donc une complexité en O(n) où n est la
+longueur du texte (donc du programme).
+
+# interprete
+La fonction interprete commence par initialiser des variables et notamment la
+pile. Toute cette partie est O(1).
+
+Ensuite vient le cœur de l'interprete, une boucle while qui tourne tant que 
+la sequence n'est pas vide. 
+
+Les fonctions A, D et G sont en O(1), elles ne font que quelques opérations
+dont le nombre reste invariable.
+
+Idem pour les opérations arythmétiques +, - et * sauf qu'on rajoute la fonction
+empiler. Comme le haut de la pile est le début de la liste chainée il suffit de
+créer un espace mémoire et faire pointer seq.tete vers lui, et cell.suivant vers
+l'ancien premier. La fonction empiler est donc aussi en O(1) ce qui laisse +, -
+et * en O(1).
+
+P et M dépilent un entier (toujours en O(1) car c'est le début de la liste chainée)
+puis lisent ou modifient une valeur dans le tableau map à un indice donné, encore O(1).
+
+Idem pour { qui ne fait qu'empiler : O(1).
+
+? introduit une nouvelle fonction, ajout_rec. Elle permet d'insérer une cellule
+au début de la liste chainée et est donc de la même complexité que empiler : O(1).
+Le reste du case ne contient que des opérations en O(1) déjà vues auparavent.
+
+X ne manipule que les deux premières cellules de la liste, pas de boucle ou récursion
+donc encore O(1).
+
+! et B utilisent des fonctions déjà analysées : O(1) toutes les deux.
+
+R contient deux boucles for dont l'une iter sur x un entier dépilé, qui dépend du
+programme. C'est une variable inconnue avant le runtime et indépendante de la taille
+du programme. On considère que O(x) ~= O(1) car dans la plupart des cas x << n.
+
+C fait une comparaison avec une valeur stockée dans la cellule lue puis dépile et
+empile : tout en O(1).
+
+I et le default utilisent des fonctions déjà vues : O(1).
+
+Z ne fait que manipuler un nombre constant de cellules (dont un échange) et est donc
+en O(1) également.
+
+La suite de l'interprete lit la cellule suivante avec recup_cellule en O(1) puis
+affiche le programme O(n), la carte et la pile. Cependant on les ignore ici car
+les tests de performance sont fait sans affichage.
+
+On obtient au final la structure suivante :
+
+main()
+ | conversion() --> O(n)
+ |
+ | interprete()
+ |  | while()   --> O(n)    _____ O(n) * O(1) = O(n)
+ |  |  | case   --> O(1)    __/
+
+
+Notre code est donc de complexité O(2n) ~ O(n).
+
+Cette analyse est confortée par les resultats des tests de performance : les grapiques
+obtenus montrent une courbe de temps linéaire, ce qui correspond à notre complexité.
+
+** recherches menées pour le challenge surprise **
+Nous avons logntemps étés bloqué par une fuite de mémoire qui, d'une manière qui nous
+échappe encore, n'affectait que la correcte exécution du test surprise.
+
+Lorsque cela fut résolu nous avons rapidement créé un programme d'automatisation de la
+recherche du token à renvoyer au serveur. Il s'avère que nous nous sommes laissé berner :
+après avoir développé deux algorithmes capables de trouver le token dans les 1000 premiers
+messages envoyés par le serveur nous avons compris que la solution devait être cachée au
+début, car les temps du Leaderboard sont autour de 2-3 secondes, alors que l'exécution
+de notre code prenait presque une minute pour les 1000 messages, principalement à cause
+du délai de communication avec appolab.
+Cela nous amène au samedi du rendu où nous étions résolus à chercher au début du challenge
+un indice que nous aurions manqué, mais le serveur était déjà fermé.
+
+Nous avons décidé de joindre nos programmes de détection pour essayer de gratter quelques
+points ;)
+
+Vous les trouverez dans le fichier zip nommé "surprise.zip".
+
+
+
+****************************************************************
+**  Langage C                                                 **
+****************************************************************
+
+Compilation
+-----------
+Pour compiler :
+> make
+
+ou
+
+> clang -Wall -Wextra main.c -o main curiosity.c interprete.c listes.c
+(Nous vous conseillons d'utiliser le compilateur clang plutôt que gcc.)
+
+
+Lancer un test
+--------------
+
+Test complet
+> ./main tests/<nom de test>.test
+
+Test en mode "pas à pas" :
+> ./main -d tests/<nom de test>.test
+
+
+Lancer une suite de tests
+-------------------------
+
+Tests fonctionnels :
+> ./tests/check.py c
+
+Tests en vérifiant les erreurs ou fuites mémoire:
+> ./tests/check.py --mem c
+
+Pour les tests de performance : lire le fichier LISEZMOI-perfs.txt

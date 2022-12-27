@@ -7,9 +7,11 @@
 
 # Projets universitaires
 
+Pour cloner une partie de ce dépôt, utilisez mon scripte [sparse-clone](https://github.com/comejv/utils-and-games/tree/main/git-sparse-clone).
+
 Note : certains projets sont stockés dans un dépôt séparé : [utils-and-games](https://github.com/comejv/utils-and-games).
 
-<a href="https://github.com/comejv/utils-and-games"><img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/comejv/utils-and-games.png" width="460px"></a>
+<a align="center" href="https://github.com/comejv/utils-and-games"><img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/comejv/utils-and-games.png" width="460px"></a>
 
 ***
 

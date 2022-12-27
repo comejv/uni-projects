@@ -11,6 +11,18 @@ Note : certains projets sont stockés dans un dépôt séparé : [utils-and-game
 
 <a href="https://github.com/comejv/utils-and-games"><img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/comejv/utils-and-games.png" width="460px"></a>
 
+***
+
+## Graphe du dépôt
+
+<p align="center" href="https://raw.githubusercontent.com/comejv/uni-projects/main/diagram.svg">
+<kbd>
+<img src="./diagram.svg" alt="A diagram of this repository" width="70%">
+</kbd>
+</p>
+
+***
+
 ## INF101 ![](https://img.shields.io/badge/-python-blue)
 
 > Méthodes informatiques et techniques de programmation

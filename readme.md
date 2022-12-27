@@ -1,8 +1,8 @@
 <p align="center">
-<img src="https://img.shields.io/github/languages/count/comejv/utils-and-games" alt="GitHub language count">
-<img src ="https://img.shields.io/github/languages/top/comejv/utils-and-games" alt="GitHub top language">
-<img src="https://img.shields.io/github/repo-size/comejv/utils-and-games" alt="GitHub repo size">
-<img src ="https://img.shields.io/github/last-commit/comejv/utils-and-games" alt="GitHub last commit">
+<img src="https://img.shields.io/github/languages/count/comejv/uni-projects" alt="GitHub language count">
+<img src ="https://img.shields.io/github/languages/top/comejv/uni-projects" alt="GitHub top language">
+<img src="https://img.shields.io/github/repo-size/comejv/uni-projects" alt="GitHub repo size">
+<img src ="https://img.shields.io/github/last-commit/comejv/uni-projects" alt="GitHub last commit">
 </p>
 
 # Projets universitaires

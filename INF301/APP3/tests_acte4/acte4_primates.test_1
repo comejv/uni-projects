@@ -1,0 +1,37 @@
+tests/primates.test
+ecailles
+1
+Mus_musculus 
+possible
+10
+10
+10
+Pongo_abelii
+0
+Homo_sapiens
+1
+car_6 
+Pan_troglodytes
+2
+car_6 car_8 
+Gorilla_gorilla
+2
+car_6 car_7 
+Nomascus_leucogenys
+1
+car_5 
+Papio_hamadryas
+1
+car_4 
+Macaca_mulatta
+2
+car_4 car_9 
+Callithrix_jacchus
+1
+car_3 
+Otolemur_garnettii
+1
+car_2 
+Mus_musculus
+2
+car_1 ecailles 

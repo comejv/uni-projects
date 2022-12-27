@@ -1,0 +1,29 @@
+tests/arbre-simple.test
+ailes
+7
+limace lamproie carpe grenouille crocodile autruche chat 
+possible
+7
+7
+7
+limace
+1
+ailes 
+lamproie
+2
+ailes vertebres 
+carpe
+3
+ailes vertebres machoires 
+grenouille
+4
+ailes vertebres machoires doigts 
+crocodile
+5
+ailes vertebres machoires doigts amnios 
+autruche
+6
+ailes vertebres machoires doigts amnios plumes 
+chat
+6
+ailes vertebres machoires doigts amnios placenta 

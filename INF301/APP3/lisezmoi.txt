@@ -1,0 +1,192 @@
+Recommandations sur l'utilisation des fichiers pour l'APP3.
+A lire absolument !
+
+
+****************************************************************
+**  Pour tout le monde                                        **
+****************************************************************
+
+Renseignez ici les noms des membres de votre binôme :
+
+Nom1 - prénom1 : Emile GUILLAUME
+Nom2 - prénom2 : Côme VINCENT
+
+Si vous avez des commentaires, remarques etc. pour le rendu, vous pouvez les 
+mettre ici:
+
+
+
+
+
+***** Makefile *****
+Nous avons ajouté trois fonctions :
+  - clean : supprime les fichiers objets intermédiaires
+  - clear : clean et supprime les fichiers exécutables
+  - afficher : transforme le fichier "arbre.dot" en image svg
+
+***** Tests *****
+Les tests de l'acte II finissent sur un échec car nous avons ajouté un test
+pour trouver l'exercice caché d'appolab. Sans ce test l'acte est réussi.
+
+***** Acte V *****
+Un (petit) jeu de test a été créé. Il est possible de le lancer avec :
+$ make tests_acte5
+ou un par un avec :
+$ ./acte5 tests_acte5/....test_n
+
+***** Complexité *****
+- Acte I
+  - analyse_arbre : récursif, appelle analyse_arbre_rec une fois pour chaque noeud de l'arbre
+    donc one complexité en O(n)
+- Acte II
+  - rechercher_espece : parcours préfixe de l'arbre jusqu'à trouver l'éspèce. Qaund on rentre
+    dans la branche de droite on ajoute la caracteristiques à la liste chainée (sur la tete)
+    donc cout constant, au maximum on a donc 1*n => O(n)
+- Acte III
+  - ajouter_espece impératif : boucle while sur la sequence de caracteristiques, puis parcours
+    jusqu'à la première feuille de l'arbre. On aura donc n = profondeur de la branche dans
+    laquelle on ajoute l'espèce et une complexité en O(n)
+  - ajout_espece récursif : implémentation différente mais même principe donc O(n) aussi
+- Acte IIIb
+  - afficher_par_niveau : boucle while sur une pile qui contiendra une fois chaque élément de
+    l'arbre donc O(n) avec n = nombre de noeuds de l'arbre
+- Acte IV
+  - On utilise ici un parcours préfixe sur l'arbre et une parcours de la sequence, mais la seq
+    a habituellement une taille négligeable p/r à l'arbre donc complexité en O(n) avec
+    n = nombre de noeuds de l'arbre
+
+
+
+
+
+Travail à effectuer:
+====================
+
+Pour commencer l'acte I, implémenter la recherche du nombre d'espèces et de
+caractéristiques d'un arbre, à modifier dans le fichier arbresphylo.{c,py}.
+
+Pour les actes suivants, vous aurez également à modifier le programme
+principal (main.{c,py}), ce qui vous permettra de tester par vous même vos
+fonctions.
+
+Nous vous fournissons également des programmes automatiques pour tester vos
+fonctions.  Pour chacune des fonctions des différents actes, il est important
+de respecter la spécification demandée pour pouvoir passer les suites de tests.
+
+Nous vous fournissons des suites de tests pour les actes I, II et III et IV.
+La façon de tester dépend du langage de programmation utilisé.
+
+POUR L'ACTE IV: Notez que pour l'acte IV, on considère qu'il n'est pas possible
+d'insérer une caractéristique à un arbre vide, ni d'insérer une caractéristique
+qui n'est possédée par aucune espèce déjà présente dans l'arbre (pour ce
+cas-là, ajout_espece fait l'affaire). Ceci permet d'éviter d'avoir à ajouter
+des noeuds caractéristique sans enfant qui seraient confondues avec des
+espèces/feuilles.
+
+Par contre, vous êtes responsables de tester et fournir vous même quelques 
+tests pour l'acte V pour le rendu.
+
+
+Tester votre implémentation en C:
+=================================
+
+Vous trouverez dans le répertoire tests/ des fichiers vous permettant de
+tester par vous-même vos fonctions en exécutant votre programme principal, par 
+exemple ainsi :
+
+> ./main tests/arbre-simple.test
+
+Plusieurs programmes de test sont également fournis:
+    acte1.c, acte2.c, acte3.c, acte3b.c et acte4.c
+Ceux-ci ne doivent **pas** être modifiés.
+Ils sont compilés automatiquement avec la commande 'make' et utilisent les 
+fonctions déclarées dans les fichiers .h et remplies dans les .c
+Ils utilisent pour leurs tests les répertoires tests_acte1, etc. correspondants.
+
+
+Pour tester l'acte I vous pouvez ainsi :
+- soit déclencher l'ensemble des tests :
+  > make tests_acte1
+
+- soit lancer manuellement un des tests ainsi (par exemple pendant le debug 
+  d'un test en particulier) :
+  > ./acte1 tests_acte1/acte1_arbre-simple.test
+
+Les actes II, III-A, III-B et IV se testent de la même manière.
+Pour information, le format des fichiers de tests est décrit en fin de ce 
+fichier.
+
+
+
+
+
+Description des formats des fichiers de test
+============================================
+
+Format des tests de l'acte I :
+------------------------------
+
+Nom du fichier arbre
+nombre d'especes
+nombre de caracteristiques
+
+
+Format des tests de l'acte II :
+-------------------------------
+
+Nom du fichier arbre
+nom de l'espece à chercher
+"present" ou "absent" selon que l'espece est presente ou pas
+Si espece presente :
+le nombre de caractéristiques
+Les caractéristiques de l'espèce (sur une seule ligne, séparées par un seul espace)
+
+
+Format des tests de l'acte III-A :
+----------------------------------
+
+Nom du fichier arbre
+Nom espèce à ajouter
+Nombre de caractéristiques de l'espèce à ajouter
+"possible" si l'insertion est légale, impossible sinon
+ -- série de tests sur l'arbre après insertion
+ Nombre espèces dans l'arbre
+ Nombre caractéristiques de l'arbre
+ Nombre espèces à tester (peut être moins que le nombre d'espèces total)
+ -- Pour chaque espèce
+ Nom espèce
+ Nombre caractéristiques de l'espèce
+ Liste caractéristiques (sur une seule ligne, séparées par un seul espace)
+
+
+Format des tests de l'acte III-B :
+----------------------------------
+
+Nom du fichier arbre
+Liste des caractéristiques au niveau 1 (sur une seule ligne, séparées par un seul espace)
+Liste des caractéristiques au niveau 2
+Liste des caractéristiques au niveau 3
+...
+
+
+
+Format des tests de l'acte IV :
+-------------------------------
+
+Nom du fichier arbre
+Nom de la caractéristique à ajouter
+Nombre d'espèces possédant ces caractéristiques
+Liste des espèces qui possèdent cette caractéristique
+"possible" si l'insertion est légale, impossible sinon
+ -- série de tests sur l'arbre après insertion
+ Nombre espèces dans l'arbre
+ Nombre caractéristiques de l'arbre
+ Nombre espèces à tester (peut être moins que le nombre d'espèces total)
+ -- Pour chaque espèce
+ Nom espèce
+ Nombre caractéristiques de l'espèce
+ Liste caractéristiques (sur une seule ligne, séparées par un seul espace)
+
+
+
+

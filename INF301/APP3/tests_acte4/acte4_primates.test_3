@@ -1,0 +1,38 @@
+tests/primates.test
+venin
+10
+Pongo_abelii Homo_sapiens Pan_troglodytes Gorilla_gorilla Nomascus_leucogenys Papio_hamadryas Macaca_mulatta Callithrix_jacchus Otolemur_garnettii Mus_musculus 
+possible
+10
+10
+10
+Pongo_abelii
+1
+venin 
+Homo_sapiens
+2
+venin car_6 
+Pan_troglodytes
+3
+venin car_6 car_8 
+Gorilla_gorilla
+3
+venin car_6 car_7 
+Nomascus_leucogenys
+2
+venin car_5 
+Papio_hamadryas
+2
+venin car_4 
+Macaca_mulatta
+3
+venin car_4 car_9 
+Callithrix_jacchus
+2
+venin car_3 
+Otolemur_garnettii
+2
+venin car_2 
+Mus_musculus
+2
+venin car_1 

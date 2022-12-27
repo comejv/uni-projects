@@ -1,0 +1,40 @@
+tests/primates.test
+sphinx
+6
+car_4 car_9 ecailles corne ailes tirebouchon 
+possible
+11
+13
+11
+Pongo_abelii
+0
+Homo_sapiens
+1
+car_6 
+Pan_troglodytes
+2
+car_6 car_8 
+Gorilla_gorilla
+2
+car_6 car_7 
+Nomascus_leucogenys
+1
+car_5 
+Papio_hamadryas
+1
+car_4 
+Macaca_mulatta
+2
+car_4 car_9 
+sphinx
+6
+car_4 car_9 ecailles corne ailes tirebouchon 
+Callithrix_jacchus
+1
+car_3 
+Otolemur_garnettii
+1
+car_2 
+Mus_musculus
+1
+car_1 

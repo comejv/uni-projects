@@ -5,11 +5,6 @@ from numpy import array, argmax, resize
 import onnxruntime
 
 
-def ask_for_image() -> str:
-    print('Please enter the path to the image you want to process:')
-    return input()
-
-
 def preprocess_image(img: cv.Mat) -> cv.Mat:
     # Convert to grayscale then to binary
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -71,18 +66,22 @@ def digit_ocr(source_img: cv.Mat, model="data/mnist_model/mnist-8.onnx") -> int:
 
 if __name__ == '__main__':
     if len(argv) != 2:
-        im_path = ask_for_image()
+        im_path = print(
+            'Please enter the path to the image you want to process:')
     else:
         im_path = argv[1]
 
+    # Read and show original image
     img = cv.imread(im_path)
 
     cv.imshow("Original", img)
     cv.waitKey(2000)
 
+    # Preprocess image and get islands contours
     img = preprocess_image(img)
     islands = get_island_contours(img)
 
+    # Get patches of numbers inside islands
     patches = get_inscribed_rectangle(img, islands)
 
     for i, patch in enumerate(patches):

@@ -66,6 +66,8 @@ Note : certains projets sont stockés dans un dépôt séparé : [utils-and-game
 
 [INF304](INF304/) fait suite à [INF301/APP2](INF301/APP2/) en abordant la génération de terrains et le test de l'intépreteur.
 
+***
+
 ## INF402 ![](https://img.shields.io/badge/-python-blue)
 
 > Introduction à la logique

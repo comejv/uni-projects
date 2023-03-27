@@ -5,6 +5,26 @@ from numpy import array, argmax, resize
 import onnxruntime
 
 
+class Ile:
+    def __init__(self, x, y, w):
+        self.x: int = x
+        self.y: int = y
+        self.weight: int = w
+        self.neighbours: list[Ile] = []
+
+    def __repr__(self) -> str:
+        return f"Ile([{self.x}, {self.y}] : {self.weight})"
+
+    def __eq__(self, other) -> bool:
+        return self.x == other.x and self.y == other.y
+
+    def add_neighbour(self, neighbour):
+        if neighbour not in self.neighbours and neighbour != self and type(neighbour) == Ile:
+            self.neighbours.append(neighbour)
+        else:
+            print("Error: Neighbour not added")
+
+
 def preprocess_image(img: cv.Mat) -> cv.Mat:
     # Convert to grayscale then to binary
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -88,8 +108,9 @@ def digit_ocr(source_img: cv.Mat,
 
 
 def draw_bridges(img: cv.Mat,
-                 islands: list[tuple[tuple[int, int], int]],
-                 bridges: list[tuple[int, int]]) -> cv.Mat:
+                 ile1: Ile,
+                 ile2: Ile,
+                 col=(0, 0, 255)) -> cv.Mat:
     """Draw bridges on an image.
 
     Args:
@@ -100,26 +121,23 @@ def draw_bridges(img: cv.Mat,
     Returns:
         cv.Mat: OpenCV matrice of the image with bridges drawn.
     """
-    for bridge in bridges:
-        start = tuple(map(int, islands[bridge[0]][0]))
-        end = tuple(map(int, islands[bridge[1]][0]))
-        cv.line(img, start, end, (0, 0, 255), 2)
+    start = (int(ile1.x), int(ile1.y))
+    end = (int(ile2.x), int(ile2.y))
+    cv.line(img, start, end, col, 2)
 
     return img
 
 
-if __name__ == '__main__':
-    if len(argv) != 2:
-        im_path = print(
-            'Please enter the path to the image you want to process:')
-    else:
-        im_path = argv[1]
+def create_islands(img: cv.Mat) -> list[Ile]:
+    """Create a list of Ile objects from an image.
 
-    # Read and show original image
-    img = cv.imread(im_path)
+    Args:
+        img (cv.Mat): OpenCV matrice of an image. Image is not altered.
 
-    cv.imshow("Original", img)
-    cv.waitKey(2000)
+    Returns:
+        list[Ile]: list of Ile objects.
+    """
+    iles = []
 
     # Preprocess image and get islands contours
     imbinary = preprocess_image(img)
@@ -128,13 +146,36 @@ if __name__ == '__main__':
     # Get patches of numbers inside islands
     patches = get_inscribed_rectangle(imbinary, islands)
 
+    # Find edge width
+    edge_width = min(min([island[0][1] for island in islands]),
+                     min([island[0][0] for island in islands])) - islands[0][1]
+
+    # Find average column width
+    y_pos = [island[0][1] for island in islands]
+    spacing = int(min([abs(y1-y2) for y1 in y_pos for y2 in y_pos if abs(y1 - y2) > .5]))
+
+    # Create Ile objects
     for i, patch in enumerate(patches):
-        cv.imshow("Number", patch)
-        print(digit_ocr(patch), islands[i][0])
-        cv.waitKey(10000)
+        x = int((islands[i][0][1] - edge_width)/spacing)
+        y = int((islands[i][0][0] - edge_width)/spacing)
+        iles.append(Ile(x, y, digit_ocr(patch)))
 
-    bridges = [(0, 1), (2, 3), (4, 5)]
-    imbridges = draw_bridges(img, islands, bridges)
+    # Sort islands by position (top to bottom, left to right)
+    iles.sort(key=lambda x: (x.x, x.y))
 
-    cv.imshow("Bridges", imbridges)
-    cv.waitKey(10000)
+    return iles
+
+
+if __name__ == '__main__':
+    if len(argv) != 2:
+        impath = print(
+            'Please enter the path to the image you want to process:')
+    else:
+        impath = argv[1]
+
+    # Read original image
+    img = cv.imread(impath)
+
+    iles = create_islands(img)
+
+    print(*iles, sep='\n')

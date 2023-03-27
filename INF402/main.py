@@ -13,7 +13,7 @@ def preprocess_image(img: cv.Mat) -> cv.Mat:
     return binary_img
 
 
-def get_island_contours(img: cv.Mat) -> list[tuple[int, int], int]:
+def get_enclosing_circles(img: cv.Mat) -> list[tuple[int, int], int]:
     """For every external contour, find the enclosing circle.
 
     Args:
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     # Preprocess image and get islands contours
     img = preprocess_image(img)
-    islands = get_island_contours(img)
+    islands = get_enclosing_circles(img)
 
     # Get patches of numbers inside islands
     patches = get_inscribed_rectangle(img, islands)

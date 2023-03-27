@@ -12,15 +12,15 @@ def fatal(msg: str):
     exit(1)
 
 
-class Ile:
-    def __init__(self, x, y, w):
+class Node:
+    def __init__(self, x, y, v):
         self.x: int = x
         self.y: int = y
-        self.weight: int = w
-        self.neighbours: list[Ile] = []
+        self.value: int = v
+        self.neighbours: list[Node] = []
 
     def __repr__(self) -> str:
-        return f"Ile([{self.x}, {self.y}] : {self.weight})"
+        return f"Node([{self.x}, {self.y}] : {self.value})"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
@@ -28,16 +28,16 @@ class Ile:
         return self.x == other.x and self.y == other.y
 
     def add_neighbour(self, neighbour):
-        if neighbour not in self.neighbours and neighbour != self and type(neighbour) == Ile:
+        if neighbour not in self.neighbours and neighbour != self and type(neighbour) == Node:
             self.neighbours.append(neighbour)
         else:
             raise ValueError("Neighbour not added")
 
 
-def find_ile(x: int, y: int, iles: list[Ile]) -> Ile or None:
-    for ile in iles:
-        if ile.x == x and ile.y == y:
-            return ile
+def find_node(x: int, y: int, nodes: list[Node]) -> Node or None:
+    for node in nodes:
+        if node.x == x and node.y == y:
+            return node
 
     return None
 
@@ -67,26 +67,26 @@ def get_enclosing_circles(img: cv.Mat) -> list[tuple[tuple[int, int], int]]:
     polygons = [cv.approxPolyDP(cnt, 0.01*cv.arcLength(cnt, True), True)
                 for cnt in clean_contours]
 
-    # Get islands center position
+    # Get circles center position
     return [cv.minEnclosingCircle(polygon) for polygon in polygons]
 
 
 def get_inscribed_rectangles(img: cv.Mat,
-                             islands: list[tuple[tuple[int, int], int]]) -> list[cv.Mat]:
-    """Get a rectangle inscribed in the enclosing circle of each island.
+                             circles: list[tuple[tuple[int, int], int]]) -> list[cv.Mat]:
+    """Get a rectangle inscribed in each circle.
 
     Args:
         img (cv.Mat): OpenCV matrice of an image. Image is not altered.
-        islands (list[tuple[int, int], int]): list of (x, y) position of each circle's center
+        circles (list[tuple[int, int], int]): list of (x, y) position of each circle's center
         and its radius.
 
     Returns:
         list[cv.Mat]: list of OpenCV image matrice of each rectangle.
     """
     patches = []
-    for island in islands:
-        x, y = int(island[0][0]), int(island[0][1])
-        length = int(1.1 * island[1])
+    for c in circles:
+        x, y = int(c[0][0]), int(c[0][1])
+        length = int(1.1 * c[1])
         rect = cv.getRectSubPix(img, (length, length), (x, y))
         patches.append(rect)
 
@@ -124,96 +124,98 @@ def digit_ocr(source_img: cv.Mat,
     return int(argmax(array(result).squeeze(), axis=0))
 
 
-def find_neighbours(iles: list[Ile], n_col: int):
-    """Find the neighbours of each island.
+def find_neighbours(nodes: list[Node], n_col: int):
+    """Find the neighbours of each node.
 
     Args:
-        iles (list[Ile]): list of Ile objects.
+        nodes (list[Node]): list of node objects.
     """
-    for ile in iles:
-        x1, x2, y1, y2 = ile.x, ile.x, ile.y, ile.y
+    for node in nodes:
+        x1, x2, y1, y2 = node.x, node.x, node.y, node.y
 
         while any([x1 > 0, x2 < n_col, y1 > 0, y2 < n_col]):
             x1, x2, y1, y2 = x1-1, x2+1, y1-1, y2+1
-            up = find_ile(x1, ile.y, iles) if x1 >= 0 else None
-            down = find_ile(x2, ile.y, iles) if x2 <= n_col else None
-            left = find_ile(ile.x, y1, iles) if y1 >= 0 else None
-            right = find_ile(ile.x, y2, iles) if y2 <= n_col else None
+            up = find_node(x1, node.y, nodes) if x1 >= 0 else None
+            down = find_node(x2, node.y, nodes) if x2 <= n_col else None
+            left = find_node(node.x, y1, nodes) if y1 >= 0 else None
+            right = find_node(node.x, y2, nodes) if y2 <= n_col else None
 
             if up:
-                ile.add_neighbour(up)
+                node.add_neighbour(up)
                 x1 = -1
             if down:
-                ile.add_neighbour(down)
+                node.add_neighbour(down)
                 x2 = n_col + 1
             if left:
-                ile.add_neighbour(left)
+                node.add_neighbour(left)
                 y1 = -1
             if right:
-                ile.add_neighbour(right)
+                node.add_neighbour(right)
                 y2 = n_col + 1
 
-    return iles
+    return nodes
 
 
-def create_islands(img: cv.Mat) -> list[Ile]:
-    """Create a list of Ile objects from an image.
+def create_nodes(img: cv.Mat) -> list[Node]:
+    """Create a list of node objects from an image.
 
     Args:
         img (cv.Mat): OpenCV matrice of an image. Image is not altered.
 
     Returns:
-        list[Ile]: list of Ile objects.
+        list[Node]: list of node objects.
     """
-    iles = []
+    nodes_list = []
 
-    # Preprocess image and get islands contours
+    # Preprocess image and get nodes contours
     imbinary = preprocess_image(img)
-    islands = get_enclosing_circles(imbinary)
+    circles = get_enclosing_circles(imbinary)
 
-    # Get patches of numbers inside islands
-    patches = get_inscribed_rectangles(imbinary, islands)
+    # Get patches of numbers inside circles
+    patches = get_inscribed_rectangles(imbinary, circles)
 
-    # Find edge width
-    edge_width = min(min([island[0][1] for island in islands]),
-                     min([island[0][0] for island in islands])) - islands[0][1]
+    # Find img's minimum edge width (smallest circle coordinates - circle radius)
+    edge_width = min(min([c[0][1] for c in circles]),
+                     min([c[0][0] for c in circles])) - circles[0][1]
 
-    # Find average column width
-    y_pos = [island[0][1] for island in islands]
+    # Find minimum column width (smallest distance between two nodes)
+    y_pos = [c[0][1] for c in circles]
     spacing = int(min([abs(y1-y2)
                   for y1 in y_pos for y2 in y_pos if abs(y1 - y2) > .5]))
 
-    # Create Ile objects
+    # Create node objects, find their relative position in the grid and value
     for i, patch in enumerate(patches):
-        x = int((islands[i][0][1] - edge_width)/spacing)
-        y = int((islands[i][0][0] - edge_width)/spacing)
-        iles.append(Ile(x, y, digit_ocr(patch)))
+        x = int((circles[i][0][1] - edge_width)/spacing)
+        y = int((circles[i][0][0] - edge_width)/spacing)
+        nodes_list.append(Node(x, y, digit_ocr(patch)))
 
     # Find neighbours
-    find_neighbours(iles, int((img.shape[0] - 2*edge_width)/spacing))
+    find_neighbours(nodes_list, int((img.shape[0] - 2*edge_width)/spacing))
 
-    # Sort islands by position (top to bottom, left to right)
-    iles.sort(key=lambda x: (x.x, x.y))
+    # Sort nodes by position (top to bottom, left to right)
+    nodes_list.sort(key=lambda x: (x.x, x.y))
 
-    return iles
+    return nodes_list
 
 
 def draw_bridges(img: cv.Mat,
-                 ile1: Ile,
-                 ile2: Ile,
+                 node1: Node,
+                 node2: Node,
                  col=(0, 0, 255)) -> cv.Mat:
     """Draw bridges on an image.
 
     Args:
         img (cv.Mat): OpenCV matrice of an image. Image is not altered.
         bridges (list[tuple[int, int]]): list of (n, m) index of each bridge's
-        start and end island.
+        start and end node.
 
     Returns:
         cv.Mat: OpenCV matrice of the image with bridges drawn.
     """
-    start = (int(ile1.x), int(ile1.y))
-    end = (int(ile2.x), int(ile2.y))
+    if node1 not in node2.neighbours:
+        return img
+    start = (int(node1.x), int(node1.y))
+    end = (int(node2.x), int(node2.y))
     cv.line(img, start, end, col, 2)
 
     return img
@@ -234,7 +236,7 @@ if __name__ == '__main__':
     # Read original image
     img = cv.imread(impath)
 
-    iles = create_islands(img)
+    nodes = create_nodes(img)
 
-    for ile in iles:
-        print(ile, ile.neighbours)
+    for node in nodes:
+        print(node, node.neighbours)

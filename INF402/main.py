@@ -13,14 +13,15 @@ def preprocess_image(img: cv.Mat) -> cv.Mat:
     return binary_img
 
 
-def get_enclosing_circles(img: cv.Mat) -> list[tuple[int, int], int]:
+def get_enclosing_circles(img: cv.Mat) -> list[tuple[tuple[int, int], int]]:
     """For every external contour, find the enclosing circle.
 
     Args:
         img (cv.Mat): OpenCV matrice of an image. Image is not altered.
 
     Returns:
-        list[tuple(int, int), int]: list of (x, y) position of each center and its radius.
+        list[tuple(int, int), int]: list of (x, y) position of each circle's center
+        and its radius.
     """
     # Find contours
     contours, hierarchy = cv.findContours(
@@ -29,11 +30,22 @@ def get_enclosing_circles(img: cv.Mat) -> list[tuple[int, int], int]:
     polygons = [cv.approxPolyDP(cnt, 0.01*cv.arcLength(cnt, True), True)
                 for cnt in clean_contours]
 
-    # Get islands centroids (position)
+    # Get islands center position
     return [cv.minEnclosingCircle(polygon) for polygon in polygons]
 
 
-def get_inscribed_rectangle(img: cv.Mat, islands: list[tuple[int, int], int]) -> list[cv.Mat]:
+def get_inscribed_rectangle(img: cv.Mat,
+                            islands: list[tuple[tuple[int, int], int]]) -> list[cv.Mat]:
+    """Get a rectangle inscribed in the enclosing circle of each island.
+
+    Args:
+        img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        islands (list[tuple[int, int], int]): list of (x, y) position of each circle's center
+        and its radius.
+
+    Returns:
+        list[cv.Mat]: list of OpenCV image matrice of each rectangle.
+    """
     patches = []
     for island in islands:
         x, y = int(island[0][0]), int(island[0][1])
@@ -44,7 +56,18 @@ def get_inscribed_rectangle(img: cv.Mat, islands: list[tuple[int, int], int]) ->
     return patches
 
 
-def digit_ocr(source_img: cv.Mat, model="data/mnist_model/mnist-8.onnx") -> int:
+def digit_ocr(source_img: cv.Mat,
+              model="data/mnist_model/mnist-8.onnx") -> int:
+    """Perform digit OCR on a single image.
+
+    Args:
+        source_img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        model (str, optional): Path to an onnx model. Model must have input of (1x1x28x28)
+        and output of (1x10). Defaults to "data/mnist_model/mnist-8.onnx".
+
+    Returns:
+        int: The digit recognized by the model.
+    """
     # Resize image
     img = cv.resize(source_img, dsize=(28, 28),
                     interpolation=cv.INTER_AREA)
@@ -64,6 +87,27 @@ def digit_ocr(source_img: cv.Mat, model="data/mnist_model/mnist-8.onnx") -> int:
     return int(argmax(array(result).squeeze(), axis=0))
 
 
+def draw_bridges(img: cv.Mat,
+                 islands: list[tuple[tuple[int, int], int]],
+                 bridges: list[tuple[int, int]]) -> cv.Mat:
+    """Draw bridges on an image.
+
+    Args:
+        img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        bridges (list[tuple[int, int]]): list of (n, m) index of each bridge's
+        start and end island.
+
+    Returns:
+        cv.Mat: OpenCV matrice of the image with bridges drawn.
+    """
+    for bridge in bridges:
+        start = tuple(map(int, islands[bridge[0]][0]))
+        end = tuple(map(int, islands[bridge[1]][0]))
+        cv.line(img, start, end, (0, 0, 255), 2)
+
+    return img
+
+
 if __name__ == '__main__':
     if len(argv) != 2:
         im_path = print(
@@ -78,13 +122,19 @@ if __name__ == '__main__':
     cv.waitKey(2000)
 
     # Preprocess image and get islands contours
-    img = preprocess_image(img)
-    islands = get_enclosing_circles(img)
+    imbinary = preprocess_image(img)
+    islands = get_enclosing_circles(imbinary)
 
     # Get patches of numbers inside islands
-    patches = get_inscribed_rectangle(img, islands)
+    patches = get_inscribed_rectangle(imbinary, islands)
 
     for i, patch in enumerate(patches):
         cv.imshow("Number", patch)
         print(digit_ocr(patch), islands[i][0])
         cv.waitKey(10000)
+
+    bridges = [(0, 1), (2, 3), (4, 5)]
+    imbridges = draw_bridges(img, islands, bridges)
+
+    cv.imshow("Bridges", imbridges)
+    cv.waitKey(10000)

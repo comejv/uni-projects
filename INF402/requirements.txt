@@ -1,3 +1,7 @@
 numpy>=1.24.2
 onnxruntime>=1.14.1
 opencv-python>=4.7.0.72
+py-aiger>=6.2.0
+py-aiger-cnf>=5.0.7
+pypblib>=0.0.4
+python-sat>=0.1.8.dev2

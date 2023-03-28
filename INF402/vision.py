@@ -2,7 +2,7 @@ import json
 from os.path import isfile
 from sys import argv
 
-import cv2 as cv
+import cv2
 import onnxruntime
 from numpy import argmax, array, resize
 
@@ -14,9 +14,9 @@ def fatal(msg: str):
 
 class Node:
     def __init__(self, x, y, v):
-        self.x: int = x
-        self.y: int = y
-        self.value: int = v
+        self.x: int = int(x)
+        self.y: int = int(y)
+        self.value: int = int(v)
         self.neighbours: list[Node] = []
 
     def __repr__(self) -> str:
@@ -42,63 +42,63 @@ def find_node(x: int, y: int, nodes: list[Node]) -> Node or None:
     return None
 
 
-def preprocess_image(img: cv.Mat) -> cv.Mat:
+def preprocess_image(img: cv2.Mat) -> cv2.Mat:
     # Convert to grayscale then to binary
-    gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    _, binary_img = cv.threshold(gray_img, 127, 255, cv.THRESH_BINARY_INV)
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary_img = cv2.threshold(gray_img, 127, 255, cv2.THRESH_BINARY_INV)
 
     return binary_img
 
 
-def get_enclosing_circles(img: cv.Mat) -> list[tuple[tuple[int, int], int]]:
+def get_enclosing_circles(img: cv2.Mat) -> list[tuple[tuple[int, int], int]]:
     """For every external contour, find the enclosing circle.
 
     Args:
-        img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
 
     Returns:
         list[tuple(int, int), int]: list of (x, y) position of each circle's center
         and its radius.
     """
     # Find contours
-    contours, hierarchy = cv.findContours(
-        img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    clean_contours = [cnt for cnt in contours if cv.contourArea(cnt) > 50]
-    polygons = [cv.approxPolyDP(cnt, 0.01*cv.arcLength(cnt, True), True)
+    contours, hierarchy = cv2.findContours(
+        img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    clean_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > 50]
+    polygons = [cv2.approxPolyDP(cnt, 0.01*cv2.arcLength(cnt, True), True)
                 for cnt in clean_contours]
 
     # Get circles center position
-    return [cv.minEnclosingCircle(polygon) for polygon in polygons]
+    return [cv2.minEnclosingCircle(polygon) for polygon in polygons]
 
 
-def get_inscribed_rectangles(img: cv.Mat,
-                             circles: list[tuple[tuple[int, int], int]]) -> list[cv.Mat]:
+def get_inscribed_rectangles(img: cv2.Mat,
+                             circles: list[tuple[tuple[int, int], int]]) -> list[cv2.Mat]:
     """Get a rectangle inscribed in each circle.
 
     Args:
-        img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
         circles (list[tuple[int, int], int]): list of (x, y) position of each circle's center
         and its radius.
 
     Returns:
-        list[cv.Mat]: list of OpenCV image matrice of each rectangle.
+        list[cv2.Mat]: list of OpenCV image matrice of each rectangle.
     """
     patches = []
     for c in circles:
         x, y = int(c[0][0]), int(c[0][1])
         length = int(1.1 * c[1])
-        rect = cv.getRectSubPix(img, (length, length), (x, y))
+        rect = cv2.getRectSubPix(img, (length, length), (x, y))
         patches.append(rect)
 
     return patches
 
 
-def digit_ocr(source_img: cv.Mat,
+def digit_ocr(source_img: cv2.Mat,
               model="data/mnist_model/mnist-8.onnx") -> int:
     """Perform digit OCR on a single image.
 
     Args:
-        source_img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        source_img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
         model (str, optional): Path to an onnx model. Model must have input of (1x1x28x28)
         and output of (1x10). Defaults to "data/mnist_model/mnist-8.onnx".
 
@@ -106,8 +106,8 @@ def digit_ocr(source_img: cv.Mat,
         int: The digit recognized by the model.
     """
     # Resize image
-    img = cv.resize(source_img, dsize=(28, 28),
-                    interpolation=cv.INTER_AREA)
+    img = cv2.resize(source_img, dsize=(28, 28),
+                     interpolation=cv2.INTER_AREA)
     img = resize(img, (1, 1, 28, 28))
 
     # Image to readable input
@@ -156,11 +156,11 @@ def find_neighbours(nodes: list[Node], n_col: int):
     return nodes
 
 
-def create_nodes(img: cv.Mat) -> list[Node]:
+def create_nodes(img: cv2.Mat) -> list[Node]:
     """Create a list of node objects from an image.
 
     Args:
-        img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
 
     Returns:
         list[Node]: list of node objects.
@@ -175,8 +175,7 @@ def create_nodes(img: cv.Mat) -> list[Node]:
     patches = get_inscribed_rectangles(imbinary, circles)
 
     # Find img's minimum edge width (smallest circle coordinates - circle radius)
-    edge_width = min(min([c[0][1] for c in circles]),
-                     min([c[0][0] for c in circles])) - circles[0][1]
+    edge_width = min([min(c[0]) for c in circles]) - circles[0][1]
 
     # Find minimum column width (smallest distance between two nodes)
     y_pos = [c[0][1] for c in circles]
@@ -198,25 +197,25 @@ def create_nodes(img: cv.Mat) -> list[Node]:
     return nodes_list
 
 
-def draw_bridges(img: cv.Mat,
-                 node1: Node,
-                 node2: Node,
-                 col=(0, 0, 255)) -> cv.Mat:
+def draw_bridge(img: cv2.Mat,
+                node1: Node,
+                node2: Node,
+                col=(0, 0, 255)) -> cv2.Mat:
     """Draw bridges on an image.
 
     Args:
-        img (cv.Mat): OpenCV matrice of an image. Image is not altered.
+        img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
         bridges (list[tuple[int, int]]): list of (n, m) index of each bridge's
         start and end node.
 
     Returns:
-        cv.Mat: OpenCV matrice of the image with bridges drawn.
+        cv2.Mat: OpenCV matrice of the image with bridges drawn.
     """
     if node1 not in node2.neighbours:
         return img
-    start = (int(node1.x), int(node1.y))
-    end = (int(node2.x), int(node2.y))
-    cv.line(img, start, end, col, 2)
+    start = (node1.x, node1.y)
+    end = (node2.x, node2.y)
+    cv2.line(img, start, end, col, 2)
 
     return img
 
@@ -234,7 +233,7 @@ if __name__ == '__main__':
             fatal("Path is not a file or doesn't exist. Please enter a valid path.")
 
     # Read original image
-    img = cv.imread(impath)
+    img = cv2.imread(impath)
 
     nodes = create_nodes(img)
 

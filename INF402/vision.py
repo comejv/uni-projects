@@ -13,19 +13,20 @@ def fatal(msg: str):
 
 
 class Node:
-    def __init__(self, x, y, v):
+    def __init__(self, id, x, y, v):
+        self.id: int = id
         self.x: int = int(x)
         self.y: int = int(y)
         self.value: int = int(v)
         self.neighbours: list[Node] = []
 
     def __repr__(self) -> str:
-        return f"Node([{self.x}, {self.y}] : {self.value})"
+        return f"Node({self.id} : [{self.x}, {self.y}], {self.value})"
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.x == other.x and self.y == other.y
+        return self.x == other.x and self.y == other.y and self.id == other.id
 
     def add_neighbour(self, neighbour):
         if neighbour not in self.neighbours and neighbour != self and type(neighbour) == Node:
@@ -50,15 +51,17 @@ def preprocess_image(img: cv2.Mat) -> cv2.Mat:
     return binary_img
 
 
-def get_enclosing_circles(img: cv2.Mat) -> list[tuple[tuple[int, int], int]]:
+def get_enclosing_circles(img: cv2.Mat) -> list[tuple[int, int]]:
     """For every external contour, find the enclosing circle.
 
     Args:
         img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
 
     Returns:
-        list[tuple(int, int), int]: list of (x, y) position of each circle's center
-        and its radius.
+        list[tuple(int, int)]: list of (x, y) position of each circle's center.
+
+    Global variables:
+        radius (int): mean radius of the enclosing circles.
     """
     # Find contours
     contours, hierarchy = cv2.findContours(
@@ -68,7 +71,11 @@ def get_enclosing_circles(img: cv2.Mat) -> list[tuple[tuple[int, int], int]]:
                 for cnt in clean_contours]
 
     # Get circles center position
-    return [cv2.minEnclosingCircle(polygon) for polygon in polygons]
+    circles = [cv2.minEnclosingCircle(polygon) for polygon in polygons]
+    global radius  # radius is used in draw_bridges() and get_inscribed_rectangles()
+    radius = sum(c[1] for c in circles)/len(circles)
+
+    return [c[0] for c in circles]
 
 
 def get_inscribed_rectangles(img: cv2.Mat,
@@ -85,8 +92,8 @@ def get_inscribed_rectangles(img: cv2.Mat,
     """
     patches = []
     for c in circles:
-        x, y = int(c[0][0]), int(c[0][1])
-        length = int(1.1 * c[1])
+        x, y = int(c[0]), int(c[1])
+        length = int(1.1 * radius)
         rect = cv2.getRectSubPix(img, (length, length), (x, y))
         patches.append(rect)
 
@@ -175,29 +182,33 @@ def create_nodes(img: cv2.Mat) -> list[Node]:
     patches = get_inscribed_rectangles(imbinary, circles)
 
     # Find img's minimum edge width (smallest circle coordinates - circle radius)
-    edge_width = min([min(c[0]) for c in circles]) - circles[0][1]
+    edge_width = min([min(c) for c in circles]) - radius
 
     # Find minimum column width (smallest distance between two nodes)
-    y_pos = [c[0][1] for c in circles]
+    y_pos = [c[1] for c in circles]
+    global spacing  # spacing is used in draw_bridge()
     spacing = int(min([abs(y1-y2)
                   for y1 in y_pos for y2 in y_pos if abs(y1 - y2) > .5]))
 
     # Create node objects, find their relative position in the grid and value
     for i, patch in enumerate(patches):
-        x = int((circles[i][0][1] - edge_width)/spacing)
-        y = int((circles[i][0][0] - edge_width)/spacing)
-        nodes_list.append(Node(x, y, digit_ocr(patch)))
+        x = int((circles[i][1] - edge_width)/spacing)
+        y = int((circles[i][0] - edge_width)/spacing)
+        nodes_list.append(Node(0, x, y, digit_ocr(patch)))
 
     # Find neighbours
     find_neighbours(nodes_list, int((img.shape[0] - 2*edge_width)/spacing))
 
-    # Sort nodes by position (top to bottom, left to right)
+    # Sort nodes by position (top to bottom, left to right) and assign id
     nodes_list.sort(key=lambda x: (x.x, x.y))
+    for i, node in enumerate(nodes_list):
+        node.id = i
 
     return nodes_list
 
 
 def draw_bridge(img: cv2.Mat,
+                lvl: int,
                 node1: Node,
                 node2: Node,
                 col=(0, 0, 255)) -> cv2.Mat:
@@ -205,16 +216,19 @@ def draw_bridge(img: cv2.Mat,
 
     Args:
         img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
-        bridges (list[tuple[int, int]]): list of (n, m) index of each bridge's
-        start and end node.
+        lvl (int): level of the bridge.
+        node1 (Node): first node of the bridge.
+        node2 (Node): second node of the bridge.
+        col (tuple, optional): color of the bridge. Defaults to (0, 0, 255).
 
     Returns:
         cv2.Mat: OpenCV matrice of the image with bridges drawn.
     """
     if node1 not in node2.neighbours:
         return img
-    start = (node1.x, node1.y)
-    end = (node2.x, node2.y)
+    # Take radius into account
+    start = (int(node1.y*spacing + radius), int(node1.x*spacing + radius))
+    end = (int(node2.y*spacing - radius), int(node2.x*spacing - radius))
     cv2.line(img, start, end, col, 2)
 
     return img

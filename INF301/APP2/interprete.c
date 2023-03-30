@@ -12,7 +12,7 @@
 
 
 /*
- *  Auteur(s) : EMILE GUILLAUME & 
+ *  Auteur(s) : EMILE GUILLAUME & COME VINCENT
  *  Date :
  *  Suivi des Modifications :
  *

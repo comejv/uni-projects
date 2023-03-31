@@ -318,5 +318,3 @@ if __name__ == '__main__':
 
     for node in nodes:
         print(node, node.neighbours)
-
-    write_nodes_to_text(nodes, "output.txt")

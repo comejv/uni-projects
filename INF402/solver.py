@@ -1,6 +1,6 @@
 from sys import argv
 from os.path import isfile
-from pysat.formula import CNF
+from pysat.formula import CNF, IDPool
 from pysat.solvers import Solver
 
 from vision import Node, create_nodes_from_image, create_nodes_from_text, draw_bridge, fatal
@@ -13,7 +13,7 @@ class Bridge:
         self.n2 = n2
 
     def __repr__(self) -> str:
-        return f"{self.n1} -> {self.n2}, lvl {self.lvl}"
+        return f"({self.n1} -> {self.n2}, lvl {self.lvl})"
 
 
 class Bridges:
@@ -73,6 +73,17 @@ class Bridges:
     #         self.dict[bid] = Bridge(lvl, Node(n1id), Node(n2id))
     #         self._len += 1
 
+    def from_node(self, n: Node) -> list:
+        """ Return the list of bridges connected to the node n.
+
+        Args:
+            n (Node): node to check.
+
+        Returns:
+            list: list of bridges connected to the node n.
+        """
+        return [b for b in self.dict.values() if b.n1 == n or b.n2 == n]
+
 
 def read_dimacs(filename: str) -> CNF:
     """Read a CNF formula from a DIMACS file.
@@ -125,9 +136,14 @@ if __name__ == '__main__':
     print(f"Number of bridges: {len(bridges)}")
     print(*bridges.dict.items(), sep='\n')
 
+    print("Bridges from node 0:")
+    print(*bridges.from_node(nodes[0]), sep='\n')
+
     # # SAT solver usage example
     # # create a satisfiable CNF formula "(-x1 ∨ x2) ∧ (-x1 ∨ -x2)":
     # cnf = CNF(from_clauses=[[-1, 2], [-1, -2]])
+
+    # vpool = IDPool()
 
     # # create a SAT solver for this formula:
     # with Solver(bootstrap_with=cnf) as solver:

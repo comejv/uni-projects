@@ -242,6 +242,28 @@ def create_nodes_from_text(fpath: str) -> list[Node]:
     return nodes_list
 
 
+def write_nodes_to_text(nodes: list[Node], fpath: str):
+    """Write nodes to a text file.
+
+    Args:
+        nodes (list[Node]): list of node objects.
+        fpath (str): Path to a text file.
+    """
+    ncol = max([max(node.x, node.y) for node in nodes]) + 1
+
+    # Write nodes to file
+    with open(fpath, 'w') as f:
+        for i in range(ncol):
+            for j in range(ncol):
+                node = find_node(i, j, nodes)
+                if node:
+                    f.write(str(node.value))
+                else:
+                    f.write('X')
+                f.write(' ')
+            f.write('\n')
+
+
 def draw_bridge(img: cv2.Mat,
                 lvl: int,
                 node1: Node,
@@ -296,3 +318,5 @@ if __name__ == '__main__':
 
     for node in nodes:
         print(node, node.neighbours)
+
+    write_nodes_to_text(nodes, "output.txt")

@@ -1,3 +1,4 @@
+from curses.ascii import isdigit
 import json
 from os.path import isfile
 from sys import argv
@@ -163,15 +164,18 @@ def find_neighbours(nodes: list[Node], n_col: int):
     return nodes
 
 
-def create_nodes(img: cv2.Mat) -> list[Node]:
+def create_nodes_from_image(fpath: str) -> list[Node]:
     """Create a list of node objects from an image.
 
     Args:
-        img (cv2.Mat): OpenCV matrice of an image. Image is not altered.
+        fpath (str): Path to an image.
 
     Returns:
         list[Node]: list of node objects.
     """
+    # Read image
+    img = cv2.imread(fpath)
+
     nodes_list = []
 
     # Preprocess image and get nodes contours
@@ -198,6 +202,37 @@ def create_nodes(img: cv2.Mat) -> list[Node]:
 
     # Find neighbours
     find_neighbours(nodes_list, int((img.shape[0] - 2*edge_width)/spacing))
+
+    # Sort nodes by position (top to bottom, left to right) and assign id
+    nodes_list.sort(key=lambda x: (x.x, x.y))
+    for i, node in enumerate(nodes_list):
+        node.id = i
+
+    return nodes_list
+
+
+def create_nodes_from_text(fpath: str) -> list[Node]:
+    """Create a list of node objects from a text file.
+
+    Args:
+        fpath (str): Path to a text file.
+
+    Returns:
+        list[Node]: list of node objects.
+    """
+    with open(fpath, 'r') as f:
+        lines = f.readlines()
+        # Remove comments and empty lines
+        lines = [line.strip() for line in lines]
+        lines = [line.split(' ') for line in lines if line[0] != '#']
+    nodes_list = []
+    for i, line in enumerate(lines):
+        for j, char in enumerate(line):
+            if isdigit(char):
+                nodes_list.append(Node(0, i, j, int(char)))
+
+    # Find neighbours
+    find_neighbours(nodes_list, len(lines))
 
     # Sort nodes by position (top to bottom, left to right) and assign id
     nodes_list.sort(key=lambda x: (x.x, x.y))
@@ -236,20 +271,28 @@ def draw_bridge(img: cv2.Mat,
 
 if __name__ == '__main__':
     if len(argv) != 2:
-        impath = input(
-            "Please enter the path to the image you want to process:\n")
-        while not isfile(impath):
-            impath = input(
+        fpath = input(
+            "Please enter the path to the image or text file you want to process:\n")
+        while not isfile(fpath):
+            fpath = input(
                 "Path is not a file or doesn't exist. Please enter a valid path:\n")
     else:
-        impath = argv[1]
-        if not isfile(impath):
+        fpath = argv[1]
+
+        if fpath == "test":
+            assert create_nodes_from_text("data/examples/7x7_1.txt") \
+                == create_nodes_from_image("data/examples/7x7_1.png")
+            print("Test 7x7_1 passed")
+            exit(0)
+
+        if not isfile(fpath):
             fatal("Path is not a file or doesn't exist. Please enter a valid path.")
 
-    # Read original image
-    img = cv2.imread(impath)
-
-    nodes = create_nodes(img)
+    # Check file extension
+    if fpath.endswith(".txt"):
+        nodes = create_nodes_from_text(fpath)
+    elif fpath.endswith(".jpg") or fpath.endswith(".png"):
+        nodes = create_nodes_from_image(fpath)
 
     for node in nodes:
         print(node, node.neighbours)

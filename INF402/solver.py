@@ -1,10 +1,9 @@
 from sys import argv
 from os.path import isfile
-from cv2 import imread
 from pysat.formula import CNF
 from pysat.solvers import Solver
 
-from vision import Node, create_nodes, draw_bridge, fatal
+from vision import Node, create_nodes_from_image, create_nodes_from_text, draw_bridge, fatal
 
 
 class Bridge:
@@ -48,7 +47,11 @@ class Bridges:
         nl = sorted([n1, n2], key=lambda n: n.id)
 
         # On assume que les node.id < 100
-        return lvl * 10000 + nl[0].id * 100 + nl[1].id
+        if lvl > 0:
+            id = lvl * 10000 + nl[0].id * 100 + nl[1].id
+        else:
+            id = lvl * 10000 - nl[0].id * 100 - nl[1].id
+        return id
 
     def add_from_nodes(self, lvl: int, n1: Node, n2: Node) -> None:
 
@@ -58,20 +61,17 @@ class Bridges:
             self.dict[bid] = Bridge(lvl, n1, n2)
             self._len += 1
 
-    def remove_from_nodes(self, lvl: int, n1: Node, n2: Node) -> None:
-        bid = self.bridge_id(lvl, n1, n2)
-
-        if bid in self.dict:
-            del self.dict[bid]
-            self._len -= 1
-
-    def add_from_id(self, bid: int) -> None:
-        if bid not in self.dict:
-            lvl = bid // 10000
-            n1id = (bid % 10000) // 100
-            n2id = bid % 100
-            self.dict[bid] = Bridge(lvl, Node(n1id), Node(n2id))
-            self._len += 1
+    # TODO: trouver la pos de l'ile à partir de l'id
+    # def add_from_id(self, bid: int) -> None:
+    #     if bid not in self.dict:
+    #         abid = abs(bid)
+    #         lvl = abid // 10000
+    #         n1id = (abid % 10000) // 100
+    #         n2id = abid % 100
+    #         if bid < 0:
+    #             lvl = -lvl
+    #         self.dict[bid] = Bridge(lvl, Node(n1id), Node(n2id))
+    #         self._len += 1
 
 
 def read_dimacs(filename: str) -> CNF:
@@ -98,20 +98,21 @@ def write_dimacs(filename: str, cnf: CNF) -> None:
 
 if __name__ == '__main__':
     if len(argv) != 2:
-        impath = input(
+        fpath = input(
             "Please enter the path to the image you want to process:\n")
-        while not isfile(impath):
-            impath = input(
+        while not isfile(fpath):
+            fpath = input(
                 "Path is not a file or doesn't exist. Please enter a valid path:\n")
     else:
-        impath = argv[1]
-        if not isfile(impath):
+        fpath = argv[1]
+        if not isfile(fpath):
             fatal("Path is not a file or doesn't exist. Please enter a valid path.")
 
-    # Read original image
-    im = imread(impath)
-
-    nodes = create_nodes(im)
+    # Check file extension
+    if fpath.endswith(".txt"):
+        nodes = create_nodes_from_text(fpath)
+    elif fpath.endswith(".jpg") or fpath.endswith(".png"):
+        nodes = create_nodes_from_image(fpath)
 
     # Create every possible bridge
     bridges = Bridges()

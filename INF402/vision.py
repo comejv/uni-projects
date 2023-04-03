@@ -7,33 +7,12 @@ import cv2
 import onnxruntime
 from numpy import argmax, array, resize
 
+from classes import Node
+
 
 def fatal(msg: str):
     print("\x1b[31m" + msg + "\x1b[0m")
     exit(1)
-
-
-class Node:
-    def __init__(self, id, x, y, v):
-        self.id: int = id
-        self.x: int = int(x)
-        self.y: int = int(y)
-        self.value: int = int(v)
-        self.neighbours: list[Node] = []
-
-    def __repr__(self) -> str:
-        return f"Node({self.id} : [{self.x}, {self.y}], {self.value})"
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            return NotImplemented
-        return self.x == other.x and self.y == other.y and self.id == other.id
-
-    def add_neighbour(self, neighbour):
-        if neighbour not in self.neighbours and neighbour != self and type(neighbour) == Node:
-            self.neighbours.append(neighbour)
-        else:
-            raise ValueError("Neighbour not added")
 
 
 def find_node(x: int, y: int, nodes: list[Node]) -> Node or None:
@@ -80,7 +59,7 @@ def get_enclosing_circles(img: cv2.Mat) -> list[tuple[int, int]]:
 
 
 def get_inscribed_rectangles(img: cv2.Mat,
-                             circles: list[tuple[tuple[int, int], int]]) -> list[cv2.Mat]:
+                             circles: list[tuple[int, int]]) -> list[cv2.Mat]:
     """Get a rectangle inscribed in each circle.
 
     Args:
@@ -229,6 +208,8 @@ def create_nodes_from_text(fpath: str) -> list[Node]:
     for i, line in enumerate(lines):
         for j, char in enumerate(line):
             if isdigit(char):
+                if int(char) > 8 or int(char) < 0:
+                    raise ValueError('Invalid value in text file.')
                 nodes_list.append(Node(0, i, j, int(char)))
 
     # Find neighbours

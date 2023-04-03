@@ -30,6 +30,57 @@ def write_dimacs(filename: str, cnf: CNF) -> None:
     cnf.to_file(filename)
 
 
+def bridge_to_id(vpool: IDPool, bridge: Bridge) -> int:
+    """Convert a bridge to an ID.
+
+    Args:
+        bridge (Bridge): Bridge to convert.
+
+    Returns:
+        int: ID of the bridge. Negative if the bridge is not used.
+    """
+    if bridge.lvl > 0:
+        return vpool.id(bridge.id)
+    else:
+        return -vpool.id(bridge.id)
+
+
+def bridges_to_cnf(vpool: IDPool, cases: list[Bridges]) -> CNF:
+    """Convert a Bridges object to a CNF formula.
+
+    Args:
+        bridges (Bridges): Bridges object to convert.
+
+    Returns:
+        CNF: CNF object representing the formula.
+    """
+    cnf = CNF()
+
+    # Add a clause for each bridge
+    for case in cases:
+        cnf.append([bridge_to_id(vpool, bridge) for bridge in case])
+
+    return cnf
+
+
+def cnf_to_bridges(vpool: IDPool, cnf: CNF) -> list[str]:
+    """Convert a CNF formula to a list of bridge ids.
+
+    Args:
+        cnf (CNF): CNF object representing the formula.
+
+    Returns:
+        Bridges: list of bridge ids.
+    """
+    bid = []
+    for var in solver.get_model():
+        if var > 0:
+            bid.append(vpool.obj(var))
+        else:
+            bid.append(-vpool.obj(-var))
+    return bid
+
+
 if __name__ == '__main__':
     if len(argv) != 2:
         fpath = input(
@@ -55,19 +106,18 @@ if __name__ == '__main__':
             bridges.add_from_nodes(1, node, neighbor)
             bridges.add_from_nodes(2, node, neighbor)
 
-    rules.rule1(nodes[0])
+    # Create a variable pool for the bridges
+    vpool = IDPool()
+    fnc = bridges_to_cnf(vpool, rules.connect_node(nodes[0]))
+    write_dimacs("output/test.cnf", fnc)
 
-    # # SAT solver usage example
-    # # create a satisfiable CNF formula "(-x1 ∨ x2) ∧ (-x1 ∨ -x2)":
-    # cnf = CNF(from_clauses=[[-1, 2], [-1, -2]])
+    # create a SAT solver for this formula:
+    with Solver(bootstrap_with=fnc) as solver:
+        # call the solver for this formula:
+        print('formula is', f'{"s" if solver.solve() else "uns"}atisfiable')
 
-    # vpool = IDPool()
-    # id = lambda x: vpool.id(x.id)
+        # the formula is satisfiable and so has a model:
+        print('and the model is:', solver.get_model())
 
-    # # create a SAT solver for this formula:
-    # with Solver(bootstrap_with=cnf) as solver:
-    #     # call the solver for this formula:
-    #     print('formula is', f'{"s" if solver.solve() else "uns"}atisfiable')
-
-    #     # the formula is satisfiable and so has a model:
-    #     print('and the model is:', solver.get_model())
+        # print the model using initial variable name
+        print('and the model is:', cnf_to_bridges(vpool, fnc))

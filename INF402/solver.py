@@ -3,7 +3,7 @@ from os.path import isfile
 from pysat.formula import CNF, IDPool
 from pysat.solvers import Solver
 
-from classes import Bridge, Bridges
+from classes import Bridge, Bridges, Node
 from vision import create_nodes_from_image, create_nodes_from_text, fatal
 import rules
 
@@ -28,6 +28,15 @@ def write_dimacs(filename: str, cnf: CNF) -> None:
         cnf (CNF): CNF object representing the formula.
     """
     cnf.to_file(filename)
+
+
+def all_bridges(nodes: list[Node]) -> Bridges:
+    bridges = Bridges()
+    for i, node in enumerate(nodes):
+        for neighbor in nodes[i].neighbours:
+            bridges.add_from_nodes(1, node, neighbor)
+            bridges.add_from_nodes(2, node, neighbor)
+    return bridges
 
 
 def bridge_to_id(vpool: IDPool, bridge: Bridge) -> int:
@@ -62,7 +71,7 @@ def bridges_to_clauses(vpool: IDPool, cases: list[Bridges]) -> list[list[int]]:
     return clauses
 
 
-def cnf_to_bridges(vpool: IDPool, cnf: CNF) -> list[str]:
+def cnf_to_bridges(vpool: IDPool, model: list[int]) -> list[str]:
     """Convert a CNF formula to a list of bridge ids.
 
     Args:
@@ -71,10 +80,10 @@ def cnf_to_bridges(vpool: IDPool, cnf: CNF) -> list[str]:
     Returns:
         Bridges: list of bridge ids.
     """
-    if cnf is None:
+    if model is None:
         return []
     bid = []
-    for var in solver.get_model():
+    for var in model:
         if var > 0:
             bid.append(vpool.obj(var))
         else:
@@ -104,6 +113,32 @@ def dnf_to_cnf(dnf: list[list]) -> list[list]:
         return cnf
 
 
+def solve_cnf(cnf: CNF, vpool: IDPool, quiet=False, assumptions=None) -> Solver:
+    """Solve a CNF formula.
+
+    Args:
+        cnf (CNF): CNF object representing the formula.
+        vpool (IDPool): IDPool object used to create the formula.
+        quiet (bool, optional): Whether to print info about the given CNF. Defaults to False.
+        assumptions (list[Bridge], optional): List of bridges that must be present. Defaults to None.
+
+    Returns:
+        Solver: Solver object representing the solution.
+    """
+    solver = Solver(bootstrap_with=cnf)
+
+    # Print number of variables and clauses
+    if not quiet:
+        print("Number of variables :", solver.nof_vars())
+        print("Number of clauses :", solver.nof_clauses())
+
+    # Add assumptions
+    if assumptions is not None:
+        solver.set_phases([vpool.id(bridge.id) for bridge in assumptions])
+
+    return solver
+
+
 if __name__ == '__main__':
     if len(argv) != 2:
         fpath = input(
@@ -123,11 +158,7 @@ if __name__ == '__main__':
         nodes = create_nodes_from_image(fpath)
 
     # Create every possible bridge
-    bridges = Bridges()
-    for i, node in enumerate(nodes):
-        for neighbor in nodes[i].neighbours:
-            bridges.add_from_nodes(1, node, neighbor)
-            bridges.add_from_nodes(2, node, neighbor)
+    bridges = all_bridges(nodes)
 
     # Create a variable pool for the bridges
     vpool = IDPool()
@@ -144,19 +175,5 @@ if __name__ == '__main__':
     # Create dimacs output file
     write_dimacs("output/test.cnf", cnf)
 
-    # Create a SAT solver instance for this formula:
-    with Solver(bootstrap_with=cnf) as solver:
-        # Print number of variables and clauses
-        print("Number of variables :", solver.nof_vars())
-        print("Number of clauses :", solver.nof_clauses())
-
-        # Add phases (assumptions):
-        # solver.set_phases([vpool.id(bridges[0].id)]) # Bridge 0 must be used
-
-        # Call the solver for this formula:
-        if solver.solve():
-            print("This game is solvable. One possible solution is:")
-            print("Var names :", solver.get_model())
-            print("Bridge ids :", cnf_to_bridges(vpool, cnf))
-        else:
-            print("This game is not solvable.")
+    # Solve the formula
+    solver = solve_cnf(cnf, vpool)

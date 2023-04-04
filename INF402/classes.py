@@ -9,10 +9,10 @@ class Node:
     def __repr__(self) -> str:
         return f"Node({self.id} : [{self.x}, {self.y}], {self.value})"
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
+    def __eq__(self, __other) -> bool:
+        if not isinstance(__other, self.__class__):
             return NotImplemented
-        return self.x == other.x and self.y == other.y and self.id == other.id
+        return self.x == __other.x and self.y == __other.y and self.id == __other.id
 
     def add_neighbour(self, neighbour):
         if neighbour not in self.neighbours and neighbour != self and type(neighbour) == Node:
@@ -32,7 +32,12 @@ class Bridge:
     def __repr__(self) -> str:
         return f"({self.n1} -> {self.n2}, lvl {self.lvl})"
 
-    def get_id(self):
+    def __eq__(self, __other: object) -> bool:
+        if not isinstance(__other, self.__class__):
+            return NotImplemented
+        return self.id == __other.id
+
+    def get_id(self) -> None:
         if self.id:
             return self.id
 
@@ -43,6 +48,12 @@ class Bridge:
             self.id = self.lvl * 10000 + nl[0].id * 100 + nl[1].id
         else:
             self.id = self.lvl * 10000 - nl[0].id * 100 - nl[1].id
+
+    def get_neg(self) -> 'Bridge':
+        return Bridge(-self.lvl, self.n1, self.n2)
+
+    def horizontal(self) -> bool:
+        return self.n1.x == self.n2.x
 
 
 class Bridges:
@@ -63,6 +74,8 @@ class Bridges:
         return f"Bridges({self.dict})"
 
     def add_from_nodes(self, lvl: int, n1: Node, n2: Node) -> None:
+        # Sort nodes by id
+        # nl = sorted([n1, n2], key=lambda n: n.id)
         bridge = Bridge(lvl, n1, n2)
 
         if bridge.id not in self.dict:
@@ -81,7 +94,7 @@ class Bridges:
     #         self.dict[bid] = Bridge(lvl, Node(n1id), Node(n2id))
     #         self._len += 1
 
-    def from_node(self, n: Node) -> list:
+    def connected_to_node(self, n: Node) -> list:
         """ Return the list of bridges connected to the node n.
 
         Args:

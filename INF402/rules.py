@@ -28,28 +28,41 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
         list[list]: list of cases where a lvl 2 bridge is not alone.
     """
     clean_cases = []
+
+    # For each case
     for case in cases:
-        lvl1 = [b.n2 for b in case if b.lvl == 1]
-        lvl2 = [b.n2 for b in case if b.lvl == 2]
+        # Sort bridges by lvl
+        lvl1 = []
+        lvl2 = []
+        for bridge in case:
+            if bridge.lvl == 1:
+                lvl1.append(bridge)
+            elif bridge.lvl == 2:
+                lvl2.append(bridge)
+
         if not lvl2:
             clean_cases.append(case)
         else:
-            for node in lvl2:
-                if node not in lvl1:
+            skip = False
+            for bridge in lvl2:
+                b1 = Bridge(1, bridge.n1, bridge.n2)
+                if b1 not in lvl1:
+                    skip = True
                     break
+            if not skip:
                 clean_cases.append(case)
     return clean_cases
 
 
 # Rule 1: A node must have its number in bridges connected to it.
 def connect_node(node: Node) -> list[Bridges]:
-    """Return all the possible bridge configurations for a node.
+    """Returns all the possible bridge configurations for a node (DNF).
 
     Args:
         node (Node): node to connect.
 
     Returns:
-        list[Bridges]: list of all the possible bridge configurations for a node.
+        list[Bridges]: DNF list of all the possible bridge configurations for a node.
     """
     # Lister tous les ponts possibles
     bridges = [Bridge(x, node, neigh) for x in [1, 2]
@@ -58,7 +71,40 @@ def connect_node(node: Node) -> list[Bridges]:
     # List all bridges combinations (node.value out of bridges)
     cases = n_choose_k(bridges, node.value)
 
-    # Supprimer les ponts de niveau 2 qui sont sans pont de niveau 1
+    # Add negatives to the cases
+    for case in cases:
+        for bridge in bridges:
+            if bridge not in case:
+                case.append(bridge.get_neg())
+
+    # Delete cases where a lvl 2 bridge is alone
     clean_cases = lvl2_impl_lvl1(cases)
 
     return clean_cases
+
+
+def no_crossing(bridges: list[Bridges]) -> list[list[Bridges]]:
+    """Returns CNF stating that bridges can't cross.
+
+    Args:
+        bridges (list[Bridges]): list of possible bridges.
+
+    Returns:
+        list[list[Bridges]]: CNF stating that bridges can't cross.
+    """
+    cnf = []
+    horizontal = []
+    vertical = []
+    for bridge in bridges.dict.values():
+        if bridge.horizontal():
+            horizontal.append(bridge)
+        else:
+            vertical.append(bridge)
+
+    for bridge in horizontal:
+        for bridge2 in vertical:
+            # If bridge is between bridge2 nodes and bridge2 is between bridge nodes
+            if bridge.n1.x > bridge2.n1.x and bridge.n1.x < bridge2.n2.x \
+                    and bridge2.n1.y > bridge.n1.y and bridge2.n1.y < bridge.n2.y:
+                cnf.append([bridge.get_neg(), bridge2.get_neg()])
+    return cnf

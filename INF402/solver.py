@@ -3,8 +3,8 @@ from os.path import isfile
 from pysat.formula import CNF, IDPool
 from pysat.solvers import Solver
 
-from classes import Bridge, Bridges, Node
-from vision import create_nodes_from_image, create_nodes_from_text, draw_bridge, fatal
+from classes import Bridge, Bridges
+from vision import create_nodes_from_image, create_nodes_from_text, fatal
 import rules
 
 
@@ -42,25 +42,24 @@ def bridge_to_id(vpool: IDPool, bridge: Bridge) -> int:
     if bridge.lvl > 0:
         return vpool.id(bridge.id)
     else:
-        return -vpool.id(bridge.id)
+        return -vpool.id(-bridge.id)
 
 
-def bridges_to_cnf(vpool: IDPool, cases: list[Bridges]) -> CNF:
-    """Convert a Bridges object to a CNF formula.
+def bridges_to_clauses(vpool: IDPool, cases: list[Bridges]) -> list[list[int]]:
+    """Convert a Bridges object to a list of clauses.
 
     Args:
         bridges (Bridges): Bridges object to convert.
 
     Returns:
-        CNF: CNF object representing the formula.
+        list[list[int]]: List of clauses.
     """
-    cnf = CNF()
-
+    clauses = []
     # Add a clause for each bridge
     for case in cases:
-        cnf.append([bridge_to_id(vpool, bridge) for bridge in case])
+        clauses.append([bridge_to_id(vpool, bridge) for bridge in case])
 
-    return cnf
+    return clauses
 
 
 def cnf_to_bridges(vpool: IDPool, cnf: CNF) -> list[str]:
@@ -72,6 +71,8 @@ def cnf_to_bridges(vpool: IDPool, cnf: CNF) -> list[str]:
     Returns:
         Bridges: list of bridge ids.
     """
+    if cnf is None:
+        return []
     bid = []
     for var in solver.get_model():
         if var > 0:
@@ -79,6 +80,28 @@ def cnf_to_bridges(vpool: IDPool, cnf: CNF) -> list[str]:
         else:
             bid.append(-vpool.obj(-var))
     return bid
+
+
+def dnf_to_cnf(dnf: list[list]) -> list[list]:
+    """Convert a dnf to a cnf.
+
+    Args:
+        dnf (list[list]): dnf to convert.
+
+    Returns:
+        list[list]: cnf.
+    """
+    cnf = []
+    if dnf == []:
+        return [[]]
+    else:
+        list = dnf[0]
+        suite = dnf[1:]
+        for lit in list:
+            for lit2 in dnf_to_cnf(suite):
+                lit2.append(lit)
+                cnf.append(lit2)
+        return cnf
 
 
 if __name__ == '__main__':
@@ -108,16 +131,32 @@ if __name__ == '__main__':
 
     # Create a variable pool for the bridges
     vpool = IDPool()
-    fnc = bridges_to_cnf(vpool, rules.connect_node(nodes[0]))
-    write_dimacs("output/test.cnf", fnc)
+    cnf = CNF()
 
-    # create a SAT solver for this formula:
-    with Solver(bootstrap_with=fnc) as solver:
-        # call the solver for this formula:
-        print('formula is', f'{"s" if solver.solve() else "uns"}atisfiable')
+    # Nodes must have {node.value} bridges exactly
+    for node in nodes:
+        dnf = bridges_to_clauses(vpool, rules.connect_node(node))
+        cnf.extend(dnf_to_cnf(dnf))
 
-        # the formula is satisfiable and so has a model:
-        print('and the model is:', solver.get_model())
+    # Bridges can't cross each other
+    cnf.extend(bridges_to_clauses(vpool, rules.no_crossing(bridges)))
 
-        # print the model using initial variable name
-        print('and the model is:', cnf_to_bridges(vpool, fnc))
+    # Create dimacs output file
+    write_dimacs("output/test.cnf", cnf)
+
+    # Create a SAT solver instance for this formula:
+    with Solver(bootstrap_with=cnf) as solver:
+        # Print number of variables and clauses
+        print("Number of variables :", solver.nof_vars())
+        print("Number of clauses :", solver.nof_clauses())
+
+        # Add phases (assumptions):
+        # solver.set_phases([vpool.id(bridges[0].id)]) # Bridge 0 must be used
+
+        # Call the solver for this formula:
+        if solver.solve():
+            print("This game is solvable. One possible solution is:")
+            print("Var names :", solver.get_model())
+            print("Bridge ids :", cnf_to_bridges(vpool, cnf))
+        else:
+            print("This game is not solvable.")

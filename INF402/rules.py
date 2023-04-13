@@ -1,7 +1,7 @@
 from classes import Bridge, Bridges, Node
 
 
-def n_choose_k(list: list, n: int) -> list[list]:
+def n_choose_k(list: list[Bridges], n: int) -> list[list[Bridges]]:
     """ Return all the combinations of n elements in the list l.
 
     Args:
@@ -15,7 +15,7 @@ def n_choose_k(list: list, n: int) -> list[list]:
         return [[]]
     if len(list) == 0:
         return []
-    return [([list[0]] + x) for x in n_choose_k(list[1:], n - 1)] + n_choose_k(list[1:], n)
+    return [([list[0].get_neg()] + x) for x in n_choose_k(list[1:], n - 1)] + n_choose_k(list[1:], n)
 
 
 def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
@@ -27,6 +27,7 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
     Returns:
         list[list]: list of cases where a lvl 2 bridge is not alone.
     """
+
     clean_cases = []
 
     # For each case
@@ -35,9 +36,9 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
         lvl1 = []
         lvl2 = []
         for bridge in case:
-            if bridge.lvl == 1:
+            if bridge.lvl == -1:
                 lvl1.append(bridge)
-            elif bridge.lvl == 2:
+            elif bridge.lvl == -2:
                 lvl2.append(bridge)
 
         if not lvl2:
@@ -68,14 +69,19 @@ def connect_node(node: Node) -> list[Bridges]:
     bridges = [Bridge(x, node, neigh) for x in [1, 2]
                for neigh in node.neighbours]
 
+    cases = []
+
     # List all bridges combinations (node.value out of bridges)
-    cases = n_choose_k(bridges, node.value)
+    for i in range(1, len(node.neighbours)+1):
+        if i != node.value:
+            temp = n_choose_k(bridges, i)
+            cases = cases + temp
 
     # Add negatives to the cases
     for case in cases:
         for bridge in bridges:
             if bridge not in case:
-                case.append(bridge.get_neg())
+                case.append(bridge)
 
     # Delete cases where a lvl 2 bridge is alone
     clean_cases = lvl2_impl_lvl1(cases)

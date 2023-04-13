@@ -21,7 +21,8 @@ args = parser.parse_args()
 
 if args.bridge_help:
     print("The first number of a bridge id is its level.\n" +
-          "Then comes the node it connects from and to, represented by their number (left to right and top to bottom).\n" +
+          "Then comes the node it connects from and to, represented by their number " +
+          "(left to right and top to bottom).\n" +
           "Positive means the bridge is used, negative it isn't.")
     exit(0)
 
@@ -64,7 +65,7 @@ bridges = solver.all_bridges(nodes)
 # Nodes must have {node.value} bridges exactly
 for node in nodes:
     dnf = solver.bridges_to_clauses(vpool, rules.connect_node(node))
-    cnf.extend(solver.dnf_to_cnf(dnf))
+    cnf.extend(dnf)
 
 # Bridges can't cross each other
 cnf.extend(solver.bridges_to_clauses(vpool, rules.no_crossing(bridges)))

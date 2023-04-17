@@ -1,7 +1,7 @@
-# Author: Côme VINCENT
+# Author: Côme VINCENT & Emile GUILLAUME
 # Date: 2023-04-13
 
-import random
+from random import choice, random
 
 
 class CNF:
@@ -72,7 +72,17 @@ class CNF:
         """
         self.__clauses.remove(clause)
         self.__nclauses -= 1
-        self.__nvars = max([abs(lit) for lit in var] for var in self.clauses())
+        self.__nvars = max(max(abs(var) for var in var)
+                           for var in self.clauses())
+
+    def extend(self, clauses: list[list[int]]) -> None:
+        """Add a list of clauses to the CNF formula.
+
+        Args:
+            clauses (list[list[int]]): List of clauses.
+        """
+        for clause in clauses:
+            self.add_clause(clause)
 
     def from_file(self, filename: str) -> None:
         """Read a dimacs file and store the clauses in the object.
@@ -139,15 +149,15 @@ class IDPool:
         # Return the ID
         return self.id_map[name]
 
-    def name(self, id: int) -> int:
-        """Get the name corresponding to the given integer ID.
+    def obj(self, id: int) -> int:
+        """Get the object name corresponding to the given integer ID.
         If name was a string, its hash is returned.
 
         Args:
             id (int): Integer ID.
 
         Returns:
-            int: Name.
+            int: Name or hash of the name.
         """
         # Invert the map and return the name
         return list(self.id_map.keys())[list(self.id_map.values()).index(id)]
@@ -173,34 +183,85 @@ def delete_valid_clauses(cnf: CNF, assignments: list[int] = []) -> None:
                 break
 
 
-def est_modele(assignation: list[int], cnf: CNF) -> bool:
+def assignation_to_var(assignation: list[int]) -> list[int]:
+    """Convert a list based on position to a list based on variable name.
+    Example: [1, 0, 1] -> [1, -2, 3]
+    """
+    vars = []
+    for n, var in enumerate(assignation):
+        if var == 1:
+            vars.append(n+1)
+        else:
+            vars.append(-(n+1))
+
+    return vars
+
+
+def unsat_clauses(assignation: list[int], cnf: CNF) -> list[list[int]]:
+    """Return the list of unsatisfied clauses.
+
+    Args:
+        assignation (list[int]): List of assignments. The index of the list
+            corresponds to the variable number, and the value to the assignment.
+        cnf (CNF): A list of clauses.
+
+    Returns:
+        list[list[int]]: List of unsatisfied clauses. If the list is empty,
+            the assignation satisfies the CNF formula.
+    """
+    unsat = []
     for clause in cnf.clauses():
         clause_1 = False
-        for e in clause:
-            if assignation[e-1] == 1:
+        for var in clause:
+            if assignation[abs(var)-1] == 1:
                 clause_1 = True
+                break
         if not clause_1:
-            return False
-    return True
+            unsat.append(clause)
+    return unsat
 
 
 def walk_sat(cnf: CNF) -> list[int]:
+    """WalkSAT algorithm.
+
+    Args:
+        cnf (CNF): A list of clauses.
+
+    Returns:
+        list[int]: List of assignments. The index of the list corresponds to
+            the variable number, and the value to the assignment.
+    """
+    # Clean the CNF formula
+    # delete_valid_clauses(cnf)
+
+    # Initialize the model
+    model = [0] * cnf.nvars()
+
     MAX_ITERATION = 10000
-    model = [0]*cnf.nvars()
-    i = 0
-    while not est_modele(model) and i < MAX_ITERATION:
-        clauses = cnf.clauses()[random.randint(0, cnf.nclauses()-1)]
-        x = random.randint(0, 1)
+    n_iter = 0
+    while n_iter < MAX_ITERATION:
+        # Get the list of unsatisfied clauses
+        clauses = unsat_clauses(model, cnf)
+
+        # If there are no unsatisfied clauses, return the model
+        if clauses == []:
+            return assignation_to_var(model)
+
+        # Get a random unsatisfied clause
+        clause = choice(clauses)
+
+        # Get a variable from the clause
+        x = random()
         if x <= 0.4:
-            y = clauses[random.randint(0, len(clauses)-1)]
+            y = choice(clause)
         else:
-            y = clauses[0]
-        model[y-1] = (model[y-1]+1) % 2
-        i += 1
-    if est_modele(model, cnf):
-        return model
-    else:
-        return None
+            y = clause[0]
+
+        # Flip the variable
+        model[abs(y)-1] = (model[abs(y)-1]+1) % 2
+        n_iter += 1
+
+    return None
 
 
 if __name__ == '__main__':
@@ -229,10 +290,9 @@ if __name__ == '__main__':
     cnf.print_clauses()
 
     print("ID of 'a':", pool.id('a'))
-    print("Name of 1:", pool.name(1))
+    print("Name of 1:", pool.obj(1))
 
     # Solve the formula
-    delete_valid_clauses(cnf)
     model = walk_sat(cnf)
     print("Satisfiable:", model is not None)
     print("Model:", model)

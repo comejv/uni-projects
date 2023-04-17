@@ -1,13 +1,11 @@
 from classes import Bridge, Bridges, Node
 
 
-def n_choose_k(list: list[Bridges], n: int) -> list[list[Bridges]]:
+def n_choose_k(list: list[Bridge], n: int) -> list[list]:
     """ Return all the combinations of n elements in the list l.
-
     Args:
         l (list): list to take elements from.
         n (int): number of elements to take.
-
     Returns:
         list: list of all the combinations of n elements in the list l.
     """
@@ -27,7 +25,6 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
     Returns:
         list[list]: list of cases where a lvl 2 bridge is not alone.
     """
-
     clean_cases = []
 
     # For each case
@@ -46,7 +43,7 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
         else:
             skip = False
             for bridge in lvl2:
-                b1 = Bridge(1, bridge.n1, bridge.n2)
+                b1 = Bridge(-1, bridge.n1, bridge.n2)
                 if b1 not in lvl1:
                     skip = True
                     break
@@ -72,21 +69,28 @@ def connect_node(node: Node) -> list[Bridges]:
     cases = []
 
     # List all bridges combinations (node.value out of bridges)
-    for i in range(1, len(node.neighbours)+1):
+    n = len(node.neighbours)*2
+    for i in range(1, n+1):
         if i != node.value:
-            temp = n_choose_k(bridges, i)
-            cases = cases + temp
+            cases = cases + n_choose_k(bridges, i)
 
     # Add negatives to the cases
     for case in cases:
         for bridge in bridges:
-            if bridge not in case:
+            if bridge.get_neg() not in case:
                 case.append(bridge)
 
-    # Delete cases where a lvl 2 bridge is alone
-    clean_cases = lvl2_impl_lvl1(cases)
+    # If node.value is 0, add all bridges as negatives
+    case_0 = []
+    for i in bridges:
+        if i.lvl == 1:
+            case_0.append(i)
+    cases.append(case_0)
 
-    return clean_cases
+    # Delete cases where a lvl 2 bridge is alone
+    # clean_cases = lvl2_impl_lvl1(cases)
+
+    return cases
 
 
 def no_crossing(bridges: list[Bridges]) -> list[list[Bridges]]:

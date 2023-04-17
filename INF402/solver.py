@@ -1,6 +1,6 @@
 from sys import argv
 from os.path import isfile
-from pysat.formula import CNF, IDPool
+from sat import CNF, IDPool, walk_sat
 from pysat.solvers import Solver
 
 from classes import Bridge, Bridges, Node
@@ -113,30 +113,46 @@ def dnf_to_cnf(dnf: list[list]) -> list[list]:
         return cnf
 
 
-def solve_cnf(cnf: CNF, vpool: IDPool, quiet=False, assumptions=None) -> Solver:
+def convert_to_pysat(cnf: CNF) -> Solver:
+    """Convert a CNF formula to a pysat formula.
+
+    Args:
+        cnf (CNF): CNF object representing the formula.
+
+    Returns:
+        Solver: pysat formula.
+    """
+    solver = Solver()
+    for clause in cnf.clauses():
+        solver.add_clause(clause)
+    return solver
+
+
+def solve_cnf(cnf: CNF, quiet=False, pysat=False) -> list[int]:
     """Solve a CNF formula.
 
     Args:
         cnf (CNF): CNF object representing the formula.
-        vpool (IDPool): IDPool object used to create the formula.
-        quiet (bool, optional): Whether to print info about the given CNF. Defaults to False.
-        assumptions (list[Bridge], optional): List of bridges that must be present. Defaults to None.
+        quiet (bool, optional): If True, no output is printed. Defaults to False.
 
     Returns:
-        Solver: Solver object representing the solution.
+        list[int]: List of each variable and its value (1 or 0).
     """
-    solver = Solver(bootstrap_with=cnf)
+    if pysat:
+        solver = convert_to_pysat(cnf)
+        # Print number of variables and clauses
+        if not quiet:
+            print("Number of variables :", solver.nof_vars())
+            print("Number of clauses :", solver.nof_clauses())
+        solvable = solver.solve()
+        return solver.get_model() if solvable else None
+    else:
+        # Print number of variables and clauses
+        if not quiet:
+            print("Number of variables :", cnf.nvars())
+            print("Number of clauses :", cnf.nclauses())
 
-    # Print number of variables and clauses
-    if not quiet:
-        print("Number of variables :", solver.nof_vars())
-        print("Number of clauses :", solver.nof_clauses())
-
-    # Add assumptions
-    if assumptions is not None:
-        solver.set_phases([vpool.id(bridge.id) for bridge in assumptions])
-
-    return solver
+        return walk_sat(cnf)
 
 
 if __name__ == '__main__':

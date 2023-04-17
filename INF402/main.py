@@ -6,13 +6,14 @@ import rules
 
 # Parse arguments
 parser = ArgumentParser()
-parser.add_argument("-i", "--image", dest="image",
-                    help="path to the image file")
-parser.add_argument("-t", "--text", dest="text", help="path to the text file")
+parser.add_argument("-i", "--input", dest="input",
+                    help="path to the input file")
 parser.add_argument("-d", "--dimacs", dest="dimacs",
                     help="path to the already generated DIMACS file")
 parser.add_argument("-c", "--cnf", dest="cnf",
                     help="path to the file where the CNF will be written")
+parser.add_argument("-p", "--pysat", dest="pysat", action="store_true", default=False,
+                    help="use PySAT instead of our own WalkSAT")
 parser.add_argument("-q", "--quiet", dest="quiet",
                     help="do not print the solution")
 parser.add_argument("-b", "--bridge-help", dest="bridge_help", action="store_true",
@@ -26,21 +27,25 @@ if args.bridge_help:
           "Positive means the bridge is used, negative it isn't.")
     exit(0)
 
-# -i, -t and -d are mutually exclusive
-if sum([args.image is not None, args.text is not None, args.dimacs is not None]) > 1:
-    parser.error("The arguments -i, -t and -d are mutually exclusive")
+# -i and -d are mutually exclusive
+if args.input and args.dimacs:
+    parser.error("You can only specify one input method.")
 
 # ## Handle input ## #
-if args.image:
-    assert isfile(args.image)
-    nodes = solver.create_nodes_from_image(args.image)
-elif args.text:
-    assert isfile(args.text)
-    nodes = solver.create_nodes_from_text(args.text)
+if args.input:
+    assert isfile(args.input)
+    # Check file extension
+    if args.input.endswith(".txt"):
+        nodes = solver.create_nodes_from_text(args.input)
+    elif args.input.endswith(".jpg") or args.input.endswith(".png"):
+        nodes = solver.create_nodes_from_image(args.input)
+    else:
+        print("Invalid file extension.")
+        exit(1)
 elif args.dimacs:
     assert isfile(args.dimacs)
     cnf = solver.read_dimacs(args.dimacs)
-    solution = solver.solve_cnf(cnf)
+    solution = solver.solve_cnf(cnf, pysat=args.pysat, quiet=args.quiet)
     solver.write_solution_to_text(solution, args.output)
     if not args.quiet:
         print(solution)
@@ -52,6 +57,9 @@ else:
         nodes = solver.create_nodes_from_text(fpath)
     elif fpath.endswith(".jpg") or fpath.endswith(".png"):
         nodes = solver.create_nodes_from_image(fpath)
+    else:
+        print("Invalid file extension.")
+        raise SystemExit
 
 # Create IDPool and cnf
 vpool = solver.IDPool()
@@ -73,12 +81,11 @@ cnf.extend(solver.bridges_to_clauses(vpool, rules.no_crossing(bridges)))
 # ## Solve ## #
 if args.cnf:
     solver.write_dimacs(args.cnf, cnf)
-satsolve = solver.solve_cnf(cnf, vpool, quiet=args.quiet)
-solvable = satsolve.solve()
+model = solver.solve_cnf(cnf, pysat=args.pysat, quiet=args.quiet)
 
 if not args.quiet:
-    print(f"Game is {'un' if not solvable else ''}atisfiable.")
-    if solvable:
+    print(f"Game is {'un' if model is None else ''}satisfiable.")
+    if model is not None:
         print("One model is :")
-        print("Variables :", satsolve.get_model())
-        print("Bridges :", solver.cnf_to_bridges(vpool, satsolve.get_model()))
+        print("Variables :", model)
+        print("Bridges :", solver.cnf_to_bridges(vpool, model))

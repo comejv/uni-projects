@@ -150,6 +150,110 @@ class IDPool:
         return list(self.id_map.keys())[list(self.id_map.values()).index(id)]
 
 
+def delete_valid_clauses(cnf: CNF, assignments: list[int]) -> None:
+    """Delete all valid clauses from the CNF formula.
+
+    Args:
+        cnf (CNF): A list of clauses.
+        assignments (list[int]): List of assignments.
+    """
+    # Delete valid clauses
+    for clause in cnf.clauses():
+        # Check if the clause contains a variable that is assigned to True
+        if any(var in assignments for var in clause if var > 0):
+            cnf.remove_clause(clause)
+            continue
+        # Check if the clause contains both a variable and its negation
+        for n, var in enumerate(clause):
+            if -var in clause[n:]:
+                cnf.remove_clause(clause)
+                break
+
+
+def dpll_rec(cnf: CNF, assignments: set[int]) -> tuple[bool, list[int]]:
+    cnf_is_modified = True
+    while cnf_is_modified:
+        cnf_is_modified = False
+
+        # 1. Check if the formula is empty (True)
+        if cnf.nclauses() == 0:
+            return True, assignments
+        # or if assignments are contradictory (False)
+        if any(-var in assignments for var in assignments):
+            return False, []
+
+        # 2. Reduction : remove clauses containing another one
+        for clause in cnf.clauses():
+            for other_clause in cnf.clauses():
+                if clause != other_clause and set(clause).issubset(set(other_clause)):
+                    cnf.remove_clause(other_clause)
+                    break
+
+        # 3. Pure literal elimination : remove clauses containing an isolated literals
+        # Find all isolated literals
+        isolated_literals = set()
+        skip = []
+        for clause in cnf.clauses():
+            for lit in clause:
+                if abs(lit) in skip:
+                    continue
+                if -lit in isolated_literals:
+                    isolated_literals.remove(-lit)
+                    skip += [abs(lit)]
+                else:
+                    isolated_literals.add(lit)
+
+        # Deal with them
+        for clause in cnf.clauses():
+            for lit in clause:
+                if lit in isolated_literals:
+                    # Remove all clauses containing an isolated literal
+                    # and add the assignment
+                    cnf.remove_clause(clause)
+                    cnf_is_modified = True
+                    break
+
+        # If the CNF formula has been modified, restart the loop
+        if cnf_is_modified:
+            continue
+
+        # 4. Unit propagation : remove clauses containing a unit literal
+        for clause in cnf.clauses():
+            if len(clause) == 1:
+                # Remove all clauses containing a unit literal
+                # and add the assignment
+                cnf.remove_clause(clause)
+                assignments.append(clause[0])
+                cnf_is_modified = True
+                break
+        if cnf_is_modified:
+            continue
+
+        # 5. Choose a literal and recurse
+        return dpll_rec(cnf, assignments + [cnf.clauses()[0][0]]) or dpll_rec(cnf, assignments + [-cnf.clauses()[0][0]])
+
+
+def dpll(cnf: CNF, assignments: set[int] = set()) -> tuple[bool, list[int]]:
+    """Checks the satisfability of a list of clauses using the DPLL algorithm.
+
+    Args:
+        cnf (CNF): A list of clauses.
+        assignments (list[int]): List of assignments.
+
+    Returns:
+        tuple[bool, list[int]]: A tuple containing a boolean indicating if the formula is satisfiable
+        and a list of assignments if the formula is satisfiable.
+    """
+    # Delete valid clauses
+    delete_valid_clauses(cnf, assignments)
+
+    # Check if the formula has empty clauses
+    if any(len(clause) == 0 for clause in cnf.clauses()):
+        return False, []
+
+    return dpll_rec(cnf, assignments)
+
+
 if __name__ == '__main__':
     # CNF + IDPool example
     cnf = CNF()
@@ -161,16 +265,16 @@ if __name__ == '__main__':
     obj_id = [pool.id(obj) for obj in obj]
     print(obj_id)
 
-    # (1 + 2) * (1 + 3) * (1 + 4) * (2 + 4) * (3 + 4) * (3 + 5) * (4 + 5) * (-1)
+    # (1 + 2) * (1 + 3) * (1 + -4) * (2 + 4) * (3 + 4) * (-3 + 5) * (4 + 5) * (-1 + 1)
     # Should be satisfiable
     cnf.add_clause([pool.id(obj[0]), pool.id(obj[1])])
     cnf.add_clause([pool.id(obj[0]), pool.id(obj[2])])
-    cnf.add_clause([pool.id(obj[0]), pool.id(obj[3])])
+    cnf.add_clause([pool.id(obj[0]), -pool.id(obj[3])])
     cnf.add_clause([pool.id(obj[1]), pool.id(obj[3])])
     cnf.add_clause([pool.id(obj[2]), pool.id(obj[3])])
-    cnf.add_clause([pool.id(obj[2]), pool.id(obj[4])])
+    cnf.add_clause([-pool.id(obj[2]), pool.id(obj[4])])
     cnf.add_clause([pool.id(obj[3]), pool.id(obj[4])])
-    cnf.add_clause([-pool.id(obj[0])])
+    cnf.add_clause([-pool.id(obj[0]), pool.id(obj[0])])
 
     print(cnf)
     cnf.print_clauses()

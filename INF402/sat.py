@@ -1,6 +1,9 @@
 # Author: Côme VINCENT
 # Date: 2023-04-13
 
+import random
+
+
 class CNF:
     def __init__(self, from_clauses=None, from_file=None) -> None:
         # List of clauses
@@ -150,7 +153,7 @@ class IDPool:
         return list(self.id_map.keys())[list(self.id_map.values()).index(id)]
 
 
-def delete_valid_clauses(cnf: CNF, assignments: list[int]) -> None:
+def delete_valid_clauses(cnf: CNF, assignments: list[int] = []) -> None:
     """Delete all valid clauses from the CNF formula.
 
     Args:
@@ -170,88 +173,34 @@ def delete_valid_clauses(cnf: CNF, assignments: list[int]) -> None:
                 break
 
 
-def dpll_rec(cnf: CNF, assignments: set[int]) -> tuple[bool, list[int]]:
-    cnf_is_modified = True
-    while cnf_is_modified:
-        cnf_is_modified = False
-
-        # 1. Check if the formula is empty (True)
-        if cnf.nclauses() == 0:
-            return True, assignments
-        # or if assignments are contradictory (False)
-        if any(-var in assignments for var in assignments):
-            return False, []
-
-        # 2. Reduction : remove clauses containing another one
-        for clause in cnf.clauses():
-            for other_clause in cnf.clauses():
-                if clause != other_clause and set(clause).issubset(set(other_clause)):
-                    cnf.remove_clause(other_clause)
-                    break
-
-        # 3. Pure literal elimination : remove clauses containing an isolated literals
-        # Find all isolated literals
-        isolated_literals = set()
-        skip = []
-        for clause in cnf.clauses():
-            for lit in clause:
-                if abs(lit) in skip:
-                    continue
-                if -lit in isolated_literals:
-                    isolated_literals.remove(-lit)
-                    skip += [abs(lit)]
-                else:
-                    isolated_literals.add(lit)
-
-        # Deal with them
-        for clause in cnf.clauses():
-            for lit in clause:
-                if lit in isolated_literals:
-                    # Remove all clauses containing an isolated literal
-                    # and add the assignment
-                    cnf.remove_clause(clause)
-                    cnf_is_modified = True
-                    break
-
-        # If the CNF formula has been modified, restart the loop
-        if cnf_is_modified:
-            continue
-
-        # 4. Unit propagation : remove clauses containing a unit literal
-        for clause in cnf.clauses():
-            if len(clause) == 1:
-                # Remove all clauses containing a unit literal
-                # and add the assignment
-                cnf.remove_clause(clause)
-                assignments.append(clause[0])
-                cnf_is_modified = True
-                break
-        if cnf_is_modified:
-            continue
-
-        # 5. Choose a literal and recurse
-        return dpll_rec(cnf, assignments + [cnf.clauses()[0][0]]) or dpll_rec(cnf, assignments + [-cnf.clauses()[0][0]])
+def est_modele(assignation: list[int], cnf: CNF) -> bool:
+    for clause in cnf.clauses():
+        clause_1 = False
+        for e in clause:
+            if assignation[e-1] == 1:
+                clause_1 = True
+        if not clause_1:
+            return False
+    return True
 
 
-def dpll(cnf: CNF, assignments: set[int] = set()) -> tuple[bool, list[int]]:
-    """Checks the satisfability of a list of clauses using the DPLL algorithm.
-
-    Args:
-        cnf (CNF): A list of clauses.
-        assignments (list[int]): List of assignments.
-
-    Returns:
-        tuple[bool, list[int]]: A tuple containing a boolean indicating if the formula is satisfiable
-        and a list of assignments if the formula is satisfiable.
-    """
-    # Delete valid clauses
-    delete_valid_clauses(cnf, assignments)
-
-    # Check if the formula has empty clauses
-    if any(len(clause) == 0 for clause in cnf.clauses()):
-        return False, []
-
-    return dpll_rec(cnf, assignments)
+def walk_sat(cnf: CNF) -> list[int]:
+    MAX_ITERATION = 10000
+    model = [0]*cnf.nvars()
+    i = 0
+    while not est_modele(model) and i < MAX_ITERATION:
+        clauses = cnf.clauses()[random.randint(0, cnf.nclauses()-1)]
+        x = random.randint(0, 1)
+        if x <= 0.4:
+            y = clauses[random.randint(0, len(clauses)-1)]
+        else:
+            y = clauses[0]
+        model[y-1] = (model[y-1]+1) % 2
+        i += 1
+    if est_modele(model, cnf):
+        return model
+    else:
+        return None
 
 
 if __name__ == '__main__':
@@ -283,7 +232,7 @@ if __name__ == '__main__':
     print("Name of 1:", pool.name(1))
 
     # Solve the formula
-    sat, model = dpll(cnf)
-    print("Satisfiable:", sat)
+    delete_valid_clauses(cnf)
+    model = walk_sat(cnf)
+    print("Satisfiable:", model is not None)
     print("Model:", model)
-    print(cnf.clauses())

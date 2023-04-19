@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS Types (
     prix_type INTEGER NOT NULL,
     rejet_max_type INTEGER NOT NULL,
     CONSTRAINT pk_types PRIMARY KEY (nom_type),
+    CONSTRAINT nom_type CHECK (nom_type IN ('gris', 'bleu', 'vert')),
     CONSTRAINT prix_typ_pos CHECK (prix_type > 0),
     CONSTRAINT rejet_typ_pos CHECK (rejet_max_type >= 0)
 );
@@ -21,7 +22,6 @@ CREATE TABLE IF NOT EXISTS Commandes (
     quantite_commande INTEGER NOT NULL,
     livraison_commande DATE,
     numero_usine INTEGER,
-    prix_total_commande INTEGER NOT NULL
     CONSTRAINT pk_commandes PRIMARY KEY (numero_commande),
     CONSTRAINT num_cmd_pos CHECK (numero_commande > 0),
     CONSTRAINT quant_cmd_pos CHECK (quantite_commande > 0),

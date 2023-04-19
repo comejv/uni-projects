@@ -24,7 +24,22 @@ def menu():
     print("1. Parcourir les données")
     print("2. Insérer ou supprimer des données")
     print("3. Requêtes avancées")
-    print("4. Quitter")
+    print("4. Quitter", end="\n\n")
+
+    choice = input("Choix: ")
+
+    while choice not in ["1", "2", "3", "4"]:
+        print("\x1b[1F\x1b[K", end="")
+        choice = input("Choix: ")
+
+    if choice == "1":
+        pass
+    if choice == "2":
+        insert_delete()
+    if choice == "3":
+        pass
+    if choice == "4":
+        exit()
 
 
 def insert_delete():

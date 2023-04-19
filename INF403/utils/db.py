@@ -19,7 +19,7 @@ def creer_connexion(db_file):
     return None
 
 
-def mise_a_jour_bd(conn: sqlite3.Connection, file: str):
+def exec_script(conn: sqlite3.Connection, file: str):
     """Exécute sur la base de données toutes les commandes contenues dans le
     fichier fourni en argument.
 
@@ -46,3 +46,12 @@ def mise_a_jour_bd(conn: sqlite3.Connection, file: str):
 
     # Validation des modifications
     conn.commit()
+
+
+def get_highest(conn: sqlite3.Connection, table: str, column: str) -> int:
+    """Retourne la valeur la plus élevée de la colonne `column` de la table
+    `table`."""
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT MAX(?1) FROM ?2", (column, table))
+    return cursor.fetchone()[0]

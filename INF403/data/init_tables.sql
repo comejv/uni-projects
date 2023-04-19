@@ -19,8 +19,9 @@ CREATE TABLE IF NOT EXISTS Usines (
 CREATE TABLE IF NOT EXISTS Commandes (
     numero_commande INTEGER NOT NULL,
     quantite_commande INTEGER NOT NULL,
-    livraison_commande TEXT,
+    livraison_commande DATE,
     numero_usine INTEGER,
+    prix_total_commande INTEGER NOT NULL
     CONSTRAINT pk_commandes PRIMARY KEY (numero_commande),
     CONSTRAINT num_cmd_pos CHECK (numero_commande > 0),
     CONSTRAINT quant_cmd_pos CHECK (quantite_commande > 0),
@@ -61,7 +62,7 @@ CREATE TABLE IF NOT EXISTS Navires (
 CREATE TABLE IF NOT EXISTS CommandesClients (
     numero_client INTEGER NOT NULL,
     numero_commande INTEGER NOT NULL,
-    date_commande_client TEXT NOT NULL,
+    date_commande_client DATE NOT NULL,
     CONSTRAINT pk_commandes_clients PRIMARY KEY (numero_client, numero_commande),
     CONSTRAINT fk_num_cli FOREIGN KEY (numero_client) REFERENCES Clients(numero_client),
     CONSTRAINT fk_num_cmd FOREIGN KEY (numero_commande) REFERENCES Commandes(numero_commande)

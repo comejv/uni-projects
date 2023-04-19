@@ -1,6 +1,3 @@
-INSERT
-    OR IGNORE INTO Types
-VALUES
-    ('gris', 2, 10),
-    ('bleu', 6, 1),
-    ('vert', 10, 0);
+INSERT OR IGNORE INTO Types VALUES ('gris', 2, 10);
+INSERT OR IGNORE INTO Types VALUES ('bleu', 6, 1);
+INSERT OR IGNORE INTO Types VALUES ('vert', 10, 0);

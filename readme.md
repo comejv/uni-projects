@@ -74,7 +74,7 @@ Info : certains projets sont stockés dans un dépôt séparé : [utils-and-game
 
 > Introduction à la logique
 
-[**INF402 - Projet**](INF402/) : un programme qui permet de résoudre une partie du jeu "Hashiwokakero" (ou "Bridges" pour les intimes) en utilisant de la computer vision pour comprendre le plateau et de la logique pour résoudre le problème.
+[**INF402 - Projet**](INF402/) : un programme qui permet de résoudre une partie du jeu "Hashiwokakero" (ou "Bridges" pour les intimes) en utilisant de la computer vision pour comprendre le plateau et de la logique pour résoudre le problème. Implémentation d'un WalkingSAT simple.
 
 ***
 

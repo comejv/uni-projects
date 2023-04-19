@@ -1,3 +1,5 @@
+-- NOT NULL nécessaire sur les primary key dans notre version de sql
+
 CREATE TABLE IF NOT EXISTS Types (
     nom_type VARCHAR(10) NOT NULL,
     prix_type INTEGER NOT NULL,
@@ -14,14 +16,16 @@ CREATE TABLE IF NOT EXISTS Usines (
     emplacement_usine TEXT NOT NULL,
     nom_type TEXT NOT NULL,
     CONSTRAINT pk_usines PRIMARY KEY (numero_usine),
-    CONSTRAINT num_usi_pos CHECK (numero_usine > 0) FOREIGN KEY (nom_type) REFERENCES TYPES(nom_type)
+    CONSTRAINT num_usi_pos CHECK (numero_usine > 0),
+    CONSTRAINT fk_usine_type FOREIGN KEY (nom_type)
+                             REFERENCES TYPES(nom_type)
 );
 
 CREATE TABLE IF NOT EXISTS Commandes (
     numero_commande INTEGER NOT NULL,
     quantite_commande INTEGER NOT NULL,
     livraison_commande DATE,
-    numero_usine INTEGER,
+    numero_usine INTEGER NOT NULL, 
     CONSTRAINT pk_commandes PRIMARY KEY (numero_commande),
     CONSTRAINT num_cmd_pos CHECK (numero_commande > 0),
     CONSTRAINT quant_cmd_pos CHECK (quantite_commande > 0),

@@ -1,7 +1,8 @@
 import sqlite3
+from utils import fmt
 
 
-def creer_connexion(db_file):
+def create_connexion(db_file):
     """Crée une connexion a la base de données SQLite spécifiée par db_file
 
     :param db_file: Chemin d'accès au fichier SQLite
@@ -17,6 +18,26 @@ def creer_connexion(db_file):
         print(e)
 
     return None
+
+
+def init_db(use_test_data=False):
+    # Nom de la BD à créer
+    db_file = "data/hydrogen.db"
+
+    # Créer une connexion a la BD
+    conn = create_connexion(db_file)
+
+    # Créer les tables et ajouter les types par défaut
+    fmt.pitalic("Initialisation de la DB...")
+    exec_script(conn, "data/init_tables.sql")
+    exec_script(conn, "data/default_types.sql")
+
+    if use_test_data:
+        # Ajouter des données de test
+        fmt.pitalic("Ajout des données de test...")
+        exec_script(conn, "data/default_inserts.sql")
+
+    return conn
 
 
 def exec_script(conn: sqlite3.Connection, file: str):
@@ -48,10 +69,57 @@ def exec_script(conn: sqlite3.Connection, file: str):
     conn.commit()
 
 
-def get_highest(conn: sqlite3.Connection, table: str, column: str) -> int:
-    """Retourne la valeur la plus élevée de la colonne `column` de la table
-    `table`."""
+def exec_query(conn: sqlite3.Connection, query: str, args: tuple = None) -> sqlite3.Cursor:
+    """Exécute la requête `query` sur la base de données.
+
+    :param conn: Connexion à la base de données
+    :type conn: sqlite3.Connection
+    :param query: Requête à exécuter
+    :type query: str
+    :param args: Arguments à passer à la requête
+    :type args: tuple
+    :return: Résultat de la requête
+    :rtype: sqlite3.Cursor
+    """
 
     cursor = conn.cursor()
-    cursor.execute("SELECT MAX(?1) FROM ?2", (column, table))
-    return cursor.fetchone()[0]
+    if args is None:
+        cursor.execute(query)
+    else:
+        cursor.execute(query, args)
+
+    return cursor
+
+
+def drop_table(conn: sqlite3.Connection, table: str):
+    """Supprime la table `table` de la base de données.
+
+    :param conn: Connexion à la base de données
+    :type conn: sqlite3.Connection
+    :param table: Nom de la table à supprimer
+    :type table: str
+    """
+
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE ?1", (table,))
+    conn.commit()
+
+
+def drop_all_tables(conn: sqlite3.Connection):
+    """Supprime toutes les tables de la base de données.
+
+    :param conn: Connexion à la base de données
+    :type conn: sqlite3.Connection
+    """
+
+    fmt.pitalic("Suppression des tables...")
+
+    tables = ["CommandesClients", "Navires", "Transporteurs",
+              "Clients", "Commandes", "Usines", "Types"]
+
+    cursor = conn.cursor()
+
+    for table in tables:
+        cursor.execute(f"DROP TABLE IF EXISTS {table}")
+
+    conn.commit()

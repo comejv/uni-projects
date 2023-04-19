@@ -7,8 +7,7 @@ if __name__ == "__main__":
     fmt.pbold("Bienvenu dans HydroGen !")
     print("Hydrogen est un gestionnaire de base de données pour un fournisseur d'hydrogène.")
 
-    conn = db.init_db(use_test_data=fmt.binput(
-        "Voulez-vous ajouter des données de test ? (O/N) "))
+    conn = db.init_db()
 
     try:
         while main_menu(conn):

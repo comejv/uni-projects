@@ -5,8 +5,8 @@ from utils import fmt
 def create_connexion(db_file):
     """Crée une connexion a la base de données SQLite spécifiée par db_file
 
-    :param db_file: Chemin d'accès au fichier SQLite
-    :return: Objet connexion ou None
+    Args:
+        db_file (str): Chemin d'accès à la base de données
     """
 
     try:
@@ -17,10 +17,17 @@ def create_connexion(db_file):
     except sqlite3.Error as e:
         print(e)
 
-    return None
 
+def init_db(use_test_data=None):
+    """Initialise la base de données. Si `use_test_data` est `True`, ajoute
+    des données de test. Si `use_test_data` est `None`, demande à l'utilisateur.
 
-def init_db(use_test_data=False):
+    Args:
+        use_test_data (bool | None, optional): Ajouter des données de test. Par défaut, None.
+
+    Returns:
+        sqlite3.Connection: Connexion à la base de données
+    """
     # Nom de la BD à créer
     db_file = "data/hydrogen.db"
 
@@ -32,9 +39,11 @@ def init_db(use_test_data=False):
     exec_script(conn, "data/init_tables.sql")
     exec_script(conn, "data/default_types.sql")
 
-    if use_test_data:
+    if use_test_data is None:
+        use_test_data = fmt.binput("Voulez-vous ajouter des données de test ? (O/N) ")
+
+    if use_test_data is True:
         # Ajouter des données de test
-        fmt.pitalic("Ajout des données de test...")
         exec_script(conn, "data/default_inserts.sql")
 
     return conn
@@ -47,10 +56,9 @@ def exec_script(conn: sqlite3.Connection, file: str):
     Les commandes dans le fichier `file` doivent être séparées par un
     point-virgule.
 
-    :param conn: Connexion à la base de données
-    :type conn: sqlite3.Connection
-    :param file: Chemin d'accès au fichier contenant les requêtes
-    :type file: str
+    Args:
+        conn (sqlite3.Connection): Connexion à la base de données
+        file (str): Chemin d'accès au fichier contenant les commandes
     """
 
     # Lecture du fichier et placement des requêtes dans un tableau
@@ -72,14 +80,10 @@ def exec_script(conn: sqlite3.Connection, file: str):
 def exec_query(conn: sqlite3.Connection, query: str, args: tuple = None) -> sqlite3.Cursor:
     """Exécute la requête `query` sur la base de données.
 
-    :param conn: Connexion à la base de données
-    :type conn: sqlite3.Connection
-    :param query: Requête à exécuter
-    :type query: str
-    :param args: Arguments à passer à la requête
-    :type args: tuple
-    :return: Résultat de la requête
-    :rtype: sqlite3.Cursor
+    Args:
+        conn (sqlite3.Connection): Connexion à la base de données
+        query (str): Requête à exécuter
+        args (tuple, optional): Arguments de la requête. Par défaut, None.
     """
 
     cursor = conn.cursor()
@@ -94,10 +98,9 @@ def exec_query(conn: sqlite3.Connection, query: str, args: tuple = None) -> sqli
 def drop_table(conn: sqlite3.Connection, table: str):
     """Supprime la table `table` de la base de données.
 
-    :param conn: Connexion à la base de données
-    :type conn: sqlite3.Connection
-    :param table: Nom de la table à supprimer
-    :type table: str
+    Args:
+        conn (sqlite3.Connection): Connexion à la base de données
+        table (str): Nom de la table à supprimer
     """
 
     cursor = conn.cursor()
@@ -108,8 +111,8 @@ def drop_table(conn: sqlite3.Connection, table: str):
 def drop_all_tables(conn: sqlite3.Connection):
     """Supprime toutes les tables de la base de données.
 
-    :param conn: Connexion à la base de données
-    :type conn: sqlite3.Connection
+    Args:
+        conn (sqlite3.Connection): Connexion à la base de données
     """
 
     fmt.pitalic("Suppression des tables...")

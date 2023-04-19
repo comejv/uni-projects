@@ -3,12 +3,20 @@ from sqlite3 import Connection, OperationalError
 
 
 def main_menu(conn: Connection) -> bool:
+    """Affiche le menu principal.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+
+    Returns:
+        bool: `True` si l'utilisateur souhaite continuer, `False` pour quitter le programme
+    """
     fmt.clear()
     fmt.pbold("Menu principal")
     print("1. Parcourir les données")
     print("2. Insérer ou supprimer des données")
     print("3. Requêtes avancées")
-    print("4. Requêtes SQL")
+    print("4. Requêtes manuelle")
     print("5. Quitter", end="\n\n")
 
     choice = input("Choix : ")
@@ -30,7 +38,7 @@ def main_menu(conn: Connection) -> bool:
     elif choice == "4":
         return True
     elif choice == "4":
-        while custom_queries(conn):
+        while manual_query(conn):
             pass
         return True
     elif choice == "5":
@@ -38,6 +46,14 @@ def main_menu(conn: Connection) -> bool:
 
 
 def browse(conn: Connection) -> bool:
+    """Affiche le menu de parcours des données.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+
+    Returns:
+        bool: `True` si l'utilisateur souhaite continuer, `False` pour revenir au menu principal
+    """
     fmt.clear()
     fmt.pbold("Parcourir les données")
     print("1. Clients")
@@ -72,8 +88,16 @@ def browse(conn: Connection) -> bool:
         return False
 
 
-def get_filters(conn: Connection, table: str) -> dict:
-    """Retourne un dictionnaire contenant les filtres à appliquer à la table `table`."""
+def get_filters(conn: Connection, table: str) -> dict[str: str]:
+    """Demande à l'utilisateur les filtres qu'il souhaite appliquer à la table `table`.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+        table (str): Nom de la table
+
+    Returns:
+        dict | None: Dictionnaire contenant les filtres {"attribut": "valeur_souhaitée"}
+    """
     fmt.clear()
     fmt.pbold(table)
     filters = {}
@@ -98,8 +122,20 @@ def get_filters(conn: Connection, table: str) -> dict:
 
 
 def browse_filter(conn: Connection, table,
-                  filters: dict = dict(), prompt_filters: bool = False) -> None:
-    """Affiche les données de la table `table` filtrées par `filters`."""
+                  filters: dict = None, prompt_filters: bool = False) -> bool:
+    """Affiche les données de la table `table` filtrées par `filters`.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+        table (str): Nom de la table
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+            False sinon.
+    """
+    if filters is None:
+        filters = {}
+
     fmt.clear()
     fmt.pbold(table)
     cursor = conn.cursor()
@@ -113,8 +149,15 @@ def browse_filter(conn: Connection, table,
     if not filters:
         cursor.execute(f"SELECT * FROM {table}")
     else:
-        args = [f"{key} = ?{i + 1}" for i,
-                key in enumerate(filters.keys()) if filters[key] is not None]
+        args = []
+        for i, key in enumerate(filters.keys()):
+            if filters[key] is not None:
+                first_char = filters[key][0]
+                if first_char in ['<', '>']:
+                    args.append(f"{key} {first_char} ?{i + 1}")
+                    filters[key] = filters[key][1:]
+                else:
+                    args.append(f"{key} = ?{i + 1}")
         args = " AND ".join(args)
 
         # Attention, cette requête est possiblement un point
@@ -138,6 +181,15 @@ def browse_filter(conn: Connection, table,
 
 
 def insert_delete(conn: Connection) -> bool:
+    """Affiche le menu d'insertion et de délétions.
+
+    Args:
+        conn (Connection): Connexion à la database.
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+            False sinon.
+    """
     fmt.clear()
     fmt.pbold("Insertion ou supression des données")
     print("1. Clients")
@@ -170,16 +222,25 @@ def insert_delete(conn: Connection) -> bool:
         if fmt.binput("Êtes-vous sûr de vouloir continuer ? (O/N) "):
             db.drop_all_tables(conn)
             fmt.pitalic("Réinitialisation de la base de données...")
-            db.init_db(use_test_data=False)
+            db.init_db()
         print("Retour au menu principal.")
         return False
     elif choice == 7:
         return False
 
 
-def custom_queries(conn: Connection) -> bool:
+def manual_query(conn: Connection) -> bool:
+    """Exécute une requête entrée manuellement par l'utilisateur.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+            False sinon.
+    """
     fmt.clear()
-    fmt.pbold("Requêtes avancées")
+    fmt.pbold("Requêtes manuelle")
     requete = input("Requête : ")
     try:
         res = db.exec_query(conn, requete)

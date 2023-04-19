@@ -38,7 +38,7 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
             elif bridge.lvl == -2:
                 lvl2.append(bridge)
 
-        if not lvl2:
+        if not lvl1:
             clean_cases.append(case)
         else:
             skip = False
@@ -47,7 +47,7 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
                 if b1 not in lvl1:
                     skip = True
                     break
-            if not skip:
+            if skip:
                 clean_cases.append(case)
     return clean_cases
 
@@ -69,10 +69,12 @@ def connect_node(node: Node) -> list[Bridges]:
     cases = []
 
     # List all bridges combinations (node.value out of bridges)
-    n = len(node.neighbours)*2
-    for i in range(1, n+1):
+    n=len(node.neighbours)*2
+    for i in range(1,n+1):
         if i != node.value:
             cases = cases + n_choose_k(bridges, i)
+        else:
+            cases = cases + lvl2_impl_lvl1(n_choose_k(bridges, i))
 
     # Add negatives to the cases
     for case in cases:

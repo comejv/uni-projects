@@ -182,21 +182,6 @@ def delete_valid_clauses(cnf: CNF, assignments: list[int] = []) -> None:
                 cnf.remove_clause(clause)
                 break
 
-
-def assignation_to_var(assignation: list[int]) -> list[int]:
-    """Convert a list based on position to a list based on variable name.
-    Example: [1, 0, 1] -> [1, -2, 3]
-    """
-    vars = []
-    for n, var in enumerate(assignation):
-        if var == 1:
-            vars.append(n+1)
-        else:
-            vars.append(-(n+1))
-
-    return vars
-
-
 def unsat_clauses(assignation: list[int], cnf: CNF) -> list[list[int]]:
     """Return the list of unsatisfied clauses.
 
@@ -213,11 +198,12 @@ def unsat_clauses(assignation: list[int], cnf: CNF) -> list[list[int]]:
     for clause in cnf.clauses():
         clause_1 = False
         for var in clause:
-            if assignation[abs(var)-1] == 1:
+            if var in assignation:
                 clause_1 = True
                 break
         if not clause_1:
             unsat.append(clause)
+
     return unsat
 
 
@@ -235,17 +221,19 @@ def walk_sat(cnf: CNF) -> list[int]:
     # delete_valid_clauses(cnf)
 
     # Initialize the model
-    model = [0] * cnf.nvars()
+    model = []
+    for i in range(1,cnf.nvars()+1):
+        model.append(i)
 
     MAX_ITERATION = 10000
     n_iter = 0
     while n_iter < MAX_ITERATION:
         # Get the list of unsatisfied clauses
         clauses = unsat_clauses(model, cnf)
-
+        
         # If there are no unsatisfied clauses, return the model
         if clauses == []:
-            return assignation_to_var(model)
+            return model
 
         # Get a random unsatisfied clause
         clause = choice(clauses)
@@ -258,7 +246,7 @@ def walk_sat(cnf: CNF) -> list[int]:
             y = clause[0]
 
         # Flip the variable
-        model[abs(y)-1] = (model[abs(y)-1]+1) % 2
+        model[abs(y)-1] = model[abs(y)-1] * (-1)
         n_iter += 1
 
     return None

@@ -40,7 +40,7 @@ def init_db(use_test_data=None):
     exec_script(conn, "data/default_types.sql")
 
     if use_test_data is None:
-        use_test_data = fmt.binput("Voulez-vous ajouter des données de test ? (O/N) ")
+        use_test_data = fmt.bool_input("Voulez-vous ajouter des données de test ? (O/N) ")
 
     if use_test_data is True:
         # Ajouter des données de test

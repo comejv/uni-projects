@@ -1,31 +1,60 @@
+# Basic python module providing functions to output
+# formatted text using ANSI escape sequences.
+
+# Author : Côme VINCENT, 2023
+
 def clear() -> None:
-    """Efface l'écran."""
+    """Clears the terminal screen, deletes scrollback buffer and
+    moves the cursor to the top left corner of the screen."""
     print("\x1b[3J\x1b[H\x1b[J", end="")
 
 
-def pitalic(s: str, end="\n") -> None:
-    """Affiche le texte en italique."""
-    print("\x1b[3m" + s + "\x1b[0m", end=end)
+def pitalic(*args, **kwargs) -> None:
+    """Prints given arguments in italic. Stdout unless specified."""
+    print("\x1b[3m", end="")
+    print(*args, **kwargs)
+    print("\x1b[23m", end="")
 
 
-def pbold(s: str) -> None:
-    """Affiche le texte en gras."""
-    print("\x1b[1m" + s + "\x1b[0m")
+def pbold(*args, **kwargs) -> None:
+    """Prints given arguments in bold. Stdout unless specified."""
+    print("\x1b[1m", end="")
+    print(*args, **kwargs)
+    print("\x1b[22m", end="")
 
 
-def perror(s: str) -> None:
-    """Affiche le texte en rouge et en gras."""
-    print("\x1b[31m" + s + "\x1b[0m")
+def pwarn(*args, **kwargs) -> None:
+    """Prints given arguments in bold yellow. Stdout unless specified."""
+    print("\x1b[33m", end="")
+    print(*args, **kwargs)
+    print("\x1b[39m", end="")
 
 
-def binput(prompt: str) -> bool:
-    """Demande à l'utilisateur d'entrer une valeur booléenne."""
-    bprompt = "\x1b[1m" + prompt + "\x1b[0m"
+def perror(*args, **kwargs) -> None:
+    """Prints given arguments in bold red. Stdout unless specified."""
+    print("\x1b[31m", end="")
+    print(*args, **kwargs)
+    print("\x1b[39m", end="")
+
+
+def pblink(s: str, **kwargs) -> None:
+    """Prints a string in blink. Stdout unless specified."""
+    print("\x1b[5m" + s + "\x1b[25m", **kwargs)
+
+
+def bool_input(prompt: str) -> bool:
+    """Asks the user to input a boolean value.
+    Cancel with Ctrl+C."""
+
+    # Get the user input
+    bold_prompt = "\x1b[1m" + prompt + "\x1b[0m"
     try:
-        str_input = input(bprompt).lower()
+        str_input = input(bold_prompt).lower()
     except KeyboardInterrupt:
         print()
         exit(0)
+
+    # Check if the input is valid
     bool_input = ['true', '1', 't', 'y', 'yes', 'o',
                   'false', '0', 'f', 'n', 'no', 'n']
 
@@ -37,26 +66,28 @@ def binput(prompt: str) -> bool:
                 return False
         except ValueError:
             try:
-                str_input = input(bprompt).lower()
+                str_input = input(bold_prompt).lower()
             except KeyboardInterrupt:
                 print()
                 exit(0)
 
 
-def print_table(data: list, headers: list) -> None:
-    """Affiche les données dans un tableau."""
+def print_table(data: list[str], headers: list[str]) -> None:
+    """Shows a formatted table in the terminal."""
     max_length_column = [0] * len(headers)
     for i in range(len(data)):
         for j in range(len(data[i])):
             if len(str(data[i][j])) > max_length_column[j]:
                 max_length_column[j] = len(str(data[i][j]))
 
-    print("\x1b[1m|", end="")
+    print("|", end="")
     for i, header in enumerate(headers):
         if len(header) > max_length_column[i]:
             max_length_column[i] = len(header)
-        print(" " + header.ljust(max_length_column[i]) + " |", end="")
-    print("\x1b[0m")
+        pbold(" " + header.ljust(max_length_column[i]) + " |", end="")
+    print()
+
+    print("*" * (sum(max_length_column) + 3 * len(headers) + 1))
 
     for row in data:
         print("|", end="")
@@ -65,8 +96,8 @@ def print_table(data: list, headers: list) -> None:
         print()
 
 
-def print_as_form(inputs: list) -> list[str]:
-    """Affiche un formulaire et renvoie les réponses de l'utilisateur."""
+def form_input(inputs: list) -> list[str]:
+    """Asks the user to input a list of values."""
     answers = [None] * len(inputs)
 
     # Calcul des longueurs des labels
@@ -75,9 +106,7 @@ def print_as_form(inputs: list) -> list[str]:
     n_labels = len(inputs)
 
     # Affichage des labels
-    print("\x1b[1m", end="")
-    print(*inputs, sep="\n", end="")
-    print("\x1b[0m", end="")
+    pbold(*inputs, sep="\n", end="")
 
     # Affichage des champs de saisie
     print(f"\x1b[{n_labels - 1}F", end="")

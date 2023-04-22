@@ -36,8 +36,6 @@ def main_menu(conn: Connection) -> bool:
     elif choice == "3":
         return True
     elif choice == "4":
-        return True
-    elif choice == "4":
         while manual_query(conn):
             pass
         return True
@@ -109,7 +107,7 @@ def get_filters(conn: Connection, table: str) -> dict[str: str]:
         return None
 
     headers = [desc[0] for desc in cursor.description]
-    values = fmt.print_as_form(headers)
+    values = fmt.form_input(headers)
 
     if values is None:
         return None
@@ -121,9 +119,11 @@ def get_filters(conn: Connection, table: str) -> dict[str: str]:
     return filters if len(filters) > 0 else None
 
 
-def browse_filter(conn: Connection, table,
+def browse_filter(conn: Connection, table: str,
                   filters: dict = None, prompt_filters: bool = False) -> bool:
     """Affiche les données de la table `table` filtrées par `filters`.
+    Attention : laisser l'utilisateur choisir le paramètre table rends la fonction
+    vulnérable à une injection SQL.
 
     Args:
         conn (Connection): Connexion à la base de données
@@ -171,7 +171,7 @@ def browse_filter(conn: Connection, table,
     fmt.print_table(cursor.fetchall(), headers)
 
     # Attente de l'utilisateur
-    fmt.pitalic("Appuyez sur une touche pour continuer...", end="")
+    fmt.pblink("Appuyez sur Entrée pour continuer...", end="")
     try:
         input()
     except KeyboardInterrupt:
@@ -219,7 +219,7 @@ def insert_delete(conn: Connection) -> bool:
         fmt.clear()
         fmt.pbold("Réinitialisation de la base de données.")
         fmt.perror("Cette action est irréversible !")
-        if fmt.binput("Êtes-vous sûr de vouloir continuer ? (O/N) "):
+        if fmt.bool_input("Êtes-vous sûr de vouloir continuer ? (O/N) "):
             db.drop_all_tables(conn)
             fmt.pitalic("Réinitialisation de la base de données...")
             db.init_db()
@@ -248,6 +248,7 @@ def manual_query(conn: Connection) -> bool:
         fmt.print_table(res.fetchall(), headers)
     except OperationalError as e:
         fmt.perror(e)
-        input("Appuyez sur Entrée pour continuer...")
+        fmt.pblink("Appuyez sur Entrée pour continuer...")
+        input()
 
-    return fmt.binput("Voulez-vous faire une autre requête ? (O/N) ")
+    return fmt.bool_input("Voulez-vous faire une autre requête ? (O/N) ")

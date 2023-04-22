@@ -83,3 +83,9 @@ Info : certains projets sont stockés dans un dépôt séparé : [utils-and-game
 > Gestion de données relationnelles et applications
 
 [**INF403 - Projet**](INF403/) : application de gestion d'une base de données pour une entreprise produisant et vendant de l'hydrogène liquide.
+
+## INF404 ![](https://img.shields.io/badge/-C-red)
+
+> Projet logiciel
+
+[**INF404 - Projet**](https://github.com/euxem/Projet_shrek) : un interpréteur de langage que nous avons créé, dont le but est d'ajouter un paradigme de programmation fonctionnelle au langage graphique dot qui n'est que déclaratif. Stocké sur un dépôt de mon binôme, [Euxem](https://github.com/euxem).

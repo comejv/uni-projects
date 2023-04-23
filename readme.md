@@ -19,13 +19,32 @@ Info : certains projets sont stockés dans un dépôt séparé : [utils-and-game
 
 ***
 
-## Graphe du dépôt
+## Stats du dépôt
 
 <p align="center" href="https://raw.githubusercontent.com/comejv/uni-projects/main/diagram.svg">
 <kbd>
 <img src="./diagram.svg" alt="A diagram of this repository" width="70%">
 </kbd>
 </p>
+
+```
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+C                               36            548            520           4493
+Python                          14            478            443           1330
+C/C++ Header                    19            198            208            439
+SQL                              4             13             25            173
+make                             3             59             15             89
+Markdown                         2             42              0             69
+xBase                           25              6              0             56
+JSON                             2              0              0             43
+YAML                             1              0              0             16
+SVG                              1              0              0              1
+-------------------------------------------------------------------------------
+SUM:                           107           1344           1211           6709
+-------------------------------------------------------------------------------
+```
 
 ***
 

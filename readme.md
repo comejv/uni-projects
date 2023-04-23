@@ -107,4 +107,4 @@ SUM:                           107           1344           1211           6709
 
 > Projet logiciel
 
-[**INF404 - Projet**](https://github.com/euxem/Projet_shrek) : un interpréteur de langage que nous avons créé, dont le but est d'ajouter un paradigme de programmation fonctionnelle au langage graphique dot qui n'est que déclaratif. Stocké sur un dépôt de mon binôme, [Euxem](https://github.com/euxem).
+[**INF404 - Projet**](https://github.com/euxem/Projet_shrek) : interpréteur d'un langage que nous avons créé, dont le but est d'ajouter un paradigme de programmation fonctionnelle au langage graphique dot qui n'est que déclaratif. Stocké sur un dépôt de mon binôme, [Euxem](https://github.com/euxem).

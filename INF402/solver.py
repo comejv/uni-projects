@@ -70,7 +70,8 @@ def bridges_to_clauses(vpool: IDPool, cases: list[Bridges]) -> list[list[int]]:
 
     return clauses
 
-def Arc_to_id (vpool: IDPool, arc: Arc):
+
+def Arc_to_id(vpool: IDPool, arc: Arc):
     """Convert an arc to an ID.
 
     Args:
@@ -83,8 +84,9 @@ def Arc_to_id (vpool: IDPool, arc: Arc):
         return vpool.id(arc.id)
     else:
         return -vpool.id(arc.id)
-    
-def Way_to_id (vpool: IDPool, way: Way):
+
+
+def Way_to_id(vpool: IDPool, way: Way):
     """Convert an way to an ID.
 
     Args:
@@ -97,7 +99,8 @@ def Way_to_id (vpool: IDPool, way: Way):
         return vpool.id(way.id)
     else:
         return -vpool.id(way.id)
-    
+
+
 def Arcs_Ways_to_clauses(vpool: IDPool, vpool_bridges: IDPool, cases: list[list]) -> list[list]:
     clauses = []
     for case in cases:
@@ -111,6 +114,7 @@ def Arcs_Ways_to_clauses(vpool: IDPool, vpool_bridges: IDPool, cases: list[list]
                 temp.append(bridge_to_id(vpool_bridges, element))
         clauses.append(temp)
     return clauses
+
 
 def cnf_to_bridges(vpool: IDPool, model: list[int]) -> list[str]:
     """Convert a CNF formula to a list of bridge ids.

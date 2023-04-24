@@ -121,30 +121,42 @@ def no_crossing(bridges: list[Bridges]) -> list[list[Bridges]]:
                 cnf.append([bridge.get_neg(), bridge2.get_neg()])
     return cnf
 
-def trouver_chemins(n1:Node,n2:Node, deja_vu:list[Node]=[]):
-    if n1==n2:
+
+def find_paths(n1: Node, n2: Node, deja_vu: list[Node] = []) -> list[list]:
+    """Returns all the paths between n1 and n2.
+
+    Args:
+        n1 (Node): First node.
+        n2 (Node): Second node.
+        deja_vu (list[Node], optional): List of nodes already visited. Defaults to [].
+
+    Returns:
+        list: List of all the paths between n1 and n2.
+    """
+    if n1 == n2:
         return [[Way(n1, n2, True)]]
-    l = [[Way(n1, n2, False)]]
+    paths = [[Way(n1, n2, False)]]
     for neigh in n1.neighbours:
-        l2=[]
-        l3=[]
-        if not neigh in deja_vu:
-            l_temp = trouver_chemins(neigh,n2,deja_vu + [n1])
-            if l_temp != []:
-                for e in l:
-                    l2.append(e+[Arc(n1, neigh, True)])
-                    l3.append(e+[Way(neigh, n2, True)])
-                l = l2 + l3
-                l.append([Arc(n1, neigh, False), Bridge(1, n1, neigh), Bridge(2, n1, neigh)])
-                l = l + l_temp
-    return l
+        outgoings = []
+        arriving = []
+        if neigh not in deja_vu:
+            neigh_paths = find_paths(neigh, n2, deja_vu + [n1])
+            if neigh_paths != []:
+                for path in paths:
+                    outgoings.append(path + [Arc(n1, neigh, True)])
+                    arriving.append(path + [Way(neigh, n2, True)])
+                paths = outgoings + arriving
+                paths.append([Arc(n1, neigh, False),
+                              Bridge(1, n1, neigh),
+                              Bridge(2, n1, neigh)])
+                paths = paths + neigh_paths
+    return paths
 
 
-def connexite (nodes:list[Node]):
-    node=nodes[0]
-    clause=[]
-    for e in nodes:
-        if e != node:
-            clause.append([Way(node, e, True)])
-            clause = clause + trouver_chemins(node,e)
+def connexite(nodes: list[Node]):
+    node_init = nodes[0]
+    clause = []
+    for node in nodes[1:]:
+        clause.append([Way(node_init, node, True)])
+        clause = clause + find_paths(node_init, node)
     return clause

@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
 from genericpath import isfile
+from classes import CNF, IDPool
+from sat import cnf_to_3sat
 import solver
 import rules
 
@@ -14,6 +16,8 @@ parser.add_argument("-c", "--cnf", dest="cnf",
                     help="path to the file where the CNF will be written")
 parser.add_argument("-p", "--pysat", dest="pysat", action="store_true", default=False,
                     help="use PySAT instead of our own WalkSAT")
+parser.add_argument("-t", "--sat3", dest="sat3", action="store_true", default=False,
+                    help="convert CNF to 3 sat before using")
 parser.add_argument("-q", "--quiet", dest="quiet",
                     help="do not print the solution")
 parser.add_argument("-b", "--bridge-help", dest="bridge_help", action="store_true",
@@ -62,8 +66,8 @@ else:
         raise SystemExit
 
 # Create IDPool and cnf
-vpool_bridges = solver.IDPool()
-cnf = solver.CNF()
+vpool_bridges = IDPool()
+cnf = CNF()
 
 # Create every possible bridge
 bridges = solver.all_bridges(nodes)
@@ -84,6 +88,10 @@ vpool = solver.IDPool(cnf.nvars() + 1)
 
 # Connexity rule apply #
 cnf.extend(solver.Arcs_Ways_to_clauses(vpool, vpool_bridges, rules.connexite(nodes)))
+
+# Convert to 3-SAT if asked
+if args.sat3:
+    cnf = cnf_to_3sat(cnf)
 
 # ## Solve ## #
 if args.cnf:

@@ -1,4 +1,4 @@
-from classes import Bridge, Bridges, Node
+from classes import Bridge, Bridges, Node, Arc, Way
 
 
 def n_choose_k(list: list[Bridge], n: int) -> list[list]:
@@ -120,3 +120,31 @@ def no_crossing(bridges: list[Bridges]) -> list[list[Bridges]]:
                     and bridge2.n1.y > bridge.n1.y and bridge2.n1.y < bridge.n2.y:
                 cnf.append([bridge.get_neg(), bridge2.get_neg()])
     return cnf
+
+def trouver_chemins(n1:Node,n2:Node, deja_vu:list[Node]=[]):
+    if n1==n2:
+        return [[Way(n1, n2, True)]]
+    l = [[Way(n1, n2, False)]]
+    for neigh in n1.neighbours:
+        l2=[]
+        l3=[]
+        if not neigh in deja_vu:
+            l_temp = trouver_chemins(neigh,n2,deja_vu + [n1])
+            if l_temp != []:
+                for e in l:
+                    l2.append(e+[Arc(n1, neigh, True)])
+                    l3.append(e+[Way(neigh, n2, True)])
+                l = l2 + l3
+                l.append([Arc(n1, neigh, False), Bridge(1, n1, neigh), Bridge(2, n1, neigh)])
+                l = l + l_temp
+    return l
+
+
+def connexite (nodes:list[Node]):
+    node=nodes[0]
+    clause=[]
+    for e in nodes:
+        if e != node:
+            clause.append([Way(node, e, True)])
+            clause = clause + trouver_chemins(node,e)
+    return clause

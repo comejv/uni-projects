@@ -62,7 +62,7 @@ else:
         raise SystemExit
 
 # Create IDPool and cnf
-vpool = solver.IDPool()
+vpool_bridges = solver.IDPool()
 cnf = solver.CNF()
 
 # Create every possible bridge
@@ -72,11 +72,18 @@ bridges = solver.all_bridges(nodes)
 
 # Nodes must have {node.value} bridges exactly
 for node in nodes:
-    dnf = solver.bridges_to_clauses(vpool, rules.connect_node(node))
-    cnf.extend(dnf)
+    cnf.extend(solver.bridges_to_clauses(vpool_bridges, rules.connect_node(node)))
 
 # Bridges can't cross each other
-cnf.extend(solver.bridges_to_clauses(vpool, rules.no_crossing(bridges)))
+cnf.extend(solver.bridges_to_clauses(vpool_bridges, rules.no_crossing(bridges)))
+
+# ## Connexity Rule ## #
+
+# Create new IDPool
+vpool = solver.IDPool(cnf.nvars() + 1)
+
+# Connexity rule apply #
+cnf.extend(solver.Arcs_Ways_to_clauses(vpool, vpool_bridges, rules.connexite(nodes)))
 
 # ## Solve ## #
 if args.cnf:
@@ -88,4 +95,4 @@ if not args.quiet:
     if model is not None:
         print("One model is :")
         print("Variables :", model)
-        print("Bridges :", solver.cnf_to_bridges(vpool, model))
+        print("Bridges :", solver.cnf_to_bridges(vpool_bridges, model[:(vpool_bridges.next_id)-1]))

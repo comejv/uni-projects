@@ -3,7 +3,7 @@ from os.path import isfile
 from sat import CNF, IDPool, walk_sat
 from pysat.solvers import Solver
 
-from classes import Bridge, Bridges, Node
+from classes import Bridge, Bridges, Node, Way, Arc
 from vision import create_nodes_from_image, create_nodes_from_text, fatal
 import rules
 
@@ -70,6 +70,47 @@ def bridges_to_clauses(vpool: IDPool, cases: list[Bridges]) -> list[list[int]]:
 
     return clauses
 
+def Arc_to_id (vpool: IDPool, arc: Arc):
+    """Convert an arc to an ID.
+
+    Args:
+        arc (Arc): Arc to convert.
+
+    Returns:
+        int: ID of the Arc. Negative if the Arc is not used.
+    """
+    if arc.value:
+        return vpool.id(arc.id)
+    else:
+        return -vpool.id(arc.id)
+    
+def Way_to_id (vpool: IDPool, way: Way):
+    """Convert an way to an ID.
+
+    Args:
+        way (Way): Way to convert.
+
+    Returns:
+        int: ID of the Way. Negative if the Way is not used.
+    """
+    if way.value:
+        return vpool.id(way.id)
+    else:
+        return -vpool.id(way.id)
+    
+def Arcs_Ways_to_clauses(vpool: IDPool, vpool_bridges: IDPool, cases: list[list]) -> list[list]:
+    clauses = []
+    for case in cases:
+        temp = []
+        for element in case:
+            if type(element) == Arc:
+                temp.append(Arc_to_id(vpool, element))
+            elif type(element) == Way:
+                temp.append(Way_to_id(vpool, element))
+            else:
+                temp.append(bridge_to_id(vpool_bridges, element))
+        clauses.append(temp)
+    return clauses
 
 def cnf_to_bridges(vpool: IDPool, model: list[int]) -> list[str]:
     """Convert a CNF formula to a list of bridge ids.
@@ -143,7 +184,7 @@ def solve_cnf(cnf: CNF, quiet=False, pysat=False) -> list[int]:
         # Print number of variables and clauses
         if not quiet:
             print("Number of variables :", solver.nof_vars())
-            print("Number of clauses :", solver.nof_clauses())
+            print("Number of clauses :", cnf.nclauses())
         solvable = solver.solve()
         return solver.get_model() if solvable else None
     else:

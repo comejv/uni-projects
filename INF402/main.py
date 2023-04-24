@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from genericpath import isfile
+from classes import CNF, IDPool
 import solver
 import rules
 
@@ -62,8 +63,8 @@ else:
         raise SystemExit
 
 # Create IDPool and cnf
-vpool = solver.IDPool()
-cnf = solver.CNF()
+vpool = IDPool()
+cnf = CNF()
 
 # Create every possible bridge
 bridges = solver.all_bridges(nodes)

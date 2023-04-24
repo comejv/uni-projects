@@ -1,9 +1,9 @@
 from sys import argv
 from os.path import isfile
-from sat import CNF, IDPool, walk_sat
+from sat import walk_sat
 from pysat.solvers import Solver
 
-from classes import Bridge, Bridges, Node
+from classes import Bridge, Bridges, Node, CNF, IDPool
 from vision import create_nodes_from_image, create_nodes_from_text, fatal
 import rules
 

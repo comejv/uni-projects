@@ -253,7 +253,8 @@ class IDPool:
 
     def obj(self, id: int) -> int:
         """Get the object name corresponding to the given integer ID.
-        If name was a string, its hash is returned.
+        If name was a string, its hash is returned. If object was not
+        found, returns None.
 
         Args:
             id (int): Integer ID.
@@ -261,5 +262,16 @@ class IDPool:
         Returns:
             int: Name or hash of the name.
         """
-        # Invert the map and return the name
-        return list(self.id_map.keys())[list(self.id_map.values()).index(id)]
+        try:
+            # Invert the map and return the name
+            return list(self.id_map.keys())[list(self.id_map.values()).index(id)]
+        except ValueError:
+            # Return None if object was not found
+            return None
+
+
+if __name__ == "__main__":
+    vpool = IDPool()
+    ia = vpool.id(1)
+    print(vpool.obj(1))
+    print(vpool.obj(2))

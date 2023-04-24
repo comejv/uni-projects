@@ -82,18 +82,6 @@ class Bridges:
             self.dict[bridge.id] = bridge
             self._len += 1
 
-    # TODO: trouver la pos de l'ile à partir de l'id
-    # def add_from_id(self, bid: int) -> None:
-    #     if bid not in self.dict:
-    #         abid = abs(bid)
-    #         lvl = abid // 10000
-    #         n1id = (abid % 10000) // 100
-    #         n2id = abid % 100
-    #         if bid < 0:
-    #             lvl = -lvl
-    #         self.dict[bid] = Bridge(lvl, Node(n1id), Node(n2id))
-    #         self._len += 1
-
     def connected_to_node(self, n: Node) -> list:
         """ Return the list of bridges connected to the node n.
 

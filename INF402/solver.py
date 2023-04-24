@@ -71,7 +71,7 @@ def bridges_to_clauses(vpool: IDPool, cases: list[Bridges]) -> list[list[int]]:
     return clauses
 
 
-def Arc_to_id(vpool: IDPool, arc: Arc):
+def arc_to_id(vpool: IDPool, arc: Arc):
     """Convert an arc to an ID.
 
     Args:
@@ -86,7 +86,7 @@ def Arc_to_id(vpool: IDPool, arc: Arc):
         return -vpool.id(arc.id)
 
 
-def Way_to_id(vpool: IDPool, way: Way):
+def way_to_id(vpool: IDPool, way: Way):
     """Convert an way to an ID.
 
     Args:
@@ -101,15 +101,15 @@ def Way_to_id(vpool: IDPool, way: Way):
         return -vpool.id(way.id)
 
 
-def Arcs_Ways_to_clauses(vpool: IDPool, vpool_bridges: IDPool, cases: list[list]) -> list[list]:
+def arcs_ways_to_clauses(vpool: IDPool, vpool_bridges: IDPool, cases: list[list]) -> list[list]:
     clauses = []
     for case in cases:
         temp = []
         for element in case:
             if type(element) == Arc:
-                temp.append(Arc_to_id(vpool, element))
+                temp.append(arc_to_id(vpool, element))
             elif type(element) == Way:
-                temp.append(Way_to_id(vpool, element))
+                temp.append(way_to_id(vpool, element))
             else:
                 temp.append(bridge_to_id(vpool_bridges, element))
         clauses.append(temp)

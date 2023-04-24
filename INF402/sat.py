@@ -59,7 +59,7 @@ def cnf_to_3sat(cnf: CNF) -> CNF:
     Returns:
         CNF: A list of clauses where each clause has at most 3.
     """
-    v_max = cnf.nvars()
+    # v_max = cnf.nvars()
     v_max_3sat = cnf.nvars()
     t_sat = CNF()
     for clause in cnf.clauses():
@@ -84,10 +84,11 @@ def cnf_to_3sat(cnf: CNF) -> CNF:
                 elif i == 0:
                     t_sat.add_clause([clause[0], clause[1], v_max_3sat + 1])
                 else:
-                    t_sat.add_clause([clause[-2], clause[-1], -(v_max_3sat + i)])
+                    t_sat.add_clause(
+                        [clause[-2], clause[-1], -(v_max_3sat + i)])
                     v_max_3sat = v_max_3sat + i
                     break
-    return t_sat, v_max
+    return t_sat  # , v_max
 
 
 def walk_sat(cnf: CNF) -> list[int]:

@@ -176,7 +176,10 @@ def browse_filter(conn: Connection, table: str,
     # Affichage des données
     headers = [desc[0] for desc in cursor.description]
     fmt.clear()
-    fmt.print_table(cursor.fetchall(), headers)
+    results = cursor.fetchall()
+    fmt.print_table(results, headers)
+    if not results:
+        fmt.pwarn("Aucune données trouvées, vérifiez votre requête !")
 
     # Attente de l'utilisateur
     fmt.pblink("Appuyez sur Entrée pour continuer...", end="")
@@ -217,7 +220,6 @@ def insert_delete(conn: Connection) -> bool:
         fmt.perror("Cette action est irréversible !")
         if fmt.bool_input("Êtes-vous sûr de vouloir continuer ? (O/N) "):
             db.drop_all_tables(conn)
-            fmt.pitalic("Réinitialisation de la base de données...")
             db.init_db()
         print("Retour au menu principal.")
         return False

@@ -15,6 +15,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         conn.close()
         fmt.clear()
-        print("\nAu revoir !")
+        print("Au revoir !")
 
     conn.close()

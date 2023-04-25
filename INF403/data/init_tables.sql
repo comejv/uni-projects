@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS Usines (
                              REFERENCES TYPES(nom_type)
 );
 
-CREATE TABLE IF NOT EXISTS Commandes (
+CREATE TABLE IF NOT EXISTS Commandes_base (
     numero_commande INTEGER NOT NULL,
     quantite_commande INTEGER NOT NULL,
     livraison_commande DATE,
@@ -32,6 +32,25 @@ CREATE TABLE IF NOT EXISTS Commandes (
     CONSTRAINT fk_num_usine FOREIGN KEY (numero_usine) REFERENCES Usines(numero_usine)
 );
 
+CREATE VIEW IF NOT EXISTS Commandes (
+    numero_commande,
+    quantite_commande,
+    livraison_commande,
+    numero_usine,
+	prix_total_commande,
+	rejet_total_commande) AS
+    SELECT
+        numero_commande,
+        quantite_commande,
+        livraison_commande,
+        numero_usine,
+        --
+        (quantite_commande * prix_type) AS prix_total_commande,
+        (quantite_commande * rejet_max_type) AS rejet_total_commande
+    FROM Commandes_base JOIN Usines USING (numero_usine)
+                        JOIN Types  USING (nom_type)
+    GROUP BY numero_commande, quantite_commande, livraison_commande,numero_usine,prix_type,rejet_max_type;
+    
 CREATE TABLE IF NOT EXISTS Clients (
     numero_client INTEGER NOT NULL,
     nom_client TEXT NOT NULL,
@@ -59,7 +78,7 @@ CREATE TABLE IF NOT EXISTS Navires (
     CONSTRAINT imo_max CHECK (imo_navire < 10000000),
     CONSTRAINT cap_nav_pos CHECK (capacite_navire > 0),
     CONSTRAINT fk_duns FOREIGN KEY (duns_transporteur) REFERENCES Transporteurs(duns_transporteur),
-    CONSTRAINT fk_num_cmd FOREIGN KEY (numero_commande) REFERENCES Commandes(numero_commande),
+    CONSTRAINT fk_num_cmd FOREIGN KEY (numero_commande) REFERENCES Commandes_base(numero_commande),
     CONSTRAINT num_cmd UNIQUE (numero_commande)
 );
 
@@ -69,5 +88,5 @@ CREATE TABLE IF NOT EXISTS CommandesClients (
     date_commande_client DATE NOT NULL,
     CONSTRAINT pk_commandes_clients PRIMARY KEY (numero_client, numero_commande),
     CONSTRAINT fk_num_cli FOREIGN KEY (numero_client) REFERENCES Clients(numero_client),
-    CONSTRAINT fk_num_cmd FOREIGN KEY (numero_commande) REFERENCES Commandes(numero_commande)
+    CONSTRAINT fk_num_cmd FOREIGN KEY (numero_commande) REFERENCES Commandes_base(numero_commande)
 );

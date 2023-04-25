@@ -127,3 +127,15 @@ def drop_all_tables(conn: sqlite3.Connection):
         cursor.execute(f"DROP TABLE IF EXISTS {table}")
 
     conn.commit()
+
+def show_results(cursor:sqlite3.Cursor) -> None :
+    headers = [desc[0] for desc in cursor.description]
+    fmt.clear()
+    results = cursor.fetchall()
+    fmt.print_table(results, headers)
+    if not results:
+        fmt.pwarn("Aucune données trouvées, vérifiez votre requête !")
+
+    # Attente de l'utilisateur
+    fmt.pblink("Appuyez sur Entrée pour continuer...", end="")
+    input()

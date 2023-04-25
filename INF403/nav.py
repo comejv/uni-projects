@@ -1,5 +1,6 @@
 from utils import db, fmt
 from sqlite3 import Connection, OperationalError
+import requete
 
 
 def create_menu(menu: list[str]) -> int:
@@ -248,8 +249,11 @@ def advance_request(conn: Connection) -> bool:
             False sinon.
     """
 
-    choice = create_menu(["Requêtes avancées", "Requête A"])
+    choice = create_menu(["Requêtes avancées", "Information client", "Retour au menu principale"])
+    
     if choice == 1:
+        return requete.information_client(conn)
+    elif choice == 2:
         return False
 
 

@@ -129,6 +129,18 @@ def drop_all_tables(conn: sqlite3.Connection):
 
     conn.commit()
 
+def show_results(cursor:sqlite3.Cursor) -> None :
+    headers = [desc[0] for desc in cursor.description]
+    fmt.clear()
+    results = cursor.fetchall()
+    fmt.print_table(results, headers)
+    if not results:
+        fmt.pwarn("Aucune données trouvées, vérifiez votre requête !")
+
+    # Attente de l'utilisateur
+    fmt.pblink("Appuyez sur Entrée pour continuer...", end="")
+    input()
+
 
 def insert_data(conn: sqlite3.Connection, table: str, data: list):
     """Insère les données `data` dans la table `table` dans la base de données.

@@ -49,6 +49,8 @@ def main_menu(conn: Connection) -> bool:
             pass
         return True
     elif choice == 3:
+        while advance_request(conn):
+            pass
         return True
     elif choice == 4:
         while manual_query(conn):
@@ -192,21 +194,9 @@ def insert_delete(conn: Connection) -> bool:
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
             False sinon.
     """
-    fmt.clear()
-    fmt.pbold("Insertion ou supression des données")
-    print("1. Clients")
-    print("2. Commandes")
-    print("3. Usines")
-    print("4. Transporteurs")
-    print("5. Types d'hydrogène")
-    print("6. Réinitialiser la base de données (irréversible)")
-    print("7. Retour au menu principal", end="\n\n")
-
-    choice = int(input("Choix : "))
-    while int(choice) < 1 or int(choice) > 7:
-        print("\x1b[1F\x1b[K", end="")
-        choice = input("Choix : ")
-
+    
+    choice = create_menu(["Insertion ou supression des données", "Clients", "Commandes", "Usines", "Transporteurs", "Types d'hydrogène", "Réinitialiser la base de données (irréversible)", "Retour au menu principal"])
+    
     if choice == 1:
         pass
     elif choice == 2:
@@ -230,6 +220,20 @@ def insert_delete(conn: Connection) -> bool:
     elif choice == 7:
         return False
 
+def advance_request(conn: Connection) -> bool:
+    """Affiche le menu des requêtes avancées.
+
+    Args:
+        conn (Connection): Connexion à la database.
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+            False sinon.
+    """
+
+    choice = create_menu(["Requêtes avancées", "Requête A"])
+    if choice == 1:
+        return False
 
 def manual_query(conn: Connection) -> bool:
     """Exécute une requête entrée manuellement par l'utilisateur.

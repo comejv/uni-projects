@@ -1,6 +1,33 @@
 from utils import db, fmt
 from sqlite3 import Connection, OperationalError
 
+def create_menu(menu:list[str]) -> int :
+    """Affiche le menu en argument.
+    
+    Args:
+        menu (list[str]): Liste représentant le titre du menu (menu[0]) et les options du menu (reste)
+    
+    Returns:
+        int : entier représentant le choix choisie par l'utilisateur     
+    """
+    correct = True
+    while correct :
+        fmt.clear()
+        fmt.pbold(menu[0])
+        for i in range(1,len(menu)):
+            print("%d. %s" %(i,menu[i]))
+        print(end="\n\n")
+
+        choice = input("Choix : ")
+
+        for i in range(1,len(menu)):
+            try:
+                if i == int(choice) :
+                    correct = False
+            except ValueError:
+                pass
+    return int(choice)
+
 
 def main_menu(conn: Connection) -> bool:
     """Affiche le menu principal.
@@ -11,35 +38,23 @@ def main_menu(conn: Connection) -> bool:
     Returns:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour quitter le programme
     """
-    fmt.clear()
-    fmt.pbold("Menu principal")
-    print("1. Parcourir les données")
-    print("2. Insérer ou supprimer des données")
-    print("3. Requêtes avancées")
-    print("4. Requêtes manuelle")
-    print("5. Quitter", end="\n\n")
+    choice = create_menu(["Menu principal", "Parcourir les données", "Insérer ou supprimer des données", "Requêtes avancées", "Requêtes manuelle", "Quitter"])
 
-    choice = input("Choix : ")
-
-    while int(choice) < 1 or int(choice) > 5:
-        print("\x1b[1F\x1b[K", end="")
-        choice = input("Choix : ")
-
-    if choice == "1":
+    if choice == 1:
         while browse(conn):
             pass
         return True
-    elif choice == "2":
+    elif choice == 2:
         while insert_delete(conn):
             pass
         return True
-    elif choice == "3":
+    elif choice == 3:
         return True
-    elif choice == "4":
+    elif choice == 4:
         while manual_query(conn):
             pass
         return True
-    elif choice == "5":
+    elif choice == 5:
         return False
 
 
@@ -52,24 +67,11 @@ def browse(conn: Connection) -> bool:
     Returns:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour revenir au menu principal
     """
-    fmt.clear()
-    fmt.pbold("Parcourir les données")
-    print("1. Clients")
-    print("2. Commandes")
-    print("3. Usines")
-    print("4. Transporteurs")
-    print("5. Navires")
-    print("6. Types d'hydrogène")
-    print("7. Retour au menu principal", end="\n\n")
-
     try:
-        choice = int(input("Choix : "))
-        while int(choice) < 1 or int(choice) > 7:
-            print("\x1b[1F\x1b[K", end="")
-            choice = input("Choix : ")
-
+        choice = create_menu(["Parcourir les données", "Clients", "Commandes", "Usines", "Transporteurs", "Navires", "Types d'hydrogène", "Retour au menu principal"])
     except KeyboardInterrupt:
         return False
+    
     if choice == 1:
         return browse_filter(conn, table="Clients", prompt_filters=True)
     elif choice == 2:

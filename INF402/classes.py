@@ -93,45 +93,48 @@ class Bridges:
         """
         return [b for b in self.dict.values() if b.n1 == n or b.n2 == n]
 
+
 class Arc:
-    def __init__(self, n1:Node, n2:Node, value:bool) -> None:
-        self.n1 : Node = n1
-        self.n2 : Node = n2
-        self.value : bool = value
-        self.id : int = self.get_id(n1.id,n2.id)
+    def __init__(self, n1: Node, n2: Node, value: bool) -> None:
+        self.n1: Node = n1
+        self.n2: Node = n2
+        self.value: bool = value
+        self.id: int = self.get_id(n1.id, n2.id)
 
     def __repr__(self) -> str:
         if self.value:
             return f"A->{self.n1.id}to{self.n2.id}"
         return f"-A->{self.n1.id}to{self.n2.id}"
-    
+
     def __eq__(self, __other) -> bool:
         if not isinstance(__other, self.__class__):
             return NotImplemented
         return self.n2 == self.n2 and self.n1 == self.n1
-    
-    def get_id(self,n1:int,n2:int):
+
+    def get_id(self, n1: int, n2: int):
         return 30000 + n1 * 100 + n2
-    
+
+
 class Way:
-    def __init__(self, n1:Node, n2:Node, value:bool) -> None:
-        self.n1 : Node = n1
-        self.n2 : Node = n2
-        self.value : bool = value
-        self.id : int = self.get_id(n1.id,n2.id)
-    
+    def __init__(self, n1: Node, n2: Node, value: bool) -> None:
+        self.n1: Node = n1
+        self.n2: Node = n2
+        self.value: bool = value
+        self.id: int = self.get_id(n1.id, n2.id)
+
     def __repr__(self) -> str:
         if self.value:
             return f"W->{self.n1.id}to{self.n2.id}"
         return f"-W->{self.n1.id}to{self.n2.id}"
-    
+
     def __eq__(self, __other) -> bool:
         if not isinstance(__other, self.__class__):
             return NotImplemented
         return self.n2 == self.n2 and self.n1 == self.n1
-    
-    def get_id(self,n1:int,n2:int) -> int:
+
+    def get_id(self, n1: int, n2: int) -> int:
         return 40000 + n1 * 100 + n2
+
 
 class CNF:
     def __init__(self, from_clauses=None, from_file=None) -> None:

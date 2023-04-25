@@ -79,7 +79,8 @@ def exec_script(conn: sqlite3.Connection, file: str):
 
 
 def exec_query(conn: sqlite3.Connection, query: str, args: tuple = None) -> sqlite3.Cursor:
-    """Exécute la requête `query` sur la base de données.
+    """Exécute la requête `query` sur la base de données. Ne commit pas,
+    empèche de modifier la base de données.
 
     Args:
         conn (sqlite3.Connection): Connexion à la base de données
@@ -125,5 +126,27 @@ def drop_all_tables(conn: sqlite3.Connection):
 
     for table in tables:
         cursor.execute(f"DROP TABLE IF EXISTS {table}")
+
+    conn.commit()
+
+
+def insert_data(conn: sqlite3.Connection, table: str, data: list):
+    """Insère les données `data` dans la table `table` dans la base de données.
+
+    Args:
+        conn (sqlite3.Connection): Connexion à la base de données
+        table (str): Nom de la table à insérer
+        data (dict): Données à insérer
+    """
+
+    cursor = conn.cursor()
+    q_mark_str = ["?"] * len(data)
+    q_mark_str = ", ".join(q_mark_str)
+    cursor.execute(
+        f"INSERT INTO {table} VALUES ({q_mark_str})", tuple(data)
+    )
+
+    # Validation des modifications
+    print("Insertion réussie de "
 
     conn.commit()

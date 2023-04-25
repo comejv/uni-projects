@@ -10,23 +10,23 @@ def create_menu(menu:list[str]) -> int :
     Returns:
         int : entier représentant le choix choisie par l'utilisateur     
     """
-    correct = True
-    while correct :
-        fmt.clear()
-        fmt.pbold(menu[0])
-        for i in range(1,len(menu)):
-            print("%d. %s" %(i,menu[i]))
-        print(end="\n\n")
+    fmt.clear()
+    fmt.pbold(menu[0])
+    for i in range(1,len(menu)):
+        print("%d. %s" %(i,menu[i]))
+    print(end="\n\n\n")
 
-        choice = input("Choix : ")
+    while True :
+        
+        choice = input("\x1b[1F\x1b[KChoix : ")
 
-        for i in range(1,len(menu)):
-            try:
-                if i == int(choice) :
-                    correct = False
-            except ValueError:
-                pass
-    return int(choice)
+        try:
+            choice = int(choice)
+        except ValueError:
+            continue
+
+        if choice > 0 and choice < len(menu):
+            return int(choice)
 
 
 def main_menu(conn: Connection) -> bool:
@@ -69,10 +69,7 @@ def browse(conn: Connection) -> bool:
     Returns:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour revenir au menu principal
     """
-    try:
-        choice = create_menu(["Parcourir les données", "Clients", "Commandes", "Usines", "Transporteurs", "Navires", "Types d'hydrogène", "Retour au menu principal"])
-    except KeyboardInterrupt:
-        return False
+    choice = create_menu(["Parcourir les données", "Clients", "Commandes", "Usines", "Transporteurs", "Navires", "Types d'hydrogène", "Retour au menu principal"])
     
     if choice == 1:
         return browse_filter(conn, table="Clients", prompt_filters=True)
@@ -176,10 +173,7 @@ def browse_filter(conn: Connection, table: str,
 
     # Attente de l'utilisateur
     fmt.pblink("Appuyez sur Entrée pour continuer...", end="")
-    try:
-        input()
-    except KeyboardInterrupt:
-        return False
+    input()
 
     return True
 

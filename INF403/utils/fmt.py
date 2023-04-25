@@ -112,9 +112,5 @@ def form_input(inputs: list) -> list[str]:
     print(f"\x1b[{n_labels - 1}F", end="")
     for i in range(n_labels):
         print(f"\x1b[{label_lengths[i]}C", end="")
-        try:
-            answers[i] = input()
-        except KeyboardInterrupt:
-            clear()
-            return None
+        answers[i] = input()
     return answers

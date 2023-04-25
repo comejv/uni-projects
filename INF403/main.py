@@ -13,6 +13,7 @@ if __name__ == "__main__":
         while main_menu(conn):
             pass
     except KeyboardInterrupt:
+        conn.close()
         fmt.clear()
         print("\nAu revoir !")
 

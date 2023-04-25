@@ -1,23 +1,25 @@
 from utils import db, fmt
 from sqlite3 import Connection, OperationalError
 
-def create_menu(menu:list[str]) -> int :
+
+def create_menu(menu: list[str]) -> int:
     """Affiche le menu en argument.
-    
+
     Args:
-        menu (list[str]): Liste représentant le titre du menu (menu[0]) et les options du menu (reste)
-    
+        menu (list[str]): Liste représentant le titre du menu (menu[0])
+        et les options du menu (reste)
+
     Returns:
-        int : entier représentant le choix choisie par l'utilisateur     
+        int : entier représentant le choix choisie par l'utilisateur
     """
     fmt.clear()
     fmt.pbold(menu[0])
-    for i in range(1,len(menu)):
-        print("%d. %s" %(i,menu[i]))
+    for i in range(1, len(menu)):
+        print("%d. %s" % (i, menu[i]))
     print(end="\n\n\n")
 
-    while True :
-        
+    while True:
+
         choice = input("\x1b[1F\x1b[KChoix : ")
 
         try:
@@ -38,7 +40,9 @@ def main_menu(conn: Connection) -> bool:
     Returns:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour quitter le programme
     """
-    choice = create_menu(["Menu principal", "Parcourir les données", "Insérer ou supprimer des données", "Requêtes avancées", "Requêtes manuelle", "Quitter"])
+    choice = create_menu(["Menu principal", "Parcourir les données",
+                          "Insérer ou supprimer des données", "Requêtes avancées",
+                          "Requêtes manuelle", "Quitter"])
 
     if choice == 1:
         while browse(conn):
@@ -67,10 +71,13 @@ def browse(conn: Connection) -> bool:
         conn (Connection): Connexion à la base de données
 
     Returns:
-        bool: `True` si l'utilisateur souhaite continuer, `False` pour revenir au menu principal
+        bool: `True` si l'utilisateur souhaite continuer, `False` pour
+        revenir au menu principal
     """
-    choice = create_menu(["Parcourir les données", "Clients", "Commandes", "Usines", "Transporteurs", "Navires", "Types d'hydrogène", "Retour au menu principal"])
-    
+    choice = create_menu(["Parcourir les données", "Clients", "Commandes", "Usines",
+                          "Transporteurs", "Navires", "Types d'hydrogène",
+                          "Retour au menu principal"])
+
     if choice == 1:
         return browse_filter(conn, table="Clients", prompt_filters=True)
     elif choice == 2:
@@ -188,9 +195,12 @@ def insert_delete(conn: Connection) -> bool:
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
             False sinon.
     """
-    
-    choice = create_menu(["Insertion ou supression des données", "Clients", "Commandes", "Usines", "Transporteurs", "Types d'hydrogène", "Réinitialiser la base de données (irréversible)", "Retour au menu principal"])
-    
+
+    choice = create_menu(["Insertion ou supression des données", "Clients",
+                          "Commandes", "Usines", "Transporteurs", "Types d'hydrogène",
+                          "Réinitialiser la base de données (irréversible)",
+                          "Retour au menu principal"])
+
     if choice == 1:
         pass
     elif choice == 2:
@@ -214,6 +224,7 @@ def insert_delete(conn: Connection) -> bool:
     elif choice == 7:
         return False
 
+
 def advance_request(conn: Connection) -> bool:
     """Affiche le menu des requêtes avancées.
 
@@ -228,6 +239,7 @@ def advance_request(conn: Connection) -> bool:
     choice = create_menu(["Requêtes avancées", "Requête A"])
     if choice == 1:
         return False
+
 
 def manual_query(conn: Connection) -> bool:
     """Exécute une requête entrée manuellement par l'utilisateur.

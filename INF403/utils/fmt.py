@@ -44,6 +44,7 @@ def perror(*args, hold=False, **kwargs) -> None:
         pblink("Appuyez sur Entrée pour continuer...")
         input()
 
+
 def pblink(s: str, **kwargs) -> None:
     """Prints a string in blink. Stdout unless specified."""
     print("\x1b[5m" + s + "\x1b[25m", **kwargs)
@@ -114,7 +115,7 @@ def form_input(inputs: list) -> list[str]:
 
     # Affichage des labels
     pbold(*inputs, sep="\n", end="")
-    if n_labels == 1 :
+    if n_labels == 1:
         print()
 
     # Affichage des champs de saisie

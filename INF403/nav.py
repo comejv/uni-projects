@@ -303,13 +303,19 @@ def menu_insert_update_delete(conn: Connection, table_name:str) -> bool :
     choice = create_menu(f"Que voulez-vous faire dans la table {table_name} ?",
                          ["Insérer des données", "Update des données", "Supprimer des données", "Retour au menu précédent"])
     if choice == 1:
+        #insert(conn, table_name)
         return False
     elif choice == 2:
+        #update(conn, table_name)
         return False
     elif choice == 3:
+        #delete(conn, table_name)
         return False
     elif choice == 4:
         return False
+    
+def menu_insert (conn: Connection) -> bool:
+    
 
 
 def manual_query(conn: Connection) -> bool:

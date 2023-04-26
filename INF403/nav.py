@@ -16,7 +16,7 @@ def create_menu(title: str, choices: list[str]) -> int:
     fmt.clear()
     fmt.pbold(title)
     for i, c in enumerate(choices):
-        print("%d. %s" % (i, c))
+        print("%d. %s" % (i+1, c))
     print(end="\n\n\n")
 
     while True:
@@ -28,7 +28,7 @@ def create_menu(title: str, choices: list[str]) -> int:
         except ValueError:
             continue
 
-        if 0 < choice < len(choices):
+        if 0 < choice <= len(choices):
             return int(choice)
 
 
@@ -304,13 +304,12 @@ def menu_insert_update_delete(conn: Connection, table_name:str) -> bool :
                          ["Insérer des données", "Update des données", "Supprimer des données", "Retour au menu précédent"])
     if choice == 1:
         return False
-    if choice == 2:
+    elif choice == 2:
         return False
-    if choice == 3:
+    elif choice == 3:
         return False
-    if choice == 4:
+    elif choice == 4:
         return False
-    return True
 
 
 def manual_query(conn: Connection) -> bool:

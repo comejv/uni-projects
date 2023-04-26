@@ -124,6 +124,8 @@ def get_filters(conn: Connection, table: str) -> dict[str: str]:
     for h, v in zip(headers, values):
         if v != "":
             filters[h] = v
+        else:
+            filters[h] = None
 
     return filters if len(filters) > 0 else None
 
@@ -154,8 +156,12 @@ def browse_filter(conn: Connection, table: str,
         if new_filters is not None:
             filters.update(new_filters)
 
+    for k, v in filters.copy().items():
+        if v is None:
+            del filters[k]
+
     # Construction et exécution de la requête
-    if not filters:
+    if not filters or len(filters) == 0:
         cursor.execute(f"SELECT * FROM {table}")
     else:
         args = []
@@ -206,7 +212,11 @@ def insert_delete(conn: Connection) -> bool:
                           "Retour au menu principal"])
 
     if choice == 1:
-        pass
+        input_data = get_filters(conn, table="Clients")
+        # No value must be None
+        while None in input_data.values():
+            input_data = get_filters(conn, table="Clients")
+        db.insert_data(conn, table="Clients", data=input_data.values())
     elif choice == 2:
         pass
     elif choice == 3:
@@ -264,8 +274,15 @@ def manual_query(conn: Connection) -> bool:
     requete = input("Requête : ")
     try:
         res = db.exec_query(conn, requete)
+        # If query is not a select, ignore
+        if not res.description:
+            fmt.pwarn(
+                "Requête invalide ! Seules les requêtes SELECT sont autorisées.")
+            return False
         headers = [desc[0] for desc in res.description]
         fmt.print_table(res.fetchall(), headers)
+        if res.rowcount == 0:
+            fmt.pwarn("Aucune données trouvées !")
     except OperationalError as e:
         fmt.perror(e)
         fmt.pblink("Appuyez sur Entrée pour continuer...")

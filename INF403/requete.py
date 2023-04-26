@@ -7,13 +7,15 @@ def information_client (conn : Connection) -> bool :
     fmt.pitalic("Ne rien mettre si vous de connaissez pas un parametre")
     info = fmt.form_input(["nom de la personne recherchée", "prenom de la personne recherchée", "société de la personne recherchée"])
     values = ""
-    if info[0] != "":
-        values = values + f"nom_client = \"{info[0]}\""
-    if info[1] != "":
-        values = values + f"prenom_client = \"{info[1]}\""
-    if info[2] != "":
-        values = values + f"societe_client = \"{info[2]}\""
+    i=1
+    key_list = ["nom" , "prenom", "societe"]
+    
+    for i,key in enumerate(key_list):
+        if info[i] != "":
+            values += f"{key}_client = ?{i}"
 
+    info = [value for value in info if value != ""]
+    
     cursor = conn.cursor()
     if values == "":
         cursor.execute("SELECT numero_client, nom_client, prenom_client, societe_client, COUNT(numero_commande) AS nombre_de_commandes_passe, SUM(prix_total_commande) AS argent_depense, nom_type AS type_hydrogene_commande \
@@ -27,7 +29,7 @@ def information_client (conn : Connection) -> bool :
                                       JOIN Commandes USING (numero_commande)\
                                       JOIN Usines USING (numero_usine)\
                          GROUP BY nom_type, numero_client, nom_client, prenom_client, societe_client\
-                         HAVING {values};")
+                         HAVING {values};",tuple(info))
     
     # Affichage des données
     db.show_results(cursor)
@@ -41,6 +43,32 @@ def information_navire (conn: Connection) -> bool :
 				                       LEFT JOIN Commandes USING (numero_commande)\
                     GROUP BY duns_transporteur, nom_transporteur;")
     
+    # Affichage des données
+    db.show_results(cursor)
+
+    return True
+
+def type_commande(conn: Connection) -> bool :
+    fmt.clear()
+    fmt.pbold("Information sur le type d'hydrogène des commandes :")
+    fmt.pitalic("Ne rien mettre si vous voulez tous les types d'hydrogènes.")
+
+    coul = fmt.form_input(["Types des commandes à afficher"])[0]
+    while not coul in ["vert", "bleu", "gris", ""] :
+        coul = fmt.form_input(["Types des commandes à afficher"])[0]
+    
+    cursor = conn.cursor()
+    
+    if coul == "":
+        cursor.execute("SELECT numero_commande, nom_type\
+                        FROM Commandes JOIN Usines USING (numero_usine)\
+			            JOIN Types USING (nom_type);")
+    else:
+        cursor.execute("SELECT numero_commande, nom_type\
+                        FROM Commandes JOIN Usines USING (numero_usine)\
+			            JOIN Types USING (nom_type)\
+                        WHERE nom_type = ?;",(coul,))
+
     # Affichage des données
     db.show_results(cursor)
 

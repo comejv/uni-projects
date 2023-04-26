@@ -131,6 +131,12 @@ def drop_all_tables(conn: sqlite3.Connection):
 
 
 def show_results(cursor: sqlite3.Cursor) -> None:
+    """Affiche les résultats d'une requete de la base de données
+    de manière formatée.
+
+    Args:
+        cursor (sqlite3.Cursor): Cursor
+    """
     headers = [desc[0] for desc in cursor.description]
     fmt.clear()
     results = cursor.fetchall()

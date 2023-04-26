@@ -73,3 +73,17 @@ def type_commande(conn: Connection) -> bool :
     db.show_results(cursor)
 
     return True
+
+def information_type_transporteur (conn: Connection) -> bool:
+    cursor = conn.cursor()
+    cursor.execute("SELECT duns_transporteur, nom_transporteur, COUNT(numero_commande) AS nombre_commande_en_cours ,nom_type\
+                    FROM Transporteurs JOIN Navires USING (duns_transporteur)\
+				                       JOIN Commandes USING (numero_commande)\
+				                       JOIN Usines USING (numero_usine)\
+				                       JOIN Types USING (nom_type)\
+                    GROUP BY duns_transporteur, nom_transporteur, nom_type;")
+
+    # Affichage des données
+    db.show_results(cursor)
+
+    return True

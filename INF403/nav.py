@@ -279,6 +279,29 @@ def advance_request(conn: Connection) -> bool:
         return requete.information_type_transporteur(conn)
     elif choice == 5:
         return False
+    
+def menu_insert_update_delete(conn: Connection, table_name:str) -> bool :
+    """Affiche le menu du choix de l'opération de modification de table.
+
+    Args:
+        conn (Connection): Connexion à la database.
+        table_name (string): Le nom de la table a modifier
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+              False sinon.
+    """
+    choice = create_menu(f"Que voulez-vous faire dans la table {table_name} ?",
+                         ["Insérer des données", "Update des données", "Supprimer des données", "Retour au menu précédent"])
+    if choice == 1:
+        return False
+    if choice == 2:
+        return False
+    if choice == 3:
+        return False
+    if choice == 4:
+        return False
+    return True
 
 
 def manual_query(conn: Connection) -> bool:

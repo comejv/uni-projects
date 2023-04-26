@@ -212,10 +212,34 @@ def insert(conn: Connection, table: str) -> bool:
         )
         input_data = get_filters(conn, table=table)
     insert_error = db.insert_data(
-        conn, table=table, data=input_data.values())
+        conn, table=table, data=input_data)
     if insert_error:
         fmt.perror("Erreur d'insertion : ", insert_error, hold=True)
         return True
+    fmt.pitalic("Insertion effectuée !", hold=True)
+    return False
+
+
+def delete(conn: Connection, table: str) -> bool:
+    """Supprime des données dans la table `table`.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+        table (str): Nom de la table
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+            False sinon.
+    """
+    filters = get_filters(conn, table=table)
+    delete_error = db.delete_data(
+        conn, table=table, data=filters
+    )
+    if delete_error:
+        fmt.perror("Erreur de supression : ", delete_error, hold=True)
+        return True
+    fmt.pitalic("Suppression effectuée !", hold=True)
+    return False
 
 
 def advance_request(conn: Connection) -> bool:

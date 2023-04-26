@@ -9,11 +9,15 @@ def clear() -> None:
     print("\x1b[3J\x1b[H\x1b[J", end="")
 
 
-def pitalic(*args, **kwargs) -> None:
+def pitalic(*args, hold=False, **kwargs) -> None:
     """Prints given arguments in italic. Stdout unless specified."""
     print("\x1b[3m", end="")
     print(*args, **kwargs)
     print("\x1b[23m", end="")
+
+    if hold:
+        pblink("Appuyez sur Entrée pour continuer...")
+        input()
 
 
 def pbold(*args, **kwargs) -> None:

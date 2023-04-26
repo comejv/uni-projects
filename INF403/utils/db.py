@@ -149,31 +149,77 @@ def show_results(cursor: sqlite3.Cursor) -> None:
     input()
 
 
-def insert_data(conn: sqlite3.Connection, table: str, data: list) -> None:
+def insert_data(conn: sqlite3.Connection, table: str, data: dict) -> Exception:
     """Insère les données `data` dans la table `table` dans la base de données.
 
     Args:
         conn (sqlite3.Connection): Connexion à la base de données
         table (str): Nom de la table à insérer
         data (dict): Données à insérer
+
+    Returns:
+        Exception: Erreur sqlite3 en cas de problème d'insertion, None sinon.
     """
 
     cursor = conn.cursor()
-    q_mark_str = ["?"] * len(data)
-    q_mark_str = ", ".join(q_mark_str)
+
+    args = []
+    for i, key in enumerate(data.keys()):
+        if data[key] is not None:
+            args.append(f"{key} = ?{i + 1}")
+            try:
+                data[key] = int(data[key])
+            except ValueError:
+                pass
+    args = " AND ".join(args)
+
     try:
         cursor.execute(
-            f"INSERT INTO {table} VALUES ({q_mark_str})", tuple(data)
+            f"INSERT INTO {table} VALUES ({args})", tuple(data)
         )
     except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
         return e
 
-    # Validation des modifications
-    print("Insertion réussie de ", len(data), "données")
-
     conn.commit()
 
     return None
+
+
+def delete_data(conn: sqlite3.Connection, table: str, filters: dict) -> Exception:
+    """Supprime les lignes dont les filtres `filters` sont valides dans la table
+    `table` de la base de données.
+
+    Args:
+        conn (sqlite3.Connection): Connexion à la base de données
+        table (str): Nom de la table
+        filters (dict): Filtres de recherche
+
+    Returns:
+        Exception: Erreur sqlite3 en cas de problème de délétion, None sinon.
+    """
+
+    cursor = conn.cursor()
+    for k, v in filters.copy().items():
+        if v is None:
+            del filters[k]
+
+    # Construction et exécution de la requête
+    args = []
+    for i, key in enumerate(filters.keys()):
+        if filters[key] is not None:
+            args.append(f"{key} = ?{i + 1}")
+            try:
+                filters[key] = int(filters[key])
+            except ValueError:
+                pass
+    args = " AND ".join(args)
+
+    try:
+        cursor.execute(f"DELETE FROM {table} WHERE {args}", tuple(filters.values()))
+    except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
+        return e
+
+    conn.commit()
 
 
 def check_exists(conn: sqlite3.Connection, table: str, attr: tuple) -> bool:

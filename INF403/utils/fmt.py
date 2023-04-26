@@ -23,19 +23,26 @@ def pbold(*args, **kwargs) -> None:
     print("\x1b[22m", end="")
 
 
-def pwarn(*args, **kwargs) -> None:
+def pwarn(*args, hold=False, **kwargs) -> None:
     """Prints given arguments in bold yellow. Stdout unless specified."""
     print("\x1b[1;33m", end="")
     print(*args, **kwargs)
     print("\x1b[22;39m", end="")
 
+    if hold:
+        pblink("Appuyez sur Entrée pour continuer...")
+        input()
 
-def perror(*args, **kwargs) -> None:
+
+def perror(*args, hold=False, **kwargs) -> None:
     """Prints given arguments in bold red. Stdout unless specified."""
     print("\x1b[1;31m", end="")
     print(*args, **kwargs)
     print("\x1b[22;39m", end="")
 
+    if hold:
+        pblink("Appuyez sur Entrée pour continuer...")
+        input()
 
 def pblink(s: str, **kwargs) -> None:
     """Prints a string in blink. Stdout unless specified."""

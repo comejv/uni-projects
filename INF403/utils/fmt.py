@@ -55,7 +55,7 @@ def bool_input(prompt: str) -> bool:
     Cancel with Ctrl+C."""
 
     # Get the user input
-    bold_prompt = "\x1b[1m" + prompt + "\x1b[0m"
+    bold_prompt = "\x1b[1F\x1b[K\x1b[1m" + prompt + "\x1b[0m"
     try:
         str_input = input(bold_prompt).lower()
     except KeyboardInterrupt:

@@ -114,6 +114,8 @@ def form_input(inputs: list) -> list[str]:
 
     # Affichage des labels
     pbold(*inputs, sep="\n", end="")
+    if n_labels == 1 :
+        print()
 
     # Affichage des champs de saisie
     print(f"\x1b[{n_labels - 1}F", end="")

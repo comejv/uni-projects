@@ -209,11 +209,41 @@ def insert_delete(conn: Connection) -> bool:
     if choice == 1:
         input_data = get_filters(conn, table="Clients")
         # No value must be None
-        while None in input_data.values():
+        while None in input_data.values() or input_data is None:
             input_data = get_filters(conn, table="Clients")
-        db.insert_data(conn, table="Clients", data=input_data.values())
+        # Check if commande is already in the database
+        if db.check_exists(conn, table="Clients",
+                           data=input_data.items()[0]):
+            fmt.perror(
+                "Ce numéro de client est déjà dans la base de données !")
+            fmt.pblink(
+                "Appuyez sur Entrée pour continuer..."
+            )
+            input()
+            return False
+        # Check if numero_usine exists, otherwise ask to create it
+
+        db.insert_data(conn, table="Commandes", data=input_data.values())
     elif choice == 2:
-        pass
+        input_data = get_filters(conn, table="Commandes_base")
+        # No value must be None
+        while None in input_data.values() or input_data is None:
+            fmt.pwarn(
+                "Veuillez renseigner tous les attributs.",
+                hold=True
+            )
+            input_data = get_filters(conn, table="Commandes_base")
+        # Check if commande is already in the database
+        if db.check_exists(conn, table="Commandes_base",
+                           data=input_data.items()[0]):
+            fmt.perror(
+                "Ce numéro de commande est déjà dans la base de données !",
+                hold=True
+            )
+            return False
+        # Check if numero_usine exists, otherwise ask to create it
+
+        db.insert_data(conn, table="Commandes", data=input_data.values())
     elif choice == 3:
         pass
     elif choice == 4:
@@ -244,8 +274,9 @@ def advance_request(conn: Connection) -> bool:
             False sinon.
     """
 
-    choice = create_menu(["Requêtes avancées", "Information client", "Information nombre de bateau par transporteur","Tets", "Retour au menu principale"])
-    
+    choice = create_menu(["Requêtes avancées", "Information client",
+                         "Information nombre de bateau par transporteur", "Tets", "Retour au menu principale"])
+
     if choice == 1:
         return requete.information_client(conn)
     elif choice == 2:

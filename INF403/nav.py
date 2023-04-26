@@ -51,7 +51,7 @@ def main_menu(conn: Connection) -> bool:
             pass
         return True
     elif choice == 2:
-        while insert_delete(conn):
+        while menu_choice_insert(conn):
             pass
         return True
     elif choice == 3:
@@ -286,8 +286,10 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
     choice = create_menu(f"Que voulez-vous faire dans la table {table_name} ?",
                          ["Insérer des données", "Update des données", "Supprimer des données",
                           "Retour au menu précédent"])
+    if table_name=="Commandes":
+        table_name="Commandes_base"
     if choice == 1:
-        #insert(conn, table_name)
+        insert(conn, table_name)
         return False
     elif choice == 2:
         #update(conn, table_name)
@@ -298,9 +300,49 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
     elif choice == 4:
         return False
     
-def menu_insert (conn: Connection) -> bool:
-    
+def menu_choice_insert (conn: Connection) -> bool:
 
+    choice = create_menu("Choisissez la table à modifier :",
+                         ["Clients", "Commandes", "Usines", "Types", "Navires", "Transporteurs", "CommandesClients", "Drop la database", "Retourner au menu principale"])
+    if choice == 1:
+        while menu_insert_update_delete(conn,"Clients"):
+            pass
+        return True
+    elif choice == 2:
+        while menu_insert_update_delete(conn,"Commandes"):
+            pass
+        return True
+    elif choice == 3:
+        while menu_insert_update_delete(conn,"Usines"):
+            pass
+        return True
+    elif choice == 4:
+        while menu_insert_update_delete(conn,"Types"):
+            pass
+        return True
+    elif choice == 5:
+        while menu_insert_update_delete(conn,"Navires"):
+            pass
+        return True
+    elif choice == 6:
+        while menu_insert_update_delete(conn,"Transporteurs"):
+            pass
+        return True
+    elif choice == 7:
+        while menu_insert_update_delete(conn,"CommandesClients"):
+            pass
+        return True
+    elif choice == 8:
+        fmt.clear()
+        fmt.pbold("Réinitialisation de la base de données.")
+        fmt.perror("Cette action est irréversible !")
+        if fmt.bool_input("Êtes-vous sûr de vouloir continuer ? (O/N) "):
+            db.drop_all_tables(conn)
+            db.init_db()
+        print("Retour au menu principal.")
+        return False
+    elif choice == 9:
+        return False
 
 def manual_query(conn: Connection) -> bool:
     """Exécute une requête entrée manuellement par l'utilisateur.

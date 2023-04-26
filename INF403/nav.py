@@ -235,7 +235,7 @@ def insert_delete(conn: Connection) -> bool:
             input_data = get_filters(conn, table="Commandes_base")
         # Check if commande is already in the database
         if db.check_exists(conn, table="Commandes_base",
-                           data=input_data.items()[0]):
+                           attr=input_data.items()[0]):
             fmt.perror(
                 "Ce numéro de commande est déjà dans la base de données !",
                 hold=True

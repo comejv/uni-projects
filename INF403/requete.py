@@ -1,7 +1,7 @@
 from utils import db, fmt
 from sqlite3 import Connection, OperationalError
 
-def information_client (conn : Connection) :
+def information_client (conn : Connection) -> bool :
     fmt.clear()
     fmt.pbold("Information client :")
     fmt.pitalic("Ne rien mettre si vous de connaissez pas un parametre")
@@ -31,4 +31,13 @@ def information_client (conn : Connection) :
     db.show_results(cursor)
 
     return True
-    
+
+def information_navire (conn: Connection) -> bool :
+    cursor = conn.cursor()
+    cursor.execute("SELECT duns_transporteur, nom_transporteur, COUNT(imo_navire) AS nombre_de_navire_en_livraison, SUM(quantite_commande) AS quantite_hydrogen_en_livraison, SUM(capacite_navire) AS capacite_cumule_des_navires_fournis\
+                    FROM Transporteurs LEFT JOIN Navires USING (duns_transporteur)\
+				                       LEFT JOIN Commandes USING (numero_commande)\
+                    GROUP BY duns_transporteur, nom_transporteur;")
+    db.show_results(cursor)
+
+    return True

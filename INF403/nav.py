@@ -239,11 +239,13 @@ def advance_request(conn: Connection) -> bool:
             False sinon.
     """
 
-    choice = create_menu(["Requêtes avancées", "Information client", "Retour au menu principale"])
+    choice = create_menu(["Requêtes avancées", "Information client", "Information nombre de bateau par transporteur", "Retour au menu principale"])
     
     if choice == 1:
         return requete.information_client(conn)
     elif choice == 2:
+        return requete.information_navire(conn)
+    elif choice == 3:
         return False
 
 

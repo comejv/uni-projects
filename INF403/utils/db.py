@@ -149,7 +149,7 @@ def show_results(cursor: sqlite3.Cursor) -> None:
     input()
 
 
-def insert_data(conn: sqlite3.Connection, table: str, data: list):
+def insert_data(conn: sqlite3.Connection, table: str, data: list) -> None:
     """Insère les données `data` dans la table `table` dans la base de données.
 
     Args:
@@ -161,11 +161,37 @@ def insert_data(conn: sqlite3.Connection, table: str, data: list):
     cursor = conn.cursor()
     q_mark_str = ["?"] * len(data)
     q_mark_str = ", ".join(q_mark_str)
-    cursor.execute(
-        f"INSERT INTO {table} VALUES ({q_mark_str})", tuple(data)
-    )
+    try:
+        cursor.execute(
+            f"INSERT INTO {table} VALUES ({q_mark_str})", tuple(data)
+        )
+    except sqlite3.OperationalError as e:
+        return e
 
     # Validation des modifications
     print("Insertion réussie de ", len(data), "données")
 
     conn.commit()
+
+    return None
+
+
+def check_exists(conn: sqlite3.Connection, table: str, attr: tuple) -> bool:
+    """Vérifie s'il existe une ligne dont l'attribut `attr[0]` est `attr[1]`
+    dans la table `table`.
+
+    Args:
+        conn (sqlite3.Connection): Connexion à la base de données
+        table (str): Nom de la table
+        attr (tuple): Attributs de la ligne
+
+    Returns:
+        bool: True si la ligne existe, False sinon
+    """
+
+    cursor = conn.cursor()
+    cursor.execute(
+        f"SELECT * FROM {table} WHERE {attr[0]} = ?", (attr[1],)
+    )
+
+    return cursor.fetchone() is not None

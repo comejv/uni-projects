@@ -233,17 +233,10 @@ def insert_delete(conn: Connection) -> bool:
                 hold=True
             )
             input_data = get_filters(conn, table="Commandes_base")
-        # Check if commande is already in the database
-        if db.check_exists(conn, table="Commandes_base",
-                           attr=("numero_commande", input_data.get("numero_commande"))):
-            fmt.perror(
-                "Ce numéro de commande est déjà dans la base de données !",
-                hold=True
-            )
+        insert_error = db.insert_data(conn, table="Commandes_base", data=input_data.values())
+        if insert_error:
+            fmt.perror("Erreur d'insertion : ", insert_error, hold=True)
             return True
-        # Check if numero_usine exists, otherwise ask to create it
-
-        db.insert_data(conn, table="Commandes", data=input_data.values())
     elif choice == 3:
         pass
     elif choice == 4:

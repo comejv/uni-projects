@@ -262,6 +262,8 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
     choice = create_menu(f"Que voulez-vous faire dans la table {table_name} ?",
                          ["Insérer des données", "Update des données", "Supprimer des données",
                           "Retour au menu précédent"])
+    if table_name=="Commandes":
+        table_name="Commandes_base"
     if choice == 1:
         insert(conn, table_name)
         return False
@@ -279,19 +281,33 @@ def menu_choice_insert (conn: Connection) -> bool:
     choice = create_menu("Choisissez la table à modifier :",
                          ["Clients", "Commandes", "Usines", "Types", "Navires", "Transporteurs", "CommandesClients", "Drop la database", "Retourner au menu principale"])
     if choice == 1:
-        return menu_insert_update_delete(conn,"Clients")
+        while menu_insert_update_delete(conn,"Clients"):
+            pass
+        return True
     elif choice == 2:
-        return menu_insert_update_delete(conn,"Commandes")
+        while menu_insert_update_delete(conn,"Commandes"):
+            pass
+        return True
     elif choice == 3:
-        return menu_insert_update_delete(conn,"Usines")
+        while menu_insert_update_delete(conn,"Usines"):
+            pass
+        return True
     elif choice == 4:
-        return menu_insert_update_delete(conn,"Types")
+        while menu_insert_update_delete(conn,"Types"):
+            pass
+        return True
     elif choice == 5:
-        return menu_insert_update_delete(conn,"Navires")
+        while menu_insert_update_delete(conn,"Navires"):
+            pass
+        return True
     elif choice == 6:
-        return menu_insert_update_delete(conn,"Transporteurs")
+        while menu_insert_update_delete(conn,"Transporteurs"):
+            pass
+        return True
     elif choice == 7:
-        return menu_insert_update_delete(conn,"CommandesClients")
+        while menu_insert_update_delete(conn,"CommandesClients"):
+            pass
+        return True
     elif choice == 8:
         fmt.clear()
         fmt.pbold("Réinitialisation de la base de données.")

@@ -200,6 +200,64 @@ def solve_cnf(cnf: CNF, quiet=False, pysat=False) -> list[int]:
         return walk_sat(cnf)
 
 
+def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
+    """Convert a model to a game file.
+    3 by 3 game file example with a node at each corner needing 1-4 bridges, solved :
+    1 X 2
+    | X $
+    3 = 4
+
+    Args:
+        nodes (list[Node]): List of nodes.
+        bridges (list[int]): List of bridges.
+        fpath (str): Path to the file to write.
+    """
+    # Sort list of nodes by id
+    nodes.sort(key=lambda x: x.id)
+
+    # List of bridges + nodes
+    br_nd = {}
+
+    for bridge in bridges:
+        # get nodes of the bridge
+        lvl = bridge // 10000
+        n1_n2_id = bridge % 10000
+        n1_id = n1_n2_id // 100
+        n2_id = n1_n2_id % 100
+        br_nd[bridge] = (lvl, nodes[n1_id], nodes[n2_id])
+
+    # Find node with furthest position
+    max_x = max([node.x for node in nodes])
+    max_y = max([node.y for node in nodes])
+    max_pos = max(max_x, max_y)
+
+    # Fill file with spaces (square dimension)
+    with open(fpath, "w") as f:
+        for x in range(max_pos + 1):
+            for y in range(max_pos + 1):
+                f.write("X ")
+            f.write("\n")
+
+        f.seek(0)
+
+        for br, nodes in br_nd.items():
+            # seek position of first node in file
+            x_1 = nodes[1].x
+            y_1 = nodes[1].y
+            f.seek(x_1 * (max_pos + 1) + y_1)
+            # Write first node
+            f.write(nodes[1].value)
+
+            # Same for second node
+            x_2 = nodes[2].x
+            y_2 = nodes[2].y
+            f.seek(x_2 * (max_pos + 1) + y_2)
+            f.write(nodes[2].value)
+
+            # Fill space between nodes according to level of bridge (nodes[0])
+            horizontal = nodes[1].x == nodes[2].x
+
+
 if __name__ == '__main__':
     if len(argv) != 2:
         fpath = input(

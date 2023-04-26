@@ -129,7 +129,8 @@ def drop_all_tables(conn: sqlite3.Connection):
 
     conn.commit()
 
-def show_results(cursor:sqlite3.Cursor) -> None :
+
+def show_results(cursor: sqlite3.Cursor) -> None:
     headers = [desc[0] for desc in cursor.description]
     fmt.clear()
     results = cursor.fetchall()
@@ -159,6 +160,6 @@ def insert_data(conn: sqlite3.Connection, table: str, data: list):
     )
 
     # Validation des modifications
-    print("Insertion réussie de "
+    print("Insertion réussie de ", len(data), "données")
 
     conn.commit()

@@ -192,72 +192,30 @@ def browse_filter(conn: Connection, table: str,
     return True
 
 
-def insert_delete(conn: Connection) -> bool:
-    """Affiche le menu d'insertion et de délétions.
+def insert(conn: Connection, table: str) -> bool:
+    """Insère des données dans la table `table`.
 
     Args:
-        conn (Connection): Connexion à la database.
+        conn (Connection): Connexion à la base de données
+        table (str): Nom de la table
 
     Returns:
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
             False sinon.
     """
-
-    choice = create_menu(title="Insertion ou supression des données",
-                         choices=["Clients",
-                                  "Commandes", "Usines", "Transporteurs", "Types d'hydrogène",
-                                  "Réinitialiser la base de données (irréversible)",
-                                  "Retour au menu principal"])
-
-    if choice == 1:
-        input_data = get_filters(conn, table="Clients")
-        # No value must be None
-        while None in input_data.values() or input_data is None:
-            input_data = get_filters(conn, table="Clients")
-        # Check if commande is already in the database
-        if db.check_exists(conn, table="Clients",
-                           data=input_data.items()[0]):
-            fmt.perror(
-                "Ce numéro de client est déjà dans la base de données !")
-            fmt.pblink(
-                "Appuyez sur Entrée pour continuer..."
-            )
-            input()
-            return False
-        # Check if numero_usine exists, otherwise ask to create it
-
-        db.insert_data(conn, table="Commandes", data=input_data.values())
-    elif choice == 2:
-        input_data = get_filters(conn, table="Commandes_base")
-        # No value must be None
-        while None in input_data.values() or input_data is None:
-            fmt.pwarn(
-                "Veuillez renseigner tous les attributs.",
-                hold=True
-            )
-            input_data = get_filters(conn, table="Commandes_base")
-        insert_error = db.insert_data(
-            conn, table="Commandes_base", data=input_data.values())
-        if insert_error:
-            fmt.perror("Erreur d'insertion : ", insert_error, hold=True)
-            return True
-    elif choice == 3:
-        pass
-    elif choice == 4:
-        pass
-    elif choice == 5:
-        pass
-    elif choice == 6:
-        fmt.clear()
-        fmt.pbold("Réinitialisation de la base de données.")
-        fmt.perror("Cette action est irréversible !")
-        if fmt.bool_input("Êtes-vous sûr de vouloir continuer ? (O/N) "):
-            db.drop_all_tables(conn)
-            db.init_db()
-        print("Retour au menu principal.")
-        return False
-    elif choice == 7:
-        return False
+    input_data = get_filters(conn, table=table)
+    # No value must be None
+    while None in input_data.values() or input_data is None:
+        fmt.pwarn(
+            "Veuillez renseigner tous les attributs.",
+            hold=True
+        )
+        input_data = get_filters(conn, table=table)
+    insert_error = db.insert_data(
+        conn, table=table, data=input_data.values())
+    if insert_error:
+        fmt.perror("Erreur d'insertion : ", insert_error, hold=True)
+        return True
 
 
 def advance_request(conn: Connection) -> bool:
@@ -288,8 +246,9 @@ def advance_request(conn: Connection) -> bool:
         return requete.information_type_transporteur(conn)
     elif choice == 5:
         return False
-    
-def menu_insert_update_delete(conn: Connection, table_name:str) -> bool :
+
+
+def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
     """Affiche le menu du choix de l'opération de modification de table.
 
     Args:
@@ -301,7 +260,8 @@ def menu_insert_update_delete(conn: Connection, table_name:str) -> bool :
               False sinon.
     """
     choice = create_menu(f"Que voulez-vous faire dans la table {table_name} ?",
-                         ["Insérer des données", "Update des données", "Supprimer des données", "Retour au menu précédent"])
+                         ["Insérer des données", "Update des données", "Supprimer des données",
+                          "Retour au menu précédent"])
     if choice == 1:
         return False
     elif choice == 2:

@@ -173,6 +173,10 @@ def browse_filter(conn: Connection, table: str,
                     filters[key] = filters[key][1:]
                 else:
                     args.append(f"{key} = ?{i + 1}")
+                try:
+                    filters[key] = int(filters[key])
+                except ValueError:
+                    pass
         args = " AND ".join(args)
 
         # Attention, cette requête est possiblement un point
@@ -181,16 +185,7 @@ def browse_filter(conn: Connection, table: str,
             f"SELECT * FROM {table} WHERE {args}", tuple(filters.values()))
 
     # Affichage des données
-    headers = [desc[0] for desc in cursor.description]
-    fmt.clear()
-    results = cursor.fetchall()
-    fmt.print_table(results, headers)
-    if not results:
-        fmt.pwarn("Aucune données trouvées, vérifiez votre requête !")
-
-    # Attente de l'utilisateur
-    fmt.pblink("Appuyez sur Entrée pour continuer...", end="")
-    input()
+    db.show_results(cursor)
 
     return True
 
@@ -249,13 +244,15 @@ def advance_request(conn: Connection) -> bool:
             False sinon.
     """
 
-    choice = create_menu(["Requêtes avancées", "Information client", "Information nombre de bateau par transporteur", "Retour au menu principale"])
+    choice = create_menu(["Requêtes avancées", "Information client", "Information nombre de bateau par transporteur","Tets", "Retour au menu principale"])
     
     if choice == 1:
         return requete.information_client(conn)
     elif choice == 2:
         return requete.information_navire(conn)
     elif choice == 3:
+        return requete.test(conn)
+    elif choice == 4:
         return False
 
 

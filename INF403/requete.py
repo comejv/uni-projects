@@ -16,18 +16,20 @@ def information_client (conn : Connection) -> bool :
 
     cursor = conn.cursor()
     if values == "":
-        cursor.execute("SELECT nom_type AS type_hydrogene_commande, numero_client, nom_client, prenom_client, societe_client, COUNT(numero_commande) AS nombre_de_commandes_passe, SUM(prix_total_commande) AS argent_depense \
+        cursor.execute("SELECT numero_client, nom_client, prenom_client, societe_client, COUNT(numero_commande) AS nombre_de_commandes_passe, SUM(prix_total_commande) AS argent_depense, nom_type AS type_hydrogene_commande \
                         FROM Clients JOIN CommandesClients USING (numero_client)\
                                      JOIN Commandes USING (numero_commande)\
                                      JOIN Usines USING (numero_usine)\
                         GROUP BY nom_type, numero_client, nom_client, prenom_client, societe_client;")
     else:
-        cursor.execute(f"SELECT nom_type AS type_hydrogene_commande, numero_client, nom_client, prenom_client, societe_client, COUNT(numero_commande) AS nombre_de_commandes_passe, SUM(prix_total_commande) AS argent_depense \
+        cursor.execute(f"SELECT numero_client, nom_client, prenom_client, societe_client, COUNT(numero_commande) AS nombre_de_commandes_passe, SUM(prix_total_commande) AS argent_depense, nom_type AS type_hydrogene_commande \
                          FROM Clients JOIN CommandesClients USING (numero_client)\
                                       JOIN Commandes USING (numero_commande)\
                                       JOIN Usines USING (numero_usine)\
                          GROUP BY nom_type, numero_client, nom_client, prenom_client, societe_client\
                          HAVING {values};")
+    
+    # Affichage des données
     db.show_results(cursor)
 
     return True
@@ -38,6 +40,8 @@ def information_navire (conn: Connection) -> bool :
                     FROM Transporteurs LEFT JOIN Navires USING (duns_transporteur)\
 				                       LEFT JOIN Commandes USING (numero_commande)\
                     GROUP BY duns_transporteur, nom_transporteur;")
+    
+    # Affichage des données
     db.show_results(cursor)
 
     return True

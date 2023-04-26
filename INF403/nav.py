@@ -51,7 +51,7 @@ def main_menu(conn: Connection) -> bool:
             pass
         return True
     elif choice == 2:
-        while insert_delete(conn):
+        while menu_choice_insert(conn):
             pass
         return True
     elif choice == 3:
@@ -263,7 +263,7 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
                          ["Insérer des données", "Update des données", "Supprimer des données",
                           "Retour au menu précédent"])
     if choice == 1:
-        #insert(conn, table_name)
+        insert(conn, table_name)
         return False
     elif choice == 2:
         #update(conn, table_name)
@@ -274,9 +274,35 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
     elif choice == 4:
         return False
     
-def menu_insert (conn: Connection) -> bool:
-    
+def menu_choice_insert (conn: Connection) -> bool:
 
+    choice = create_menu("Choisissez la table à modifier :",
+                         ["Clients", "Commandes", "Usines", "Types", "Navires", "Transporteurs", "CommandesClients", "Drop la database", "Retourner au menu principale"])
+    if choice == 1:
+        return menu_insert_update_delete(conn,"Clients")
+    elif choice == 2:
+        return menu_insert_update_delete(conn,"Commandes")
+    elif choice == 3:
+        return menu_insert_update_delete(conn,"Usines")
+    elif choice == 4:
+        return menu_insert_update_delete(conn,"Types")
+    elif choice == 5:
+        return menu_insert_update_delete(conn,"Navires")
+    elif choice == 6:
+        return menu_insert_update_delete(conn,"Transporteurs")
+    elif choice == 7:
+        return menu_insert_update_delete(conn,"CommandesClients")
+    elif choice == 8:
+        fmt.clear()
+        fmt.pbold("Réinitialisation de la base de données.")
+        fmt.perror("Cette action est irréversible !")
+        if fmt.bool_input("Êtes-vous sûr de vouloir continuer ? (O/N) "):
+            db.drop_all_tables(conn)
+            db.init_db()
+        print("Retour au menu principal.")
+        return False
+    elif choice == 9:
+        return False
 
 def manual_query(conn: Connection) -> bool:
     """Exécute une requête entrée manuellement par l'utilisateur.

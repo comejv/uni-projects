@@ -165,7 +165,7 @@ def insert_data(conn: sqlite3.Connection, table: str, data: list) -> None:
         cursor.execute(
             f"INSERT INTO {table} VALUES ({q_mark_str})", tuple(data)
         )
-    except sqlite3.OperationalError as e:
+    except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
         return e
 
     # Validation des modifications

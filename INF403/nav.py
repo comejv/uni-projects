@@ -3,20 +3,20 @@ from sqlite3 import Connection, OperationalError
 import requete
 
 
-def create_menu(menu: list[str]) -> int:
-    """Affiche le menu en argument.
+def create_menu(title: str, choices: list[str]) -> int:
+    """Affiche un menu à choix à l'utilisateur.
 
     Args:
-        menu (list[str]): Liste représentant le titre du menu (menu[0])
-        et les options du menu (reste)
+        title (str): Titre du menu
+        choix (list[str]): Liste de choix
 
     Returns:
         int : entier représentant le choix choisie par l'utilisateur
     """
     fmt.clear()
-    fmt.pbold(menu[0])
-    for i in range(1, len(menu)):
-        print("%d. %s" % (i, menu[i]))
+    fmt.pbold(title)
+    for i, c in enumerate(choices):
+        print("%d. %s" % (i, c))
     print(end="\n\n\n")
 
     while True:
@@ -28,7 +28,7 @@ def create_menu(menu: list[str]) -> int:
         except ValueError:
             continue
 
-        if choice > 0 and choice < len(menu):
+        if 0 < choice < len(choices):
             return int(choice)
 
 
@@ -41,9 +41,10 @@ def main_menu(conn: Connection) -> bool:
     Returns:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour quitter le programme
     """
-    choice = create_menu(["Menu principal", "Parcourir les données",
-                          "Insérer ou supprimer des données", "Requêtes avancées",
-                          "Requêtes manuelle", "Quitter"])
+    choice = create_menu(title="Menu principal",
+                         choices=["Parcourir les données",
+                                  "Insérer ou supprimer des données", "Requêtes avancées",
+                                  "Requêtes manuelle", "Quitter"])
 
     if choice == 1:
         while browse(conn):
@@ -75,9 +76,10 @@ def browse(conn: Connection) -> bool:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour
         revenir au menu principal
     """
-    choice = create_menu(["Parcourir les données", "Clients", "Commandes", "Usines",
-                          "Transporteurs", "Navires", "Types d'hydrogène",
-                          "Retour au menu principal"])
+    choice = create_menu(title="Parcourir les données",
+                         choices=["Clients", "Commandes", "Usines",
+                                  "Transporteurs", "Navires", "Types d'hydrogène",
+                                  "Retour au menu principal"])
 
     if choice == 1:
         return browse_filter(conn, table="Clients", prompt_filters=True)
@@ -201,10 +203,11 @@ def insert_delete(conn: Connection) -> bool:
             False sinon.
     """
 
-    choice = create_menu(["Insertion ou supression des données", "Clients",
-                          "Commandes", "Usines", "Transporteurs", "Types d'hydrogène",
-                          "Réinitialiser la base de données (irréversible)",
-                          "Retour au menu principal"])
+    choice = create_menu(title="Insertion ou supression des données",
+                         choices=["Clients",
+                                  "Commandes", "Usines", "Transporteurs", "Types d'hydrogène",
+                                  "Réinitialiser la base de données (irréversible)",
+                                  "Retour au menu principal"])
 
     if choice == 1:
         input_data = get_filters(conn, table="Clients")
@@ -233,7 +236,8 @@ def insert_delete(conn: Connection) -> bool:
                 hold=True
             )
             input_data = get_filters(conn, table="Commandes_base")
-        insert_error = db.insert_data(conn, table="Commandes_base", data=input_data.values())
+        insert_error = db.insert_data(
+            conn, table="Commandes_base", data=input_data.values())
         if insert_error:
             fmt.perror("Erreur d'insertion : ", insert_error, hold=True)
             return True
@@ -267,8 +271,13 @@ def advance_request(conn: Connection) -> bool:
             False sinon.
     """
 
-    choice = create_menu(["Requêtes avancées", "Information client", "Information nombre de bateau par transporteur", "Information sur le type d'hydrogène des commandes", "Information sur le nombre de commandes transporter par transporteur selon le type d'hydrogen", "Retour au menu principale"])
-    
+    choice = create_menu(title="Requêtes avancées",
+                         choices=["Information client",
+                                  "Information nombre de bateau par transporteur",
+                                  "Information sur le type d'hydrogène des commandes",
+                                  "Information sur le nombre de commandes transportées par transporteur selon le type d'hydrogène",
+                                  "Retour au menu principale"])
+
     if choice == 1:
         return requete.information_client(conn)
     elif choice == 2:

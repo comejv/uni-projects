@@ -245,13 +245,14 @@ class CNF:
         Args:
             filename (str): Name of the file to write.
         """
+        filename.rstrip()
         with open(filename, "w") as f:
             # Write the header
             f.write(f"p cnf {self.nvars()} {self.nclauses()}")
 
             # Write the clauses
             for clause in self.clauses():
-                f.write(" ".join(map(str, clause)) + " 0")
+                f.write(" ".join(map(str, clause)) + " 0\n")
 
 
 class IDPool:

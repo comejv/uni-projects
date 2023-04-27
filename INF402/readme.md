@@ -5,16 +5,23 @@ This program can solve a Hashiwokakero puzzle. It uses [computer vision](vision.
 
 ## Usage
 ```
-usage: main.py [-h] [-i IMAGE] [-t TEXT] [-d DIMACS] [-c CNF] [-q QUIET]
+usage: main.py [-h] [-i INPUT] [-d DIMACS] [-c CNF] [-p] [-t] [-w WRITE_FILE] [-q QUIET] [-b]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -i IMAGE, --image IMAGE
-                        Path to the image file
-  -t TEXT, --text TEXT  Path to the text file
+  -i INPUT, --input INPUT
+                        path to the input file
   -d DIMACS, --dimacs DIMACS
-                        Path to the already generated DIMACS file
-  -c CNF, --cnf CNF     Path to the file where the CNF will be written
+                        path to the already generated DIMACS file
+  -c CNF, --cnf CNF     path to the file where the CNF will be written
+  -p, --pysat           use PySAT instead of our own WalkSAT
+  -t, --sat3            convert CNF to 3 sat before using
+  -w WRITE_FILE, --write_file WRITE_FILE
+                        Write the graphical solution to the given file
   -q QUIET, --quiet QUIET
-                        Do not print the solution
+                        do not print the solution
+  -b, --bridge-help     show how the bridges are numbered
 ```
+
+## Example
+`py main.py -i data/examples/3x3_1.txt -c clauses.dimacs -w stdout`

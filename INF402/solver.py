@@ -20,16 +20,6 @@ def read_dimacs(filename: str) -> CNF:
     return CNF(from_file=filename)
 
 
-def write_dimacs(filename: str, cnf: CNF) -> None:
-    """Write a CNF formula to a DIMACS file.
-
-    Args:
-        filename (str): Path to the DIMACS file.
-        cnf (CNF): CNF object representing the formula.
-    """
-    cnf.to_file(filename)
-
-
 def all_bridges(nodes: list[Node]) -> Bridges:
     bridges = Bridges()
     for i, node in enumerate(nodes):
@@ -248,9 +238,13 @@ def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
             for i in range(2 * n1.x + 1, 2 * n2.x):
                 game[i][n1.y * 2] = '|' if lvl == 1 else '$'
 
-    with open(fpath, 'w') as f:
+    if fpath == "stdout":
         for line in game:
-            f.write(''.join(line) + '\n')
+            print(''.join(line))
+    else:
+        with open(fpath, 'w') as f:
+            for line in game:
+                f.write(''.join(line) + '\n')
 
 
 if __name__ == '__main__':
@@ -287,7 +281,7 @@ if __name__ == '__main__':
     cnf.extend(bridges_to_clauses(vpool, rules.no_crossing(bridges)))
 
     # Create dimacs output file
-    write_dimacs("output/test.cnf", cnf)
+    cnf.to_file(fpath + ".cnf")
 
     # Solve the formula
     solver = solve_cnf(cnf, vpool)

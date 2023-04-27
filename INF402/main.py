@@ -18,6 +18,8 @@ parser.add_argument("-p", "--pysat", dest="pysat", action="store_true", default=
                     help="use PySAT instead of our own WalkSAT")
 parser.add_argument("-t", "--sat3", dest="sat3", action="store_true", default=False,
                     help="convert CNF to 3 sat before using")
+parser.add_argument("-w", "--write_file", dest="write_file",
+                    help="Write the graphical solution to the given file")
 parser.add_argument("-q", "--quiet", dest="quiet",
                     help="do not print the solution")
 parser.add_argument("-b", "--bridge-help", dest="bridge_help", action="store_true",
@@ -95,7 +97,7 @@ if args.sat3:
 
 # ## Solve ## #
 if args.cnf:
-    solver.write_dimacs(args.cnf, cnf)
+    cnf.to_file(args.cnf)
 model = solver.solve_cnf(cnf, pysat=args.pysat, quiet=args.quiet)
 
 if not args.quiet:
@@ -108,4 +110,4 @@ if not args.quiet:
         print("Bridges :", bridges)
         solver.model_to_game_file(nodes=nodes,
                                   bridges=bridges,
-                                  fpath="solution.txt")
+                                  fpath=args.write_file)

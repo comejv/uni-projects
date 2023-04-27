@@ -122,6 +122,15 @@ def no_crossing(bridges: list[Bridges]) -> list[list[Bridges]]:
     return cnf
 
 
+def fp(n1:Node,n2:Node,deja:list[Node]):
+    if n1 == n2:
+        return True
+    b=False
+    for e in n1.neighbours:
+        if e not in deja:
+            b = b or fp(e,n2,deja + [n1])
+    return b
+
 def find_paths(n1: Node, n2: Node, deja_vu: list[Node] = []) -> list[list]:
     """Returns all the paths between n1 and n2.
 
@@ -133,25 +142,72 @@ def find_paths(n1: Node, n2: Node, deja_vu: list[Node] = []) -> list[list]:
     Returns:
         list: List of all the paths between n1 and n2.
     """
-    if n1 == n2:
+    if n1.id == n2.id:
         return [[Way(n1, n2, True)]]
     paths = [[Way(n1, n2, False)]]
+    temp_list = []
     for neigh in n1.neighbours:
         outgoings = []
         arriving = []
         if neigh not in deja_vu:
             neigh_paths = find_paths(neigh, n2, deja_vu + [n1])
             if neigh_paths != []:
-                for path in paths:
-                    outgoings.append(path + [Arc(n1, neigh, True)])
-                    arriving.append(path + [Way(neigh, n2, True)])
-                paths = outgoings + arriving
-                paths.append([Arc(n1, neigh, False),
-                              Bridge(1, n1, neigh),
-                              Bridge(2, n1, neigh)])
-                paths = paths + neigh_paths
-    return paths
+                temp_list.append([Arc(n1, neigh, False),
+                                  Bridge(1, n1, neigh)])
+                temp_list += neigh_paths
+        if fp(neigh,n2, deja_vu):
+            for path in paths:
+                outgoings.append(path + [Arc(n1, neigh, True)])
+                arriving.append(path + [Way(neigh, n2, True)])
+            paths = outgoings + arriving
+    if len(paths) == 1 :
+        return []
+    return paths + temp_list
 
+
+def delete_incomplete_clause(clause: list[list]) -> list[list]:
+    for i,e in enumerate(clause) :
+        pop=False
+        for j,f in enumerate(clause) :
+            if i != j :
+                if f == e :
+                    pop=True
+                elif f[0] == e[0]:
+                    pop=True
+                    clause[j]+=e[1:]
+        if pop:
+            clause.pop(i)
+    return clause
+
+def nul(nodes: list[Node]):
+    clause = []
+    for n in nodes:
+        for node in nodes :
+            if n != node:
+                paths = [[Way(n,node,False)]]
+                for neigh in node.neighbours:
+                    outgoings = []
+                    arriving = []    
+                    for path in paths:
+                        outgoings.append(path + [Arc(node, neigh, True)])
+                        arriving.append(path + [Way(neigh, node, True)])
+                    paths = outgoings + arriving
+                    clause.append([Arc(node, neigh, False),
+                                    Bridge(1, node, neigh)])
+            else:
+                paths = [[Way(n,node,True)]]
+            clause += paths
+
+
+    node_init = nodes[0]
+    for node in nodes[1:]:
+        clause.append([Way(node_init, node, True)])
+
+    for node_x in nodes:
+        for neigh in node_x.neighbours:
+            clause.append([Arc(node_x,neigh,False), Arc(neigh,node_x,False)])
+
+    return clause
 
 def connexite(nodes: list[Node]):
     node_init = nodes[0]
@@ -159,4 +215,7 @@ def connexite(nodes: list[Node]):
     for node in nodes[1:]:
         clause.append([Way(node_init, node, True)])
         clause = clause + find_paths(node_init, node)
+    for node_x in nodes:
+        for neigh in node_x.neighbours:
+            clause.append([Arc(node_x,neigh,False), Arc(neigh,node_x,False)])
     return clause

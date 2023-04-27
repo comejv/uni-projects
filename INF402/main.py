@@ -89,7 +89,7 @@ cnf.extend(solver.bridges_to_clauses(vpool_bridges, rules.no_crossing(bridges)))
 vpool = solver.IDPool(cnf.nvars() + 1)
 
 # Connexity rule apply
-cnf.extend(solver.arcs_ways_to_clauses(vpool, vpool_bridges, rules.connexite(nodes)))
+cnf.extend(solver.arcs_ways_to_clauses(vpool, vpool_bridges, rules.nul(nodes)))
 
 # Convert to 3-SAT if asked
 if args.sat3:

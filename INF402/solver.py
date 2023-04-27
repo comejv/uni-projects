@@ -202,10 +202,12 @@ def solve_cnf(cnf: CNF, quiet=False, pysat=False) -> list[int]:
 
 def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
     """Convert a model to a game file.
-    3 by 3 game file example with a node at each corner needing 1-4 bridges, solved :
-    1 X 2
-    | X $
-    3 = 4
+    3 by 3 game file example :
+    4===3
+    $███|
+    $█2-2
+    $█|██
+    2█1██
 
     Args:
         nodes (list[Node]): List of nodes.
@@ -229,46 +231,26 @@ def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
     max_x = max([node.x for node in nodes])
     max_y = max([node.y for node in nodes])
     max_pos = max(max_x, max_y)
-    line_length = (max_pos + 1) * 2 + 1
 
-    with open(fpath, "w") as f:
-        # Fill file with spaces (square dimension)
-        for x in range(2 * max_pos + 1):
-            for y in range(max_pos + 1):
-                f.write("  ")
-            f.write("\n")
+    # Create an array of the game
+    game = [['█' for _ in range(1, 2 * (max_pos + 1))]
+            for _ in range(1, 2 * (max_pos + 1))]
 
-        f.seek(0)
+    # Fill array with nodes and bridges
+    for lvl, n1, n2 in lvl_iles:
+        game[n1.x * 2][n1.y * 2] = str(n1.value)
+        game[n2.x * 2][n2.y * 2] = str(n2.value)
+        horizontal = n1.x == n2.x
+        if horizontal:
+            for i in range(2 * n1.y + 1, 2 * n2.y):
+                game[n1.x * 2][i] = '-' if lvl == 1 else '='
+        else:
+            for i in range(2 * n1.x + 1, 2 * n2.x):
+                game[i][n1.y * 2] = '|' if lvl == 1 else '$'
 
-        for lvl, n1, n2 in lvl_iles:
-            # seek position of first node in file
-            pos = n1.x * 2 * line_length + n1.y * 2
-            f.seek(pos)
-            # Write first node
-            f.write(str(n1.value))
-
-            # Same for second node
-            pos = n2.x * 2 * line_length + n2.y * 2
-            f.seek(pos)
-            f.write(str(n2.value))
-
-            # Fill space between nodes according to level of bridge (nodes[0])
-            horizontal = n1.x == n2.x
-            if horizontal:
-                # f.seek(min(n1.x, n2.x) * 2 * line_length + min(n1.y, n2.y) + 2)
-                f.seek(int((2 * n1.y + 2 * n2.y) / 2) + n1.x * 2 * line_length)
-                # for x in range(n1.y + 1, n2.y):
-                if lvl == 1:
-                    f.write("-")
-                elif lvl == 2:
-                    f.write("=")
-            else:
-                # for y in range(1, abs(n1.y + 1 - n2.y) * 2 + 1):
-                f.seek(int((n1.x * 2 + n2.x * 2) / 2) * line_length + n1.y * 2)
-                if lvl == 1:
-                    f.write("|")
-                else:
-                    f.write("$")
+    with open(fpath, 'w') as f:
+        for line in game:
+            f.write(''.join(line) + '\n')
 
 
 if __name__ == '__main__':

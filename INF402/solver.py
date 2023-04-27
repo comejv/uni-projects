@@ -238,6 +238,22 @@ def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
             for i in range(2 * n1.x + 1, 2 * n2.x):
                 game[i][n1.y * 2] = '|' if lvl == 1 else '$'
 
+    # Remove lines and columns without numbers
+    useless_lines = []
+    for i, line in enumerate(game):
+        for element in line:
+            if element.isdigit():
+                break
+        else:
+            useless_lines.append(i)
+    useless_columns = []
+    for i in range(len(game[0])):
+        for j in range(len(game)):
+            if game[i][j].isdigit():
+                break
+        else:
+            useless_columns.append(i)
+
     if fpath == "stdout":
         for line in game:
             print(''.join(line))

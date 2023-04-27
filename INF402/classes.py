@@ -248,7 +248,7 @@ class CNF:
         filename.rstrip()
         with open(filename, "w") as f:
             # Write the header
-            f.write(f"p cnf {self.nvars()} {self.nclauses()}")
+            f.write(f"p cnf {self.nvars()} {self.nclauses()}\n")
 
             # Write the clauses
             for clause in self.clauses():

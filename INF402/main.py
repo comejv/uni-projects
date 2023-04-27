@@ -86,8 +86,8 @@ cnf.extend(solver.bridges_to_clauses(vpool_bridges, rules.no_crossing(bridges)))
 # Create new IDPool
 vpool = solver.IDPool(cnf.nvars() + 1)
 
-# Connexity rule apply #
-cnf.extend(solver.arcs_ways_to_clauses(vpool, vpool_bridges, rules.connexite(nodes)))
+# Connexity rule apply
+# cnf.extend(solver.arcs_ways_to_clauses(vpool, vpool_bridges, rules.connexite(nodes)))
 
 # Convert to 3-SAT if asked
 if args.sat3:
@@ -103,4 +103,9 @@ if not args.quiet:
     if model is not None:
         print("One model is :")
         print("Variables :", model)
-        print("Bridges :", solver.cnf_to_bridges(vpool_bridges, model[:(vpool_bridges.next_id)-1]))
+        bridges = solver.cnf_to_bridges(
+            vpool_bridges, model[:(vpool_bridges.next_id)-1])
+        print("Bridges :", bridges)
+        solver.model_to_game_file(nodes=nodes,
+                                  bridges=bridges,
+                                  fpath="solution.txt")

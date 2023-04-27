@@ -212,50 +212,63 @@ def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
         bridges (list[int]): List of bridges.
         fpath (str): Path to the file to write.
     """
-    # Sort list of nodes by id
-    nodes.sort(key=lambda x: x.id)
-
     # List of bridges + nodes
-    br_nd = {}
+    lvl_iles: list[int, Node, Node] = []
 
     for bridge in bridges:
+        if bridge < 0:
+            continue
         # get nodes of the bridge
         lvl = bridge // 10000
         n1_n2_id = bridge % 10000
         n1_id = n1_n2_id // 100
         n2_id = n1_n2_id % 100
-        br_nd[bridge] = (lvl, nodes[n1_id], nodes[n2_id])
+        lvl_iles.append((lvl, nodes[n1_id], nodes[n2_id]))
 
     # Find node with furthest position
     max_x = max([node.x for node in nodes])
     max_y = max([node.y for node in nodes])
     max_pos = max(max_x, max_y)
+    line_length = (max_pos + 1) * 2 + 1
 
-    # Fill file with spaces (square dimension)
     with open(fpath, "w") as f:
-        for x in range(max_pos + 1):
+        # Fill file with spaces (square dimension)
+        for x in range(2 * max_pos + 1):
             for y in range(max_pos + 1):
-                f.write("X ")
+                f.write("  ")
             f.write("\n")
 
         f.seek(0)
 
-        for br, nodes in br_nd.items():
+        for lvl, n1, n2 in lvl_iles:
             # seek position of first node in file
-            x_1 = nodes[1].x
-            y_1 = nodes[1].y
-            f.seek(x_1 * (max_pos + 1) + y_1)
+            pos = n1.x * 2 * line_length + n1.y * 2
+            f.seek(pos)
             # Write first node
-            f.write(nodes[1].value)
+            f.write(str(n1.value))
 
             # Same for second node
-            x_2 = nodes[2].x
-            y_2 = nodes[2].y
-            f.seek(x_2 * (max_pos + 1) + y_2)
-            f.write(nodes[2].value)
+            pos = n2.x * 2 * line_length + n2.y * 2
+            f.seek(pos)
+            f.write(str(n2.value))
 
             # Fill space between nodes according to level of bridge (nodes[0])
-            horizontal = nodes[1].x == nodes[2].x
+            horizontal = n1.x == n2.x
+            if horizontal:
+                # f.seek(min(n1.x, n2.x) * 2 * line_length + min(n1.y, n2.y) + 2)
+                f.seek(int((2 * n1.y + 2 * n2.y) / 2) + n1.x * 2 * line_length)
+                # for x in range(n1.y + 1, n2.y):
+                if lvl == 1:
+                    f.write("-")
+                elif lvl == 2:
+                    f.write("=")
+            else:
+                # for y in range(1, abs(n1.y + 1 - n2.y) * 2 + 1):
+                f.seek(int((n1.x * 2 + n2.x * 2) / 2) * line_length + n1.y * 2)
+                if lvl == 1:
+                    f.write("|")
+                else:
+                    f.write("$")
 
 
 if __name__ == '__main__':

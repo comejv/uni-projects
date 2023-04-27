@@ -18,7 +18,7 @@ parser.add_argument("-p", "--pysat", dest="pysat", action="store_true", default=
                     help="use PySAT instead of our own WalkSAT")
 parser.add_argument("-t", "--sat3", dest="sat3", action="store_true", default=False,
                     help="convert CNF to 3 sat before using")
-parser.add_argument("-w", "--write_file", dest="write_file",
+parser.add_argument("-w", "--write_file", dest="write_file", default="stdout",
                     help="Write the graphical solution to the given file")
 parser.add_argument("-q", "--quiet", dest="quiet",
                     help="do not print the solution")

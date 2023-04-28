@@ -20,7 +20,7 @@ parser.add_argument("-t", "--sat3", dest="sat3", action="store_true", default=Fa
                     help="convert CNF to 3 sat before using")
 parser.add_argument("-w", "--write_file", dest="write_file", default="stdout",
                     help="Write the graphical solution to the given file")
-parser.add_argument("-q", "--quiet", dest="quiet",
+parser.add_argument("-q", "--quiet", dest="quiet", action="store_true",
                     help="do not print the solution")
 parser.add_argument("-b", "--bridge-help", dest="bridge_help", action="store_true",
                     help="show how the bridges are numbered")
@@ -78,10 +78,12 @@ bridges = solver.all_bridges(nodes)
 
 # Nodes must have {node.value} bridges exactly
 for node in nodes:
-    cnf.extend(solver.bridges_to_clauses(vpool_bridges, rules.connect_node(node)))
+    cnf.extend(solver.bridges_to_clauses(
+        vpool_bridges, rules.connect_node(node)))
 
 # Bridges can't cross each other
-cnf.extend(solver.bridges_to_clauses(vpool_bridges, rules.no_crossing(bridges)))
+cnf.extend(solver.bridges_to_clauses(
+    vpool_bridges, rules.no_crossing(bridges)))
 
 # ## Connexity Rule ## #
 
@@ -89,7 +91,8 @@ cnf.extend(solver.bridges_to_clauses(vpool_bridges, rules.no_crossing(bridges)))
 vpool = solver.IDPool(cnf.nvars() + 1)
 
 # Connexity rule apply
-cnf.extend(solver.arcs_ways_to_clauses(vpool, vpool_bridges, rules.connexite(nodes)))
+cnf.extend(solver.arcs_ways_to_clauses(
+    vpool, vpool_bridges, rules.connexite(nodes)))
 
 # Convert to 3-SAT if asked
 if args.sat3:
@@ -100,14 +103,20 @@ if args.cnf:
     cnf.to_file(args.cnf)
 model = solver.solve_cnf(cnf, pysat=args.pysat, quiet=args.quiet)
 
-if not args.quiet:
-    print(f"Game is {'un' if model is None else ''}satisfiable.")
-    if model is not None:
+if model is not None:
+    bridges = solver.cnf_to_bridges(
+        vpool_bridges, model[:(vpool_bridges.next_id)-1])
+
+    solver.model_to_game_file(nodes=nodes,
+                              bridges=bridges,
+                              fpath=args.write_file)
+
+    if not args.quiet:
+        print(f"Game is {'un' if model is None else ''}satisfiable.")
         print("One model is :")
         print("Variables :", model)
-        bridges = solver.cnf_to_bridges(
-            vpool_bridges, model[:(vpool_bridges.next_id)-1])
         print("Bridges :", bridges)
-        solver.model_to_game_file(nodes=nodes,
-                                  bridges=bridges,
-                                  fpath=args.write_file)
+
+    exit(0)
+else:
+    exit(1)

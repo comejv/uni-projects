@@ -126,28 +126,6 @@ def cnf_to_bridges(vpool: IDPool, model: list[int]) -> list[str]:
     return bid
 
 
-def dnf_to_cnf(dnf: list[list]) -> list[list]:
-    """Convert a dnf to a cnf.
-
-    Args:
-        dnf (list[list]): dnf to convert.
-
-    Returns:
-        list[list]: cnf.
-    """
-    cnf = []
-    if dnf == []:
-        return [[]]
-    else:
-        list = dnf[0]
-        suite = dnf[1:]
-        for lit in list:
-            for lit2 in dnf_to_cnf(suite):
-                lit2.append(lit)
-                cnf.append(lit2)
-        return cnf
-
-
 def convert_to_pysat(cnf: CNF) -> Solver:
     """Convert a CNF formula to a pysat formula.
 
@@ -291,7 +269,6 @@ if __name__ == '__main__':
     # Nodes must have {node.value} bridges exactly
     for node in nodes:
         dnf = bridges_to_clauses(vpool, rules.connect_node(node))
-        cnf.extend(dnf_to_cnf(dnf))
 
     # Bridges can't cross each other
     cnf.extend(bridges_to_clauses(vpool, rules.no_crossing(bridges)))

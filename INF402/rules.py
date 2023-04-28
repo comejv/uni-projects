@@ -121,41 +121,40 @@ def no_crossing(bridges: list[Bridges]) -> list[list[Bridges]]:
                 cnf.append([bridge.get_neg(), bridge2.get_neg()])
     return cnf
 
+
 def connexite(nodes: list[Node]):
     clause = []
     for n in nodes:
-        for node in nodes :
+        for node in nodes:
             if n != node:
-                paths = [[Way(node,n,False)]]
+                paths = [[Way(node, n, False)]]
                 for neigh in node.neighbours:
                     outgoings = []
-                    arriving = []    
+                    arriving = []
                     for path in paths:
                         outgoings.append(path + [Arc(node, neigh, True)])
                         arriving.append(path + [Way(neigh, n, True)])
                     paths = outgoings + arriving
                     clause.append([Arc(node, neigh, False),
-                                    Bridge(1, node, neigh)])
+                                   Bridge(1, node, neigh)])
             else:
-                paths = [[Way(n,node,True)]]
+                paths = [[Way(n, node, True)]]
             clause += paths
 
     for n in nodes:
-        for node in nodes :
+        for node in nodes:
             if n != node:
                 for neigh in node.neighbours:
-                    reversed = [Way(neigh,n,False),Arc(node,neigh,False),Way(node,n,True)]
+                    reversed = [Way(neigh, n, False), Arc(
+                        node, neigh, False), Way(node, n, True)]
                     clause.append(reversed)
-                
+
     for node_x in nodes:
         for n in nodes:
             if n != node_x:
-                clause.append([Way(node_x,n,False), Way(n,node_x,False)])
+                clause.append([Way(node_x, n, False), Way(n, node_x, False)])
 
     node_init = nodes[0]
     for node in nodes[1:]:
         clause.append([Way(node_init, node, True)])
-
-    for e in clause:
-        print(e)
     return clause

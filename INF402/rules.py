@@ -126,13 +126,13 @@ def connexite(nodes: list[Node]):
     for n in nodes:
         for node in nodes :
             if n != node:
-                paths = [[Way(n,node,False)]]
+                paths = [[Way(node,n,False)]]
                 for neigh in node.neighbours:
                     outgoings = []
                     arriving = []    
                     for path in paths:
                         outgoings.append(path + [Arc(node, neigh, True)])
-                        arriving.append(path + [Way(neigh, node, True)])
+                        arriving.append(path + [Way(neigh, n, True)])
                     paths = outgoings + arriving
                     clause.append([Arc(node, neigh, False),
                                     Bridge(1, node, neigh)])
@@ -140,13 +140,22 @@ def connexite(nodes: list[Node]):
                 paths = [[Way(n,node,True)]]
             clause += paths
 
+    for n in nodes:
+        for node in nodes :
+            if n != node:
+                for neigh in node.neighbours:
+                    reversed = [Way(neigh,n,False),Arc(node,neigh,False),Way(node,n,True)]
+                    clause.append(reversed)
+                
+    for node_x in nodes:
+        for n in nodes:
+            if n != node_x:
+                clause.append([Way(node_x,n,False), Way(n,node_x,False)])
 
     node_init = nodes[0]
     for node in nodes[1:]:
         clause.append([Way(node_init, node, True)])
 
-    for node_x in nodes:
-        for neigh in node_x.neighbours:
-            clause.append([Arc(node_x,neigh,False), Arc(neigh,node_x,False)])
-
+    for e in clause:
+        print(e)
     return clause

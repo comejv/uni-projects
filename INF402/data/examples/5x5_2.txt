@@ -1,0 +1,5 @@
+2 X 2 X 1
+X X x X X
+2 X 2 X 1
+X X X X x
+X X X X X

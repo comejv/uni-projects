@@ -168,7 +168,7 @@ def solve_cnf(cnf: CNF, quiet=False, pysat=False, heuristic=None) -> list[int]:
         return walk_sat(cnf, heuristic=heuristic)
 
 
-def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
+def pretty_print_model(nodes: list[Node], bridges: list[int], fpath: str):
     """Convert a model to a game file.
     3 by 3 game file example :
     4===3
@@ -235,10 +235,12 @@ def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):
     if fpath == "stdout":
         for line in game:
             print(''.join(line))
+        print()
     else:
         with open(fpath, 'w') as f:
             for line in game:
                 f.write(''.join(line) + '\n')
+            f.write('\n')
 
 
 if __name__ == '__main__':

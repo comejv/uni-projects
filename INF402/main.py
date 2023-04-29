@@ -114,7 +114,7 @@ if model is not None:
     bridges = solver.cnf_to_bridges(
         vpool_bridges, model[:(vpool_bridges.next_id)-1])
 
-    solver.model_to_game_file(nodes=nodes,
+    solver.pretty_print_model(nodes=nodes,
                               bridges=bridges,
                               fpath=args.write_file)
 

@@ -141,7 +141,7 @@ def convert_to_pysat(cnf: CNF) -> Solver:
     return solver
 
 
-def solve_cnf(cnf: CNF, quiet=False, pysat=False) -> list[int]:
+def solve_cnf(cnf: CNF, quiet=False, pysat=False, heuristic=None) -> list[int]:
     """Solve a CNF formula.
 
     Args:
@@ -165,7 +165,7 @@ def solve_cnf(cnf: CNF, quiet=False, pysat=False) -> list[int]:
             print("Number of variables :", cnf.nvars())
             print("Number of clauses :", cnf.nclauses())
 
-        return walk_sat(cnf)
+        return walk_sat(cnf, heuristic=heuristic)
 
 
 def model_to_game_file(nodes: list[Node], bridges: list[int], fpath: str):

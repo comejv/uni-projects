@@ -90,7 +90,76 @@ def cnf_to_3sat(cnf: CNF) -> CNF:
     return t_sat
 
 
-def walk_sat(cnf: CNF) -> list[int]:
+def jw_heuristic(cnf: CNF) -> list[float]:
+    """JW heuristic algorithm.
+
+    Args:
+        cnf (CNF): A list of clauses.
+
+    Returns:
+        list[int]: List of assignments. The index of the list corresponds to
+            the variable number, and the value to the inverse probability.
+
+    """
+    # Initialize the score, add one because there's no var 0
+    scores = [0] * (cnf.nvars() + 1)
+    total = 0
+    for clause in cnf.clauses():
+        for var in clause:
+            scores[abs(var)] += len(clause)
+            total += len(clause)
+
+    # Normalize and inverse scores
+    scores = [total - x for x in scores]
+    total = sum(scores)
+    scores = [x / total for x in scores]
+
+    return [sum(scores[:i+1]) for i in range(len(scores))]
+
+
+def custom_random_choice(scores: list[float]):
+    rand_num = random()
+
+    for i, cum_prob in enumerate(scores):
+        if rand_num <= cum_prob:
+            return i
+
+
+def moms_heuristic(cnf: CNF) -> list[float]:
+    """MOMS heuristic algorithm. (maximum occurences in clauses of
+    minimum size)
+
+    Args:
+        cnf (CNF): A list of clauses.
+
+    Returns:
+        list[int]: List of assignments. The index of the list corresponds to
+            the variable number, and the value to the probability.
+    """
+    # Initialize the score, add one because there's no var 0
+    scores = [0] * (cnf.nvars() + 1)
+    total = 0
+
+    clauses_copy = cnf.clauses()
+
+    while clauses_copy:
+        min_size = min(len(clause) for clause in clauses_copy)
+        for clause in clauses_copy:
+            if len(clause) == min_size:
+                for var in clause:
+                    scores[abs(var)] += 1
+                    total += 1
+        clauses_copy = [clause for clause in clauses_copy if len(clause) != min_size]
+
+    # Normalize and inverse scores
+    scores = [total - x for x in scores]
+    total = sum(scores)
+    scores = [x / total for x in scores]
+
+    return [sum(scores[:i+1]) for i in range(len(scores))]
+
+
+def walk_sat(cnf: CNF, heuristic=None) -> list[int]:
     """WalkSAT algorithm.
 
     Args:
@@ -101,6 +170,7 @@ def walk_sat(cnf: CNF) -> list[int]:
             the variable number, and the value to the assignment.
     """
     # Clean the CNF formula
+    # Commented because slower than possible gains
     # delete_valid_clauses(cnf)
 
     # Initialize the model
@@ -108,7 +178,13 @@ def walk_sat(cnf: CNF) -> list[int]:
     for i in range(1, cnf.nvars()+1):
         model.append(i)
 
-    MAX_ITERATION = 10000
+    # Run heuristic algorithm
+    if heuristic == 'jw':
+        score = jw_heuristic(cnf)
+    elif heuristic == 'moms':
+        score = moms_heuristic(cnf)
+
+    MAX_ITERATION = 100000
     n_iter = 0
     while n_iter < MAX_ITERATION:
         # Get the list of unsatisfied clauses
@@ -123,14 +199,21 @@ def walk_sat(cnf: CNF) -> list[int]:
 
         # Get a variable from the clause
         x = random()
-        if x <= 0.4:
-            y = choice(clause)
+        if x <= 0.6:
+            # Random choice
+            y = abs(choice(clause))
         else:
-            y = clause[0]
+            if heuristic:
+                # Deterministic choice (probability inverse of score)
+                y = custom_random_choice(score)
+            else:
+                y = abs(clause[0])
 
         # Flip the variable
-        model[abs(y)-1] = model[abs(y)-1] * (-1)
+        model[y-1] = model[y-1] * (-1)
         n_iter += 1
+
+    print("Itération maximale atteinte")
 
     return None
 

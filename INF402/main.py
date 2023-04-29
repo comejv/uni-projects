@@ -20,6 +20,9 @@ parser.add_argument("-t", "--sat3", dest="sat3", action="store_true", default=Fa
                     help="convert CNF to 3 sat before using")
 parser.add_argument("-w", "--write_file", dest="write_file", default="stdout",
                     help="Write the graphical solution to the given file")
+parser.add_argument("--branching", dest="branching",
+                    help="what branching heuristic walksat should use. \
+                        If none provided, always chooses the same variable.")
 parser.add_argument("-q", "--quiet", dest="quiet", action="store_true",
                     help="do not print the solution")
 parser.add_argument("-b", "--bridge-help", dest="bridge_help", action="store_true",
@@ -48,14 +51,17 @@ if args.input:
     else:
         print("Invalid file extension.")
         exit(1)
+
 elif args.dimacs:
     assert isfile(args.dimacs)
     cnf = solver.read_dimacs(args.dimacs)
-    solution = solver.solve_cnf(cnf, pysat=args.pysat, quiet=args.quiet)
+    solution = solver.solve_cnf(
+        cnf, pysat=args.pysat, quiet=args.quiet, jw=args.jw_walk)
     solver.write_solution_to_text(solution, args.output)
     if not args.quiet:
         print(solution)
         exit()
+
 else:
     fpath = input("Enter the path to the input file:\n")
     # Check file extension
@@ -101,7 +107,8 @@ if args.sat3:
 # ## Solve ## #
 if args.cnf:
     cnf.to_file(args.cnf)
-model = solver.solve_cnf(cnf, pysat=args.pysat, quiet=args.quiet)
+model = solver.solve_cnf(cnf, pysat=args.pysat,
+                         quiet=args.quiet, heuristic=args.branching)
 
 if model is not None:
     bridges = solver.cnf_to_bridges(

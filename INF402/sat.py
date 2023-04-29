@@ -117,14 +117,6 @@ def jw_heuristic(cnf: CNF) -> list[float]:
     return [sum(scores[:i+1]) for i in range(len(scores))]
 
 
-def custom_random_choice(scores: list[float]):
-    rand_num = random()
-
-    for i, cum_prob in enumerate(scores):
-        if rand_num <= cum_prob:
-            return i
-
-
 def moms_heuristic(cnf: CNF) -> list[float]:
     """MOMS heuristic algorithm. (maximum occurences in clauses of
     minimum size)
@@ -157,6 +149,14 @@ def moms_heuristic(cnf: CNF) -> list[float]:
     scores = [x / total for x in scores]
 
     return [sum(scores[:i+1]) for i in range(len(scores))]
+
+
+def custom_random_choice(scores: list[float]):
+    rand_num = random()
+
+    for i, cum_prob in enumerate(scores):
+        if rand_num <= cum_prob:
+            return i
 
 
 def walk_sat(cnf: CNF, heuristic=None) -> list[int]:

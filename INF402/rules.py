@@ -2,10 +2,12 @@ from classes import Bridge, Bridges, Node, Arc, Way
 
 
 def n_choose_k(list: list[Bridge], n: int) -> list[list]:
-    """ Return all the combinations of n elements in the list l.
+    """ Return all the combinations of n briges in the list l
+    that must not exist for a particular n configuration.
     Args:
         l (list): list to take elements from.
         n (int): number of elements to take.
+
     Returns:
         list: list of all the combinations of n elements in the list l.
     """
@@ -52,15 +54,16 @@ def lvl2_impl_lvl1(cases: list[list]) -> list[list]:
     return clean_cases
 
 
-# Rule 1: A node must have its number in bridges connected to it.
 def connect_node(node: Node) -> list[Bridges]:
-    """Returns all the possible bridge configurations for a node (DNF).
+    """Returns all the possible bridge configurations for a node in
+    CNF format.
 
     Args:
         node (Node): node to connect.
 
     Returns:
-        list[Bridges]: DNF list of all the possible bridge configurations for a node.
+        list[Bridges]: all the possible configurations for a node in CNF
+        format.
     """
     # Lister tous les ponts possibles
     bridges = [Bridge(x, node, neigh) for x in [1, 2]
@@ -68,13 +71,14 @@ def connect_node(node: Node) -> list[Bridges]:
 
     cases = []
 
-    # List all bridges combinations (node.value out of bridges)
+    # Interdire les ponts qui ne peuvent pas exister
+    # pour chaque configuration possible
     n = len(node.neighbours)*2
     for i in range(1, n+1):
         if i != node.value:
-            cases = cases + n_choose_k(bridges, i)
+            cases += n_choose_k(bridges, i)
         else:
-            cases = cases + lvl2_impl_lvl1(n_choose_k(bridges, i))
+            cases += lvl2_impl_lvl1(n_choose_k(bridges, i))
 
     # Add negatives to the cases
     for case in cases:
@@ -88,9 +92,6 @@ def connect_node(node: Node) -> list[Bridges]:
         if i.lvl == 1:
             case_0.append(i)
     cases.append(case_0)
-
-    # Delete cases where a lvl 2 bridge is alone
-    # clean_cases = lvl2_impl_lvl1(cases)
 
     return cases
 

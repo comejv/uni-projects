@@ -26,6 +26,7 @@ class Bridge:
         self.lvl = lvl
         self.n1 = n1
         self.n2 = n2
+        assert self.n1.x == self.n2.x or self.n1.y == self.n2.y
         self.id = None
         self.get_id()
 

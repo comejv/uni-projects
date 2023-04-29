@@ -141,7 +141,8 @@ def moms_heuristic(cnf: CNF) -> list[float]:
                 for var in clause:
                     scores[abs(var)] += 1
                     total += 1
-        clauses_copy = [clause for clause in clauses_copy if len(clause) != min_size]
+        clauses_copy = [
+            clause for clause in clauses_copy if len(clause) != min_size]
 
     # Normalize and inverse scores
     scores = [total - x for x in scores]
@@ -159,7 +160,7 @@ def custom_random_choice(scores: list[float]):
             return i
 
 
-def walk_sat(cnf: CNF, heuristic=None) -> list[int]:
+def walk_sat(cnf: CNF, heuristic: str = None) -> list[int]:
     """WalkSAT algorithm.
 
     Args:
@@ -179,6 +180,7 @@ def walk_sat(cnf: CNF, heuristic=None) -> list[int]:
         model.append(i)
 
     # Run heuristic algorithm
+    heuristic = heuristic.lower()
     if heuristic == 'jw':
         score = jw_heuristic(cnf)
     elif heuristic == 'moms':

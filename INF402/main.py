@@ -21,7 +21,7 @@ parser.add_argument("-t", "--sat3", dest="sat3", action="store_true", default=Fa
 parser.add_argument("-w", "--write_file", dest="write_file", default="stdout",
                     help="Write the graphical solution to the given file")
 parser.add_argument("--branching", dest="branching",
-                    help="what branching heuristic walksat should use. \
+                    help="what branching heuristic walksat should use. jw or moms. \
                         If none provided, always chooses the same variable.")
 parser.add_argument("--use-c-walk", dest="c_walk", action="store_true", default=False,
                     help="use the C implementation of our Walksat")

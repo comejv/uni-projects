@@ -1,6 +1,7 @@
 from setuptools import setup, Extension
 
-csat = Extension('Csat', sources=['libsat.c'])
+csat = Extension('Csat', sources=['libsat.c'],
+                 extra_compile_args=["-O3"])
 
 setup(
     name='Csat',

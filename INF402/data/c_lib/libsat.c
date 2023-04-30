@@ -78,14 +78,20 @@ static double *c_jw_heuristic(PyObject *cnf)
     Py_DECREF(clauses);
 
     int new_total = 0;
+    // Inverse scores
     for (int i = 1; i <= nvars; i++)
     {
         scores[i] = total - scores[i];
         new_total += (int)scores[i];
     }
+
+    // Normalize and cumulative
+    double cum_total = 0;
     for (int i = 1; i <= nvars; i++)
     {
         scores[i] = scores[i] / new_total;
+        cum_total += scores[i];
+        scores[i] = cum_total;
     }
     // Mark end of array
     scores[nvars + 1] = 0;
@@ -102,7 +108,7 @@ static int c_custom_random_choice(double *scores)
 
     for (int i = 0; scores[i] != 0; i++)
     {
-        if (rand_num <= scores[i])
+        if (rand_num >= scores[i])
         {
             return i;
         }

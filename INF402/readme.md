@@ -24,6 +24,9 @@ optional arguments:
   -q, --quiet           do not print the solution
   -b, --bridge-help     show how the bridges are numbered
 ```
+> If you want to use the --use-c-walk flag, you need to have the library compiled. You can do so using this command :
+> 
+> `cd data/c_lib/ && py setup.py build_ext --inplace && cd ../..`
 
 ## Example
 - Solve example 3x3_1, write clauses in a file and show graphical solution on stdout : `py main.py -i data/examples/3x3_1.txt -c clauses.dimacs -w stdout`

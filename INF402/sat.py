@@ -39,12 +39,12 @@ def unsat_clauses(assignation: list[int], cnf: CNF) -> list[list[int]]:
     """
     unsat = []
     for clause in cnf.clauses():
-        clause_1 = False
+        satisfiable = False
         for var in clause:
             if var in assignation:
-                clause_1 = True
+                satisfiable = True
                 break
-        if not clause_1:
+        if not satisfiable:
             unsat.append(clause)
 
     return unsat
@@ -110,11 +110,17 @@ def jw_heuristic(cnf: CNF) -> list[float]:
             total += len(clause)
 
     # Normalize and inverse scores
-    scores = [total - x for x in scores]
-    total = sum(scores)
-    scores = [x / total for x in scores]
+    new_total = 0
+    for i in range(1, cnf.nvars() + 1):
+        scores[i] = total - scores[i]
+        new_total += scores[i]
+    total = 0
+    for i in range(1, cnf.nvars() + 1):
+        scores[i] = scores[i] / new_total
+        total += scores[i]
+        scores[i] = total
 
-    return [sum(scores[:i+1]) for i in range(len(scores))]
+    return scores
 
 
 def moms_heuristic(cnf: CNF) -> list[float]:
@@ -145,18 +151,24 @@ def moms_heuristic(cnf: CNF) -> list[float]:
             clause for clause in clauses_copy if len(clause) != min_size]
 
     # Normalize and inverse scores
-    scores = [total - x for x in scores]
-    total = sum(scores)
-    scores = [x / total for x in scores]
+    new_total = 0
+    for i in range(1, cnf.nvars() + 1):
+        scores[i] = total - scores[i]
+        new_total += scores[i]
+    total = 0
+    for i in range(1, cnf.nvars() + 1):
+        scores[i] = scores[i] / new_total
+        total += scores[i]
+        scores[i] = total
 
-    return [sum(scores[:i+1]) for i in range(len(scores))]
+    return scores
 
 
 def custom_random_choice(scores: list[float]):
     rand_num = random()
 
     for i, cum_prob in enumerate(scores):
-        if rand_num <= cum_prob:
+        if rand_num >= cum_prob:
             return i
 
 

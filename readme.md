@@ -89,7 +89,7 @@ SUM:                           107           1344           1211           6709
 
 ***
 
-## INF402 ![](https://img.shields.io/badge/-python-blue)
+## INF402 ![](https://img.shields.io/badge/-python-blue)![](https://img.shields.io/badge/-C-red)
 
 > Introduction à la logique
 

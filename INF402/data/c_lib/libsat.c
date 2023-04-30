@@ -125,13 +125,13 @@ static PyObject *c_walk_sat(PyObject *self, PyObject *args)
     }
 
     // Run heuristic algorithm
-    double *score = NULL;
+    double *scores = NULL;
     if (heuristic != Py_None)
     {
         PyObject *lower_heuristic = PyObject_CallMethod(heuristic, "lower", NULL);
         if (strcmp(PyUnicode_AsUTF8(lower_heuristic), "jw") == 0)
         {
-            score = jw_heuristic(cnf);
+            scores = jw_heuristic(cnf);
         }
     }
 
@@ -178,10 +178,10 @@ static PyObject *c_walk_sat(PyObject *self, PyObject *args)
         }
         else
         {
-            if (score != NULL)
+            if (scores != NULL)
             {
-                // Deterministic choice (probability inverse of score)
-                y = custom_random_choice(score);
+                // Deterministic choice (probability inverse of scores)
+                y = custom_random_choice(scores);
             }
             else
             {

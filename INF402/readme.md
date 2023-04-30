@@ -5,28 +5,22 @@ This program can solve a Hashiwokakero puzzle. It uses [computer vision](vision.
 
 ## Usage
 ```
-usage: main.py [-h] [-i INPUT] [-d DIMACS] [-c CNF] [-p] [-t]
-               [-w WRITE_FILE] [--branching BRANCHING] [-q]
-               [-b]
+usage: main.py [-h] [-i INPUT] [-d DIMACS] [-c CNF] [-p] [-t] [-w WRITE_FILE] [--branching BRANCHING] [--use-c-walk] [-q] [-b]
 
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         path to the input file
   -d DIMACS, --dimacs DIMACS
-                        path to the already generated DIMACS
-                        file
-  -c CNF, --cnf CNF     path to the file where the CNF will be
-                        written
+                        path to the already generated DIMACS file
+  -c CNF, --cnf CNF     path to the file where the CNF will be written
   -p, --pysat           use PySAT instead of our own WalkSAT
   -t, --sat3            convert CNF to 3 sat before using
   -w WRITE_FILE, --write_file WRITE_FILE
-                        Write the graphical solution to the
-                        given file
+                        Write the graphical solution to the given file
   --branching BRANCHING
-                        what branching heuristic walksat should
-                        use. If none provided, always chooses
-                        the same variable.
+                        what branching heuristic walksat should use. If none provided, always chooses the same variable.
+  --use-c-walk          use the C implementation of our Walksat
   -q, --quiet           do not print the solution
   -b, --bridge-help     show how the bridges are numbered
 ```

@@ -23,6 +23,8 @@ parser.add_argument("-w", "--write_file", dest="write_file", default="stdout",
 parser.add_argument("--branching", dest="branching",
                     help="what branching heuristic walksat should use. \
                         If none provided, always chooses the same variable.")
+parser.add_argument("--use-c-walk", dest="c_walk", action="store_true", default=False,
+                    help="use the C implementation of our Walksat")
 parser.add_argument("-q", "--quiet", dest="quiet", action="store_true",
                     help="do not print the solution")
 parser.add_argument("-b", "--bridge-help", dest="bridge_help", action="store_true",
@@ -108,7 +110,7 @@ if args.sat3:
 if args.cnf:
     cnf.to_file(args.cnf)
 model = solver.solve_cnf(cnf, pysat=args.pysat,
-                         quiet=args.quiet, heuristic=args.branching)
+                         quiet=args.quiet, heuristic=args.branching, c_walk=args.c_walk)
 
 if model is not None:
     bridges = solver.cnf_to_bridges(

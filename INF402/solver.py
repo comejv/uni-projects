@@ -7,6 +7,8 @@ from classes import Bridge, Bridges, Node, Way, Arc, CNF, IDPool
 from vision import create_nodes_from_image, create_nodes_from_text, fatal
 import rules
 
+from data.c_lib import Csat
+
 
 def read_dimacs(filename: str) -> CNF:
     """Read a CNF formula from a DIMACS file.
@@ -141,7 +143,7 @@ def convert_to_pysat(cnf: CNF) -> Solver:
     return solver
 
 
-def solve_cnf(cnf: CNF, quiet=False, pysat=False, heuristic=None) -> list[int]:
+def solve_cnf(cnf: CNF, quiet=False, pysat=False, c_walk=False, heuristic=None) -> list[int]:
     """Solve a CNF formula.
 
     Args:
@@ -159,6 +161,8 @@ def solve_cnf(cnf: CNF, quiet=False, pysat=False, heuristic=None) -> list[int]:
             print("Number of clauses :", cnf.nclauses())
         solvable = solver.solve()
         return solver.get_model() if solvable else None
+    elif c_walk:
+        return Csat.walk_sat(cnf, heuristic)
     else:
         # Print number of variables and clauses
         if not quiet:

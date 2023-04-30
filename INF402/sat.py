@@ -180,11 +180,12 @@ def walk_sat(cnf: CNF, heuristic: str = None) -> list[int]:
         model.append(i)
 
     # Run heuristic algorithm
-    heuristic = heuristic.lower()
-    if heuristic == 'jw':
-        score = jw_heuristic(cnf)
-    elif heuristic == 'moms':
-        score = moms_heuristic(cnf)
+    if heuristic:
+        heuristic = heuristic.lower()
+        if heuristic == 'jw':
+            score = jw_heuristic(cnf)
+        elif heuristic == 'moms':
+            score = moms_heuristic(cnf)
 
     MAX_ITERATION = 100000
     n_iter = 0

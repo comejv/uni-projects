@@ -4,3 +4,4 @@ __pycache__
 output
 *.dimacs
 *.hsw
+build

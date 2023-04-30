@@ -1,0 +1,10 @@
+from setuptools import setup, Extension
+
+csat = Extension('Csat', sources=['libsat.c'])
+
+setup(
+    name='Csat',
+    version='0.1',
+    description='C walksat solver',
+    ext_modules=[csat]
+)

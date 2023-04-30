@@ -2,7 +2,7 @@
 
 rm -f /tmp/mtime.$$
 
-for x in {1..5}
+for x in {1..20}
 do
   /usr/bin/time -f "real %e user %U sys %S" -a -o /tmp/mtime.$$ $@
   tail -1 /tmp/mtime.$$

@@ -47,7 +47,7 @@ static PyObject *c_unsat_clauses(PyObject *assignation, PyObject *cnf)
 }
 
 
-static double *c_jw_heuristic(PyObject *cnf)
+static double *jw_heuristic(PyObject *cnf)
 {
     int nvars = PyLong_AsLong(PyObject_CallMethod(cnf, "nvars", NULL));
 
@@ -100,7 +100,7 @@ static double *c_jw_heuristic(PyObject *cnf)
 }
 
 
-static int c_custom_random_choice(double *scores)
+static int custom_random_choice(double *scores)
 {
     double rand_num;
 
@@ -131,7 +131,7 @@ static PyObject *c_walk_sat(PyObject *self, PyObject *args)
         PyObject *lower_heuristic = PyObject_CallMethod(heuristic, "lower", NULL);
         if (strcmp(PyUnicode_AsUTF8(lower_heuristic), "jw") == 0)
         {
-            score = c_jw_heuristic(cnf);
+            score = jw_heuristic(cnf);
         }
     }
 
@@ -181,7 +181,7 @@ static PyObject *c_walk_sat(PyObject *self, PyObject *args)
             if (score != NULL)
             {
                 // Deterministic choice (probability inverse of score)
-                y = c_custom_random_choice(score);
+                y = custom_random_choice(score);
             }
             else
             {

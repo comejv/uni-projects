@@ -1,7 +1,7 @@
 # Author: Côme VINCENT & Emile GUILLAUME
 # Date: 2023-04-13
 
-from random import choice, random
+from random import choice, random, uniform
 from classes import CNF, IDPool
 
 
@@ -164,12 +164,19 @@ def moms_heuristic(cnf: CNF) -> list[float]:
     return scores
 
 
-def custom_random_choice(scores: list[float]):
-    rand_num = random()
+def custom_random_choice(scores: list[float], indexes: list[int]) -> int:
+    indexes = [abs(i) for i in indexes]
+    indexes.sort()
+    binf = scores[indexes[0]]
+    bsup = scores[(indexes[-1] + 1) % len(scores)]
+    rand_num = uniform(binf, bsup)
 
-    for i, cum_prob in enumerate(scores):
-        if rand_num >= cum_prob:
+    # Return index that has the closest score to rand_num
+    for i in indexes:
+        if scores[i] <= rand_num < scores[i + 1 % len(scores)]:
             return i
+    else:
+        return indexes[-1]
 
 
 def walk_sat(cnf: CNF, heuristic: str = None) -> list[int]:
@@ -195,9 +202,9 @@ def walk_sat(cnf: CNF, heuristic: str = None) -> list[int]:
     if heuristic:
         heuristic = heuristic.lower()
         if heuristic == 'jw':
-            score = jw_heuristic(cnf)
+            scores = jw_heuristic(cnf)
         elif heuristic == 'moms':
-            score = moms_heuristic(cnf)
+            scores = moms_heuristic(cnf)
 
     MAX_ITERATION = 100000
     n_iter = 0
@@ -220,7 +227,7 @@ def walk_sat(cnf: CNF, heuristic: str = None) -> list[int]:
         else:
             if heuristic:
                 # Deterministic choice (probability inverse of score)
-                y = custom_random_choice(score)
+                y = custom_random_choice(scores, clause)
             else:
                 y = abs(clause[0])
 

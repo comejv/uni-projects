@@ -88,7 +88,10 @@ def browse(conn: Connection) -> bool:
     if choice == 7:
         return False
 
-    browse_filter(conn, tables[choice-1], prompt_filters=True)
+    if tables[choice-1] == "Types d'hydrogène":
+        browse_filter(conn, "Types", prompt_filters=True)
+    else:
+        browse_filter(conn, tables[choice-1], prompt_filters=True)
 
 
 def get_filters(conn: Connection, table: str, desc: str, title: str) -> dict[str: str]:
@@ -157,7 +160,7 @@ def browse_filter(conn: Connection, table: str,
                            "Pour filtrer les données dont l'attribut est supérieur à 10.")
 
     if prompt_filters is True:
-        new_filters = get_filters(conn, table, filters_description)
+        new_filters = get_filters(conn, table, filters_description, table)
         if new_filters is not None:
             filters.update(new_filters)
 
@@ -248,17 +251,25 @@ def update(conn: Connection, table: str) -> bool:
             hold=True
         )
         input_where = get_filters(conn, table=table, desc=description, title=title)
-
-    description="Vous devez renseigner tous les attributs."
+        
     title = f"{table} : Update, nouvelle donnée"
     input_set = get_filters(conn, table=table, desc=description, title=title)
     # No value must be None
-    while None in input_set.values() or input_set is None:
+    while input_set is None:
         fmt.pwarn(
-            "Veuillez renseigner tous les attributs.",
+            "Veuillez renseigner au moins un attribut.",
             hold=True
         )
         input_set = get_filters(conn, table=table, desc=description, title=title)
+    
+    update_error = db.update_data(
+        conn, table=table, filters=input_where, data=input_set
+    )
+    if update_error:
+        fmt.perror("Erreur de update : ", update_error, hold=True)
+        return True
+    fmt.pitalic("Update effectuée !", hold=True)
+    return False
 
 
 
@@ -340,7 +351,7 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
         insert(conn, table_name)
         return False
     elif choice == 2:
-        # update(conn, table_name)
+        update(conn, table_name)
         return False
     elif choice == 3:
         delete(conn, table_name)

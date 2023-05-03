@@ -177,6 +177,54 @@ def insert_data(conn: sqlite3.Connection, table: str, data: dict) -> Exception:
 
     return None
 
+def update_data(conn: sqlite3.Connection, table:str, filters: dict, data: dict) -> Exception:
+    cursor = conn.cursor()
+    
+    for k, v in filters.copy().items():
+        if v is None:
+            del filters[k]
+
+    for k, v in data.copy().items():
+        if v is None:
+            del data[k]
+
+
+    q_mark = []
+    taille_data = len(data)
+    for i, key in enumerate(data.keys()):
+        if data[key] is not None:
+            q_mark.append(f"{key} = ?{i + 1}")
+            try:
+                data[key] = int(data[key])
+            except ValueError:
+                pass
+    q_mark = ", ".join(q_mark)
+
+    # Construction et exécution de la requête
+    args = []
+    for i, key in enumerate(filters.keys()):
+        if filters[key] is not None:
+            first_char = filters[key][0]
+            if first_char in ['<', '>']:
+                args.append(f"{key} {first_char} ?{i + 1 + taille_data}")
+                filters[key] = filters[key][1:]
+            else:
+                args.append(f"{key} = ?{i + 1 + taille_data}")
+            try:
+                filters[key] = int(filters[key])
+            except ValueError:
+                pass
+    args = " AND ".join(args)
+
+    try:
+        cursor.execute(f"UPDATE {table} SET {q_mark} WHERE {args}", tuple(list(data.values()) + list(filters.values())))
+    except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
+        return e
+    
+    conn.commit()
+
+    return None
+
 
 def delete_data(conn: sqlite3.Connection, table: str, filters: dict) -> Exception:
     """Supprime les lignes dont les filtres `filters` sont valides dans la table

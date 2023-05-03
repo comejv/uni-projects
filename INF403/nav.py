@@ -454,27 +454,28 @@ def commander(conn: Connection) -> bool:
                          ["Créer un nouveau client", "Choisir un client existant"])
     if choice == 1:
         _, client = insert(conn, "Clients")
+        numero_client = client[0]
     else:
-        num_client = int(fmt.form_input("Numéro du client : ")[0])
+        num_client = int(fmt.form_input(["Numéro du client"])[0])
         cursor = conn.execute(
-            "SELECT * FROM Clients WHERE num_client = ?",
+            "SELECT * FROM Clients WHERE numero_client = ?",
             (num_client,)
         )
-        client = cursor.fetchone()[0]
+        numero_client = cursor.fetchone()[0]
 
     # Commande
     choice = create_menu("Choix de la commande",
                          ["Créer une nouvelle commande", "Choisir une commande existante"])
     if choice == 1:
-        _, commande = insert(conn, "Commandes")
+        _, commande = insert(conn, "Commandes_base")
+        numero_commande = commande[0]
     else:
-        num_commande = int(fmt.form_input("Numéro de la commande : ")[0])
+        num_commande = int(fmt.form_input(["Numéro de la commande"])[0])
         cursor = conn.execute(
-            "SELECT * FROM Commandes WHERE num_commande = ?",
+            "SELECT * FROM Commandes_base WHERE numero_commande = ?",
             (num_commande,)
         )
-        commande = cursor.fetchone()[0]
-    numero_commande = commande[0]
+        numero_commande = cursor.fetchone()[0]
 
     # Création d'un navire et affectation à un transporteur
     while True:
@@ -510,7 +511,7 @@ def commander(conn: Connection) -> bool:
 
     # Vérification format date
     while True:
-        date = fmt.form_input("Date de commande: ")[0]
+        date = fmt.form_input(["Date de commande"])[0]
         try:
             date = str(datetime.strptime(date, "%Y-%m-%d").date())
         except ValueError:
@@ -519,16 +520,19 @@ def commander(conn: Connection) -> bool:
         break
 
     cursor = conn.execute(
-        "INSERT INTO commandes_clients (num_commande, num_client, date) VALUES (?, ?, ?)",
-        (commande[0], client[0], date)
+        "INSERT INTO CommandesClients (numero_commande, numero_client, date_commande_client) VALUES (?, ?, ?)",
+        (numero_commande, numero_client, date)
     )
 
     # Récapitulatif de la commande
     cursor = conn.execute(
-        "SELECT * FROM commandes_clients WHERE num_commande = ?",
-        (commande[0],)
+        "SELECT * FROM CommandesClients WHERE numero_commande = ?",
+        (numero_commande,)
     )
     fmt.pbold("Récapitulatif de la commande")
-    fmt.print_table(cursor.fetchall(), ["num_commande", "num_client", "date"])
+    fmt.print_table(cursor.fetchall(), [
+                    "numero_commande",
+                    "numero_client",
+                    "date_commande_client"])
 
     return fmt.bool_input("Voulez-vous faire une autre requête ? (O/N) ")

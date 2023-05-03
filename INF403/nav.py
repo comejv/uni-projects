@@ -1,5 +1,5 @@
 from utils import db, fmt
-from sqlite3 import Connection, OperationalError
+from sqlite3 import Connection, IntegrityError, OperationalError
 import requete
 
 
@@ -373,7 +373,7 @@ def manual_query(conn: Connection) -> bool:
         fmt.print_table(res.fetchall(), headers)
         if res.rowcount == 0:
             fmt.pwarn("Aucune données trouvées !")
-    except OperationalError as e:
+    except (OperationalError, IntegrityError) as e:
         fmt.perror(e)
         fmt.pblink("Appuyez sur Entrée pour continuer...")
         input()

@@ -106,7 +106,7 @@ def drop_table(conn: sqlite3.Connection, table: str):
     """
 
     cursor = conn.cursor()
-    cursor.execute("DROP TABLE ?1", (table,))
+    cursor.execute("DROP TABLE IF EXISTS " + table)
     conn.commit()
 
 
@@ -120,14 +120,14 @@ def drop_all_tables(conn: sqlite3.Connection):
     fmt.pitalic("Suppression des tables...")
 
     tables = ["CommandesClients", "Navires", "Transporteurs",
-              "Clients", "Commandes", "Usines", "Types"]
+              "Clients", "Commandes_base", "Usines", "Types"]
+
+    for table in tables:
+        drop_table(conn, table)
 
     cursor = conn.cursor()
 
-    for table in tables:
-        cursor.execute(f"DROP TABLE IF EXISTS {table}")
-
-    conn.commit()
+    cursor.execute("DROP VIEW IF EXISTS Commandes")
 
 
 def show_results(cursor: sqlite3.Cursor) -> None:

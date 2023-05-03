@@ -163,19 +163,12 @@ def insert_data(conn: sqlite3.Connection, table: str, data: dict) -> Exception:
 
     cursor = conn.cursor()
 
-    args = []
-    for i, key in enumerate(data.keys()):
-        if data[key] is not None:
-            args.append(f"{key} = ?{i + 1}")
-            try:
-                data[key] = int(data[key])
-            except ValueError:
-                pass
-    args = " AND ".join(args)
+    q_mark = ["?"] * len(data)
+    q_mark = ", ".join(q_mark)
 
     try:
         cursor.execute(
-            f"INSERT INTO {table} VALUES ({args})", tuple(data)
+            f"INSERT INTO {table} VALUES ({q_mark})", tuple(data.values())
         )
     except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
         return e

@@ -49,9 +49,11 @@ def perror(*args, hold=False, **kwargs) -> None:
         input()
 
 
-def pblink(s: str, **kwargs) -> None:
+def pblink(*args, **kwargs) -> None:
     """Prints a string in blink. Stdout unless specified."""
-    print("\x1b[5m" + s + "\x1b[25m", **kwargs)
+    print("\x1b[5m", end="")
+    print(*args, **kwargs)
+    print("\x1b[25m", end="")
 
 
 def bool_input(prompt: str) -> bool:

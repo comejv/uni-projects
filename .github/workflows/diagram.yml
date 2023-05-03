@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '**/*'
+  workflow_dispatch:
 
 jobs:
   check_new_or_deleted_files:
@@ -19,16 +20,16 @@ jobs:
           if [ -n "$NEW_OR_DELETED_FILES" ]; then
             echo "New or deleted file(s) detected:"
             echo "$NEW_OR_DELETED_FILES"
-            echo "::set-output name=trigger_get_data::true"
+            echo "TRIGGER_GET_DATA=true" >> $GITHUB_ENV
           else
             echo "No new or deleted files detected"
-            echo "::set-output name=trigger_get_data::false"
+            echo "TRIGGER_GET_DATA=false" >> $GITHUB_ENV
           fi
-        id: check_files
 
   get_data:
+    needs: check_new_or_deleted_files
     runs-on: ubuntu-latest
-    if: needs.check_new_or_deleted_files.outputs.trigger_get_data == 'true'
+    if: ${{ needs.check_new_or_deleted_files.outputs.trigger_get_data == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master

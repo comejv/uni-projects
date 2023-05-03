@@ -91,7 +91,7 @@ def browse(conn: Connection) -> bool:
     browse_filter(conn, tables[choice-1], prompt_filters=True)
 
 
-def get_filters(conn: Connection, table: str, desc: str) -> dict[str: str]:
+def get_filters(conn: Connection, table: str, desc: str, title: str) -> dict[str: str]:
     """Demande à l'utilisateur les filtres qu'il souhaite appliquer à la table `table`.
 
     Args:
@@ -103,7 +103,7 @@ def get_filters(conn: Connection, table: str, desc: str) -> dict[str: str]:
     """
 
     fmt.clear()
-    fmt.pbold(table)
+    fmt.pbold(title)
     print("\n" + desc)
     filters = {}
     cursor = conn.cursor()
@@ -209,14 +209,15 @@ def insert(conn: Connection, table: str) -> bool:
 
     filters_description = "Veuillez renseigner tous les attributs de la ligne à insérer."
 
-    input_data = get_filters(conn, table, filters_description)
+    title = f"{table} : Insertion"
+    input_data = get_filters(conn, table, filters_description,title)
     # No value must be None
     while None in input_data.values() or input_data is None:
         fmt.pwarn(
             "Veuillez renseigner tous les attributs.",
             hold=True
         )
-        input_data = get_filters(conn, table, filters_description)
+        input_data = get_filters(conn, table, filters_description,title)
     insert_error = db.insert_data(
         conn, table=table, data=input_data)
     if insert_error:
@@ -238,28 +239,26 @@ def update(conn: Connection, table: str) -> bool:
     """
 
     description="Vous devez renseigner au moins 1 attribut."
-    fmt.pbold("Que faut t'il remplacer dans %s ?" %table)
-    input_where = get_filters(conn, table=table, desc=description)
+    title = f"{table} : Update, donnée à remplacer"
+    input_where = get_filters(conn, table=table, desc=description, title=title)
     # au moins une valeur de tri
     while input_where is None:
         fmt.pwarn(
             "Veuillez renseigner au moins un attribut.",
             hold=True
         )
-        fmt.pbold("Que faut t'il remplacer dans %s ?" %table)
-        input_where = get_filters(conn, table=table, desc=description)
+        input_where = get_filters(conn, table=table, desc=description, title=title)
 
     description="Vous devez renseigner tous les attributs."
-    fmt.pbold("Par quel valeurs voulez vous les remplacer dans %s ?" %table)
-    input_set = get_filters(conn, table=table, desc=description)
+    title = f"{table} : Update, nouvelle donnée"
+    input_set = get_filters(conn, table=table, desc=description, title=title)
     # No value must be None
     while None in input_set.values() or input_set is None:
         fmt.pwarn(
             "Veuillez renseigner tous les attributs.",
             hold=True
         )
-        fmt.pbold("Par quel valeurs voulez vous les remplacer dans %s ?" %table)
-        input_set = get_filters(conn, table=table, desc=description)
+        input_set = get_filters(conn, table=table, desc=description, title=title)
 
 
 
@@ -277,7 +276,8 @@ def delete(conn: Connection, table: str) -> bool:
 
     filters_description = "Veuillez renseigner les attributrs de(s) lignes(s) à supprimer."
 
-    filters = get_filters(conn, table, filters_description)
+    title = f"{table} : Delete"
+    filters = get_filters(conn, table, filters_description, title)
     delete_error = db.delete_data(
         conn, table=table, filters=filters
     )

@@ -13,6 +13,7 @@ def create_menu(title: str, choices: list[str]) -> int:
     Returns:
         int : entier représentant le choix choisie par l'utilisateur
     """
+
     fmt.clear()
     fmt.pbold(title)
     for i, c in enumerate(choices):
@@ -41,6 +42,7 @@ def main_menu(conn: Connection) -> bool:
     Returns:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour quitter le programme
     """
+
     choice = create_menu(title="Menu principal",
                          choices=["Parcourir les données",
                                   "Insérer ou supprimer des données", "Requêtes avancées",
@@ -76,28 +78,20 @@ def browse(conn: Connection) -> bool:
         bool: `True` si l'utilisateur souhaite continuer, `False` pour
         revenir au menu principal
     """
-    choice = create_menu(title="Parcourir les données",
-                         choices=["Clients", "Commandes", "Usines",
-                                  "Transporteurs", "Navires", "Types d'hydrogène",
-                                  "Retour au menu principal"])
 
-    if choice == 1:
-        return browse_filter(conn, table="Clients", prompt_filters=True)
-    elif choice == 2:
-        return browse_filter(conn, table="Commandes", prompt_filters=True)
-    elif choice == 3:
-        return browse_filter(conn, table="Usines", prompt_filters=True)
-    elif choice == 4:
-        return browse_filter(conn, table="Transporteurs", prompt_filters=True)
-    elif choice == 5:
-        return browse_filter(conn, table="Navires", prompt_filters=True)
-    elif choice == 6:
-        return browse_filter(conn, table="Types", prompt_filters=True)
-    elif choice == 7:
+    tables = ["Clients", "Commandes", "Usines",
+              "Transporteurs", "Navires", "Types d'hydrogène",
+              "Retour au menu principal"]
+
+    choice = create_menu(title="Parcourir les données",
+                         choices=tables)
+    if choice == 7:
         return False
 
+    browse_filter(conn, tables[choice-1], prompt_filters=True)
 
-def get_filters(conn: Connection, table: str) -> dict[str: str]:
+
+def get_filters(conn: Connection, table: str, desc: str) -> dict[str: str]:
     """Demande à l'utilisateur les filtres qu'il souhaite appliquer à la table `table`.
 
     Args:
@@ -107,8 +101,10 @@ def get_filters(conn: Connection, table: str) -> dict[str: str]:
     Returns:
         dict | None: Dictionnaire contenant les filtres {"attribut": "valeur_souhaitée"}
     """
+
     fmt.clear()
     fmt.pbold(table)
+    print("\n" + desc)
     filters = {}
     cursor = conn.cursor()
     try:
@@ -146,6 +142,7 @@ def browse_filter(conn: Connection, table: str,
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
             False sinon.
     """
+
     if filters is None:
         filters = {}
 
@@ -153,8 +150,14 @@ def browse_filter(conn: Connection, table: str,
     fmt.pbold(table)
     cursor = conn.cursor()
 
+    filters_description = "Vous pouvez filtrer les données de la table avec les filtres suivants.\n\
+        Il est possible de renseigner des valeurs ou des valeurs plancher/plafond avec > et <.\n\
+            Par exemple vous pouvez écrire :\n\
+                \t(attribut): > 10\n\
+            Pour filtrer les données dont l'attribut est supérieur à 10."
+
     if prompt_filters is True:
-        new_filters = get_filters(conn, table)
+        new_filters = get_filters(conn, table, filters_description)
         if new_filters is not None:
             filters.update(new_filters)
 
@@ -203,6 +206,7 @@ def insert(conn: Connection, table: str) -> bool:
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
             False sinon.
     """
+
     input_data = get_filters(conn, table=table)
     # No value must be None
     while None in input_data.values() or input_data is None:
@@ -231,9 +235,12 @@ def delete(conn: Connection, table: str) -> bool:
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
             False sinon.
     """
-    filters = get_filters(conn, table=table)
+
+    filters_description = "Veuillez renseigner les attributrs de(s) lignes(s) à supprimer."
+
+    filters = get_filters(conn, table=table, desc=filters_description)
     delete_error = db.delete_data(
-        conn, table=table, data=filters
+        conn, table=table, filters=filters
     )
     if delete_error:
         fmt.perror("Erreur de supression : ", delete_error, hold=True)
@@ -284,6 +291,7 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
               False sinon.
     """
+
     choice = create_menu(f"Que voulez-vous faire dans la table {table_name} ?",
                          ["Insérer des données", "Update des données", "Supprimer des données",
                           "Retour au menu précédent"])
@@ -303,9 +311,18 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
 
 
 def menu_choice_insert(conn: Connection) -> bool:
+    """Affiche le menu du choix de l'opération de modification de table.
+
+    Args:
+        conn (Connection): Connexion à la database.
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+              False sinon.
+    """
 
     tables = ["Clients", "Commandes", "Usines", "Types", "Navires",
-              "Transporteurs", "CommandesClients", "Drop la database",
+              "Transporteurs", "CommandesClients", "Réinitialiser la base de données",
               "Retourner au menu principale"]
 
     choice = create_menu("Choisissez la table à modifier :",
@@ -337,6 +354,7 @@ def manual_query(conn: Connection) -> bool:
         bool: True si l'utilisateur souhaite continuer dans le même sous menu,
             False sinon.
     """
+
     fmt.clear()
     fmt.pbold("Requêtes manuelle")
     requete = input("Requête : ")

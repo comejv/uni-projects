@@ -212,6 +212,9 @@ def delete_data(conn: sqlite3.Connection, table: str, filters: dict) -> Exceptio
     except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
         return e
 
+    if cursor.rowcount == 0:
+        return Exception("Aucune données correspondante trouvée")
+
     conn.commit()
 
 

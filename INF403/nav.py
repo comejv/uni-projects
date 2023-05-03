@@ -207,14 +207,16 @@ def insert(conn: Connection, table: str) -> bool:
             False sinon.
     """
 
-    input_data = get_filters(conn, table=table)
+    filters_description = "Veuillez renseigner tous les attributs de la ligne à insérer."
+
+    input_data = get_filters(conn, table, filters_description)
     # No value must be None
     while None in input_data.values() or input_data is None:
         fmt.pwarn(
             "Veuillez renseigner tous les attributs.",
             hold=True
         )
-        input_data = get_filters(conn, table=table)
+        input_data = get_filters(conn, table, filters_description)
     insert_error = db.insert_data(
         conn, table=table, data=input_data)
     if insert_error:
@@ -275,7 +277,7 @@ def delete(conn: Connection, table: str) -> bool:
 
     filters_description = "Veuillez renseigner les attributrs de(s) lignes(s) à supprimer."
 
-    filters = get_filters(conn, table=table, desc=filters_description)
+    filters = get_filters(conn, table, filters_description)
     delete_error = db.delete_data(
         conn, table=table, filters=filters
     )
@@ -377,7 +379,7 @@ def menu_choice_insert(conn: Connection) -> bool:
     elif choice == 9:
         return False
 
-    menu_insert_update_delete(conn, table_name=tables[choice - 1])
+    menu_insert_update_delete(conn, tables[choice - 1])
     return True
 
 

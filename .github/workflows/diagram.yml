@@ -28,7 +28,7 @@ jobs:
 
   get_data:
     runs-on: ubuntu-latest
-    if: steps.check_files.outputs.trigger_get_data == 'true'
+    if: needs.check_new_or_deleted_files.outputs.trigger_get_data == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@master

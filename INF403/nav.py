@@ -223,6 +223,43 @@ def insert(conn: Connection, table: str) -> bool:
     fmt.pitalic("Insertion effectuée !", hold=True)
     return False
 
+def update(conn: Connection, table: str) -> bool:
+    """Update des données dans la table `table`.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+        table (str): Nom de la table
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+            False sinon.
+    """
+
+    description="Vous devez renseigner au moins 1 attribut."
+    fmt.pbold("Que faut t'il remplacer dans %s ?" %table)
+    input_where = get_filters(conn, table=table, desc=description)
+    # au moins une valeur de tri
+    while input_where is None:
+        fmt.pwarn(
+            "Veuillez renseigner au moins un attribut.",
+            hold=True
+        )
+        fmt.pbold("Que faut t'il remplacer dans %s ?" %table)
+        input_where = get_filters(conn, table=table, desc=description)
+
+    description="Vous devez renseigner tous les attributs."
+    fmt.pbold("Par quel valeurs voulez vous les remplacer dans %s ?" %table)
+    input_set = get_filters(conn, table=table, desc=description)
+    # No value must be None
+    while None in input_set.values() or input_set is None:
+        fmt.pwarn(
+            "Veuillez renseigner tous les attributs.",
+            hold=True
+        )
+        fmt.pbold("Par quel valeurs voulez vous les remplacer dans %s ?" %table)
+        input_set = get_filters(conn, table=table, desc=description)
+
+
 
 def delete(conn: Connection, table: str) -> bool:
     """Supprime des données dans la table `table`.

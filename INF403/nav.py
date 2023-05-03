@@ -55,7 +55,7 @@ def main_menu(conn: Connection) -> bool:
             pass
         return True
     elif choice == 3:
-        while advance_request(conn):
+        while combined_request(conn):
             pass
         return True
     elif choice == 4:
@@ -242,7 +242,7 @@ def delete(conn: Connection, table: str) -> bool:
     return False
 
 
-def advance_request(conn: Connection) -> bool:
+def combined_request(conn: Connection) -> bool:
     """Affiche le menu des requêtes avancées.
 
     Args:

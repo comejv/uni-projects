@@ -1,3 +1,5 @@
+from datetime import datetime
+from random import randint
 from utils import db, fmt
 from sqlite3 import Connection, IntegrityError, OperationalError
 import requetes
@@ -45,7 +47,9 @@ def main_menu(conn: Connection) -> bool:
 
     choice = create_menu(title="Menu principal",
                          choices=["Parcourir les données",
-                                  "Insérer ou supprimer des données", "Requêtes avancées",
+                                  "Insérer ou supprimer des données",
+                                  "Commander",
+                                  "Requêtes avancées",
                                   "Requêtes manuelle", "Quitter"])
 
     if choice == 1:
@@ -57,14 +61,18 @@ def main_menu(conn: Connection) -> bool:
             pass
         return True
     elif choice == 3:
-        while combined_request(conn):
+        while commander(conn):
             pass
         return True
     elif choice == 4:
-        while manual_query(conn):
+        while combined_request(conn):
             pass
         return True
     elif choice == 5:
+        while manual_query(conn):
+            pass
+        return True
+    elif choice == 6:
         return False
 
 
@@ -210,21 +218,22 @@ def insert(conn: Connection, table: str) -> bool:
     filters_description = "Veuillez renseigner tous les attributs de la ligne à insérer."
 
     title = f"{table} : Insertion"
-    input_data = get_filters(conn, table, filters_description,title)
+    input_data = get_filters(conn, table, filters_description, title)
     # No value must be None
     while None in input_data.values() or input_data is None:
         fmt.pwarn(
             "Veuillez renseigner tous les attributs.",
             hold=True
         )
-        input_data = get_filters(conn, table, filters_description,title)
+        input_data = get_filters(conn, table, filters_description, title)
     insert_error = db.insert_data(
         conn, table=table, data=input_data)
     if insert_error:
         fmt.perror("Erreur d'insertion : ", insert_error, hold=True)
         return True
     fmt.pitalic("Insertion effectuée !", hold=True)
-    return False
+    return False, input_data
+
 
 def update(conn: Connection, table: str) -> bool:
     """Update des données dans la table `table`.
@@ -238,7 +247,7 @@ def update(conn: Connection, table: str) -> bool:
             False sinon.
     """
 
-    description="Vous devez renseigner au moins 1 attribut."
+    description = "Vous devez renseigner au moins 1 attribut."
     title = f"{table} : Update, donnée à remplacer"
     input_where = get_filters(conn, table=table, desc=description, title=title)
     # au moins une valeur de tri
@@ -247,9 +256,10 @@ def update(conn: Connection, table: str) -> bool:
             "Veuillez renseigner au moins un attribut.",
             hold=True
         )
-        input_where = get_filters(conn, table=table, desc=description, title=title)
+        input_where = get_filters(
+            conn, table=table, desc=description, title=title)
 
-    description="Vous devez renseigner tous les attributs."
+    description = "Vous devez renseigner tous les attributs."
     title = f"{table} : Update, nouvelle donnée"
     input_set = get_filters(conn, table=table, desc=description, title=title)
     # No value must be None
@@ -258,8 +268,8 @@ def update(conn: Connection, table: str) -> bool:
             "Veuillez renseigner tous les attributs.",
             hold=True
         )
-        input_set = get_filters(conn, table=table, desc=description, title=title)
-
+        input_set = get_filters(
+            conn, table=table, desc=description, title=title)
 
 
 def delete(conn: Connection, table: str) -> bool:
@@ -279,7 +289,7 @@ def delete(conn: Connection, table: str) -> bool:
     title = f"{table} : Delete"
     filters = get_filters(conn, table, filters_description, title)
     delete_error = db.delete_data(
-        conn, table=table, filters=filters
+        conn, table, filters
     )
     if delete_error:
         fmt.perror("Erreur de supression : ", delete_error, hold=True)
@@ -411,5 +421,104 @@ def manual_query(conn: Connection) -> bool:
         fmt.perror(e)
         fmt.pblink("Appuyez sur Entrée pour continuer...")
         input()
+
+    return fmt.bool_input("Voulez-vous faire une autre requête ? (O/N) ")
+
+
+def commander(conn: Connection) -> bool:
+    """Commander crée un nouveau client ou en choisit un existant, puis
+    crée un nouveau navire ou en choisit un existant, puis
+    crée une nouvelle commande_base et lui attribue le navire, et enfin
+    crée la relation dans commandes_clients avec une date.
+
+    Args:
+        conn (Connection): Connexion à la base de données
+
+    Returns:
+        bool: True si l'utilisateur souhaite continuer dans le même sous menu,
+            False sinon.
+    """
+
+    # Client
+    choice = create_menu("Choix du client",
+                         ["Créer un nouveau client", "Choisir un client existant"])
+    if choice == 1:
+        _, client = insert(conn, "Clients")
+    else:
+        num_client = int(fmt.form_input("Numéro du client : ")[0])
+        cursor = conn.execute(
+            "SELECT * FROM Clients WHERE num_client = ?",
+            (num_client,)
+        )
+        client = cursor.fetchone()[0]
+
+    # Commande
+    choice = create_menu("Choix de la commande",
+                         ["Créer une nouvelle commande", "Choisir une commande existante"])
+    if choice == 1:
+        _, commande = insert(conn, "Commandes")
+    else:
+        num_commande = int(fmt.form_input("Numéro de la commande : ")[0])
+        cursor = conn.execute(
+            "SELECT * FROM Commandes WHERE num_commande = ?",
+            (num_commande,)
+        )
+        commande = cursor.fetchone()[0]
+    numero_commande = commande[0]
+
+    # Création d'un navire et affectation à un transporteur
+    while True:
+        imo_navire = randint(1000000, 9999999)
+
+        # Check if navire already exists
+        cursor = conn.execute(
+            "SELECT * FROM Navires WHERE imo_navire = ?",
+            (imo_navire,)
+        )
+
+        if cursor.fetchone():
+            continue
+        else:
+            break
+
+    cursor = conn.execute(
+        "SELECT * FROM Transporteurs"
+    )
+    transporteurs = cursor.fetchall()
+    transporteur = transporteurs[randint(0, len(transporteurs) - 1)]
+    duns_transporteur = transporteur[0]
+    db.insert_data(conn, "Navires",
+                   {"imo_navire": imo_navire,
+                    "capacite_navire": 9999,
+                    "duns_transporteur": duns_transporteur,
+                    "numero_commande": numero_commande})
+
+    # CommandeClient
+    fmt.clear()
+    fmt.pbold("Création de la relation dans commandes_clients")
+    print("Merci d'entrer la date sous format YYYY-MM-DD")
+
+    # Vérification format date
+    while True:
+        date = fmt.form_input("Date de commande: ")[0]
+        try:
+            date = str(datetime.strptime(date, "%Y-%m-%d").date())
+        except ValueError:
+            fmt.perror("Format de date invalide !")
+            continue
+        break
+
+    cursor = conn.execute(
+        "INSERT INTO commandes_clients (num_commande, num_client, date) VALUES (?, ?, ?)",
+        (commande[0], client[0], date)
+    )
+
+    # Récapitulatif de la commande
+    cursor = conn.execute(
+        "SELECT * FROM commandes_clients WHERE num_commande = ?",
+        (commande[0],)
+    )
+    fmt.pbold("Récapitulatif de la commande")
+    fmt.print_table(cursor.fetchall(), ["num_commande", "num_client", "date"])
 
     return fmt.bool_input("Voulez-vous faire une autre requête ? (O/N) ")

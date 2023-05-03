@@ -128,4 +128,6 @@ if model is not None:
 
     exit(0)
 else:
+    if not args.quiet:
+        print("Game is unsatisfiable.")
     exit(1)

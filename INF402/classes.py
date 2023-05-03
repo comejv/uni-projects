@@ -195,6 +195,9 @@ class CNF:
         self.__nclauses += 1
         # Update the number of variables
         # Assume that the variables are numbered consecutively
+        if not clause:
+            print("Aucun pont possible, jeu insatisfaisable")
+            exit(1)
         self.__nvars = max(self.nvars(), max(abs(var) for var in clause))
 
     def remove_clause(self, clause: list[int]) -> None:

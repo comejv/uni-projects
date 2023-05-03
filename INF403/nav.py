@@ -1,6 +1,6 @@
 from utils import db, fmt
 from sqlite3 import Connection, IntegrityError, OperationalError
-import requete
+import requetes
 
 
 def create_menu(title: str, choices: list[str]) -> int:
@@ -262,13 +262,13 @@ def combined_request(conn: Connection) -> bool:
                                   "Retour au menu principale"])
 
     if choice == 1:
-        return requete.information_client(conn)
+        return requetes.information_client(conn)
     elif choice == 2:
-        return requete.information_navire(conn)
+        return requetes.information_navire(conn)
     elif choice == 3:
-        return requete.type_commande(conn)
+        return requetes.type_commande(conn)
     elif choice == 4:
-        return requete.information_type_transporteur(conn)
+        return requetes.information_type_transporteur(conn)
     elif choice == 5:
         return False
 
@@ -296,7 +296,7 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
         # update(conn, table_name)
         return False
     elif choice == 3:
-        # delete(conn, table_name)
+        delete(conn, table_name)
         return False
     elif choice == 4:
         return False
@@ -304,39 +304,14 @@ def menu_insert_update_delete(conn: Connection, table_name: str) -> bool:
 
 def menu_choice_insert(conn: Connection) -> bool:
 
+    tables = ["Clients", "Commandes", "Usines", "Types", "Navires",
+              "Transporteurs", "CommandesClients", "Drop la database",
+              "Retourner au menu principale"]
+
     choice = create_menu("Choisissez la table à modifier :",
-                         ["Clients", "Commandes", "Usines", "Types", "Navires",
-                          "Transporteurs", "CommandesClients", "Drop la database",
-                          "Retourner au menu principale"])
-    if choice == 1:
-        while menu_insert_update_delete(conn, "Clients"):
-            pass
-        return True
-    elif choice == 2:
-        while menu_insert_update_delete(conn, "Commandes"):
-            pass
-        return True
-    elif choice == 3:
-        while menu_insert_update_delete(conn, "Usines"):
-            pass
-        return True
-    elif choice == 4:
-        while menu_insert_update_delete(conn, "Types"):
-            pass
-        return True
-    elif choice == 5:
-        while menu_insert_update_delete(conn, "Navires"):
-            pass
-        return True
-    elif choice == 6:
-        while menu_insert_update_delete(conn, "Transporteurs"):
-            pass
-        return True
-    elif choice == 7:
-        while menu_insert_update_delete(conn, "CommandesClients"):
-            pass
-        return True
-    elif choice == 8:
+                         tables)
+
+    if choice == 8:
         fmt.clear()
         fmt.pbold("Réinitialisation de la base de données.")
         fmt.perror("Cette action est irréversible !")
@@ -347,6 +322,9 @@ def menu_choice_insert(conn: Connection) -> bool:
         return False
     elif choice == 9:
         return False
+
+    menu_insert_update_delete(conn, table_name=tables[choice - 1])
+    return True
 
 
 def manual_query(conn: Connection) -> bool:

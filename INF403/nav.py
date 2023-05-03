@@ -150,11 +150,11 @@ def browse_filter(conn: Connection, table: str,
     fmt.pbold(table)
     cursor = conn.cursor()
 
-    filters_description = "Vous pouvez filtrer les données de la table avec les filtres suivants.\n\
-        Il est possible de renseigner des valeurs ou des valeurs plancher/plafond avec > et <.\n\
-            Par exemple vous pouvez écrire :\n\
-                \t(attribut): > 10\n\
-            Pour filtrer les données dont l'attribut est supérieur à 10."
+    filters_description = ("Vous pouvez filtrer les données de la table avec les filtres suivants.\n"
+                           "Il est possible de renseigner des valeurs ou des valeurs plancher/plafond avec > et <.\n"
+                           "Par exemple vous pouvez écrire :\n"
+                           "\t(attribut): > 10\n"
+                           "Pour filtrer les données dont l'attribut est supérieur à 10.")
 
     if prompt_filters is True:
         new_filters = get_filters(conn, table, filters_description)
@@ -303,8 +303,8 @@ def combined_request(conn: Connection) -> bool:
                          choices=["Information client",
                                   "Information nombre de bateau par transporteur",
                                   "Information sur le type d'hydrogène des commandes",
-                                  "Information sur le nombre de commandes transportées par transporteur \
-                                        selon le type d'hydrogène",
+                                  "Information sur le nombre de commandes transportées par transporteur" +
+                                  "selon le type d'hydrogène",
                                   "Retour au menu principale"])
 
     if choice == 1:
@@ -364,8 +364,7 @@ def menu_choice_insert(conn: Connection) -> bool:
               "Transporteurs", "CommandesClients", "Réinitialiser la base de données",
               "Retourner au menu principale"]
 
-    choice = create_menu("Choisissez la table à modifier :",
-                         tables)
+    choice = create_menu("Choisissez la table à modifier :", tables)
 
     if choice == 8:
         fmt.clear()

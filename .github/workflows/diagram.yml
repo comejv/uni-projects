@@ -3,7 +3,8 @@ name: Update diagram
 on:
   push:
     paths:
-      - '**/*',
+      - '**/*'
+  workflow_dispatch:
 
 env:
   TRIGGER_JOB: false

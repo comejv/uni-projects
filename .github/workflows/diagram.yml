@@ -1,31 +1,13 @@
 name: Update diagram
 
 on:
-  push:
-    paths:
-      - '**/*'
   workflow_dispatch:
 
 jobs:
-  check_changes:
+  update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Fetch and set default branch
-        run: |
-          git fetch origin
-
-      - name: Check for added or deleted files
-        run: |
-          files=$(git show --name-status --diff-filter=AD)
-          if [ -n files ]; then
-            TRIGGER_JOB=1
-            echo "Files deleted or added !" >> $GITHUB_STEP_SUMMARY
-          fi
-
       - name: Update diagram
-        if: ${{ env.TRIGGER_JOB == 1 }} 
         uses: githubocto/repo-visualizer@main
         with:
           excluded_paths: ".github"

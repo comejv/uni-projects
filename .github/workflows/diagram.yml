@@ -23,7 +23,7 @@ jobs:
         run: |
           files=$(git show --name-status --diff-filter=AD)
           if [ -n files ]; then
-            echo "TRIGGER_JOB=true" >> "$GITHUB_ENV"
+            echo "TRIGGER_JOB=true" >> $GITHUB_ENV
             echo "Files deleted or added !" >> $GITHUB_STEP_SUMMARY
           fi
 

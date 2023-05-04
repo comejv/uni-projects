@@ -18,7 +18,7 @@ jobs:
 
       - name: Check for added or deleted files
         run: |
-          files=$(git diff --diff-filter=AD HEAD^ HEAD)
+          files=$(git show --name-status --diff-filter=AD)
           if [ -n files ]; then
             echo "TRIGGER_JOB=true" >> $GITHUB_ENV
           fi

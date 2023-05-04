@@ -14,22 +14,23 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check for new or deleted files
+        id: check_files
         run: |
           git fetch origin ${{ github.base_ref }}
           NEW_OR_DELETED_FILES=$(git diff --diff-filter=AD --name-only FETCH_HEAD)
           if [ -n "$NEW_OR_DELETED_FILES" ]; then
             echo "New or deleted file(s) detected:"
             echo "$NEW_OR_DELETED_FILES"
-            echo "TRIGGER_GET_DATA=true" >> $GITHUB_ENV
+            echo "trigger_diagram=true" >> $GITHUB_OUTPUT
           else
             echo "No new or deleted files detected"
-            echo "TRIGGER_GET_DATA=false" >> $GITHUB_ENV
+            echo "trigger_diagram=false" >> $GITHUB_OUTPUT
           fi
 
-  get_data:
+  diagram:
     needs: check_new_or_deleted_files
     runs-on: ubuntu-latest
-    if: ${{ needs.check_new_or_deleted_files.outputs.trigger_get_data == 'true' }}
+    if: ${{ needs.check_new_or_deleted_files.outputs.trigger_diagram == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master

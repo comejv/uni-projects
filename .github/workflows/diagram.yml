@@ -30,7 +30,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
       - name: Update diagram
-        if: ${{ needs.check_changes.outputs.trigger_job == 'true' }}
+        if: ${{ needs.check_changes.outputs.TRIGGER_JOB == 'true' }}
         uses: githubocto/repo-visualizer@main
         with:
           excluded_paths: ".github"

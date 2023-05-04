@@ -16,17 +16,20 @@ jobs:
       - name: Check for new or deleted files
         run: |
           git fetch origin ${{ github.base_ref }}
-          if ${{ github.event_name == 'pull_request' }}; then
-              echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_ENV
+          NEW_OR_DELETED_FILES=$(git diff --diff-filter=AD --name-only FETCH_HEAD)
+          if [ -n "$NEW_OR_DELETED_FILES" ]; then
+            echo "New or deleted file(s) detected:"
+            echo "$NEW_OR_DELETED_FILES"
+            echo "::set-output name=trigger_get_data::true"
           else
-              echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_ENV
+            echo "No new or deleted files detected"
+            echo "::set-output name=trigger_get_data::false"
           fi
-
 
   get_data:
     needs: check_new_or_deleted_files
     runs-on: ubuntu-latest
-    if: ${{ env.TRIGGER_GET_DATA == 'true' }}
+    if: ${{ needs.check_new_or_deleted_files.outputs.trigger_get_data == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master

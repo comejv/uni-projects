@@ -25,7 +25,7 @@ jobs:
           fi
 
       - name: Update diagram
-        if: ${{ TRIGGER_JOB == 1 }}
+        if: ${{ $TRIGGER_JOB == 1 }}
         uses: githubocto/repo-visualizer@main
         with:
           excluded_paths: ".github"

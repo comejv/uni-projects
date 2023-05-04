@@ -1,36 +1,33 @@
 name: Update diagram
 
 on:
+[
   push:
     paths:
-      - '**/*'
+      - '**/*',
   workflow_dispatch:
+]
+
+env:
+  TRIGGER_JOB: false
 
 jobs:
-  check_new_or_deleted_files:
+  check_changes:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Check for new or deleted files
-        id: check_files
+      - name: Check for added or deleted files
         run: |
-          git fetch origin ${{ github.base_ref }}
-          NEW_OR_DELETED_FILES=$(git diff --diff-filter=AD --name-only FETCH_HEAD)
-          if [ -n "$NEW_OR_DELETED_FILES" ]; then
-            echo "New or deleted file(s) detected:"
-            echo "$NEW_OR_DELETED_FILES"
-            echo "trigger_diagram=true" >> $GITHUB_OUTPUT
-          else
-            echo "No new or deleted files detected"
-            echo "trigger_diagram=false" >> $GITHUB_OUTPUT
+          git diff --diff-filter=AD HEAD^ HEAD > /dev/null
+          if [ $? -eq 0 ]; then
+            echo "TRIGGER_JOB=true" >> $GITHUB_ENV
           fi
 
   diagram:
-    needs: check_new_or_deleted_files
+    needs: check_changes
+    if: ${{ env.TRIGGER_JOB == 'true' }}
     runs-on: ubuntu-latest
-    if: ${{ needs.check_new_or_deleted_files.outputs.trigger_diagram == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master

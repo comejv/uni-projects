@@ -1,7 +1,0 @@
-python3 main.py -pi data/examples/7x7_1.txt -c output/clauses.dimacs
-less output/clauses.dimacs
-
-# Marche pas:
-4x4_1 4x4_2
-
-./avg_time.sh python3 main.py -qi data/examples/3x3_1.txt --branching jw --use-c-walk

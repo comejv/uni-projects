@@ -6,6 +6,9 @@ on:
       - '**/*'
   workflow_dispatch:
 
+env:
+  TRIGGER_JOB: false
+
 jobs:
   check_changes:
     runs-on: ubuntu-latest
@@ -20,7 +23,8 @@ jobs:
         run: |
           files=$(git show --name-status --diff-filter=AD)
           if [ -n files ]; then
-            echo "TRIGGER_JOB=true" >> $GITHUB_ENV
+            echo "TRIGGER_JOB=true" >> "$GITHUB_ENV"
+            echo "Files deleted or added !" >> $GITHUB_STEP_SUMMARY
           fi
 
   diagram:
@@ -30,7 +34,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
       - name: Update diagram
-        if: ${{ needs.check_changes.outputs.TRIGGER_JOB == 'true' }}
+        if: ${{ env.TRIGGER_JOB == 'true' }}
         uses: githubocto/repo-visualizer@main
         with:
           excluded_paths: ".github"

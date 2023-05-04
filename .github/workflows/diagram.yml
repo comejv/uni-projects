@@ -21,16 +21,16 @@ jobs:
           if [ -n "$NEW_OR_DELETED_FILES" ]; then
             echo "New or deleted file(s) detected:"
             echo "$NEW_OR_DELETED_FILES"
-            echo "trigger_diagram=true" >> $GITHUB_ENV_PATH
+            echo "trigger_diagram=true" >> $GITHUB_OUTPUT
           else
             echo "No new or deleted files detected"
-            echo "trigger_diagram=false" >> $GITHUB_ENV_PATH
+            echo "trigger_diagram=false" >> $GITHUB_OUTPUT
           fi
 
   diagram:
     needs: check_new_or_deleted_files
     runs-on: ubuntu-latest
-    if: ${{ needs.check_new_or_deleted_files.outputs.trigger_diagrram == 'true' }}
+    if: ${{ needs.check_new_or_deleted_files.outputs.trigger_diagram == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@master

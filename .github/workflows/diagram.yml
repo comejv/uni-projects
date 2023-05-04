@@ -12,6 +12,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Fetch and set default branch
+        run: |
+          git fetch --depth=1 origin +refs/heads/*:refs/heads/*
+          git branch --set-upstream-to=origin/$(git symbolic-ref --short HEAD) $(git symbolic-ref --short HEAD)
+
       - name: Check for added or deleted files
         run: |
           files=$(git diff --diff-filter=AD HEAD^ HEAD)

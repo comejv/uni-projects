@@ -41,7 +41,8 @@ def init_db(use_test_data=None):
 
     if use_test_data is None:
         use_test_data = fmt.bool_input(
-            "Voulez-vous ajouter des données de test ? (O/N) ")
+            "Voulez-vous ajouter des données de test ? (O/N) "
+        )
 
     if use_test_data is True:
         # Ajouter des données de test
@@ -65,7 +66,7 @@ def exec_script(conn: sqlite3.Connection, file: str):
     # Lecture du fichier et placement des requêtes dans un tableau
     sqlQueries = []
 
-    with open(file, 'r') as f:
+    with open(file, "r") as f:
         createSql = f.read()
         sqlQueries = createSql.split(";")
 
@@ -78,7 +79,9 @@ def exec_script(conn: sqlite3.Connection, file: str):
     conn.commit()
 
 
-def exec_query(conn: sqlite3.Connection, query: str, args: tuple = None) -> sqlite3.Cursor:
+def exec_query(
+    conn: sqlite3.Connection, query: str, args: tuple = None
+) -> sqlite3.Cursor:
     """Exécute la requête `query` sur la base de données. Ne commit pas,
     empèche de modifier la base de données.
 
@@ -119,8 +122,15 @@ def drop_all_tables(conn: sqlite3.Connection):
 
     fmt.pitalic("Suppression des tables...")
 
-    tables = ["CommandesClients", "Navires", "Transporteurs",
-              "Clients", "Commandes_base", "Usines", "Types"]
+    tables = [
+        "CommandesClients",
+        "Navires",
+        "Transporteurs",
+        "Clients",
+        "Commandes_base",
+        "Usines",
+        "Types",
+    ]
 
     for table in tables:
         drop_table(conn, table)
@@ -167,9 +177,7 @@ def insert_data(conn: sqlite3.Connection, table: str, data: dict) -> Exception:
     q_mark = ", ".join(q_mark)
 
     try:
-        cursor.execute(
-            f"INSERT INTO {table} VALUES ({q_mark})", tuple(data.values())
-        )
+        cursor.execute(f"INSERT INTO {table} VALUES ({q_mark})", tuple(data.values()))
     except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
         return e
 
@@ -177,9 +185,12 @@ def insert_data(conn: sqlite3.Connection, table: str, data: dict) -> Exception:
 
     return None
 
-def update_data(conn: sqlite3.Connection, table:str, filters: dict, data: dict) -> Exception:
+
+def update_data(
+    conn: sqlite3.Connection, table: str, filters: dict, data: dict
+) -> Exception:
     cursor = conn.cursor()
-    
+
     for k, v in filters.copy().items():
         if v is None:
             del filters[k]
@@ -187,7 +198,6 @@ def update_data(conn: sqlite3.Connection, table:str, filters: dict, data: dict) 
     for k, v in data.copy().items():
         if v is None:
             del data[k]
-
 
     q_mark = []
     taille_data = len(data)
@@ -205,7 +215,7 @@ def update_data(conn: sqlite3.Connection, table:str, filters: dict, data: dict) 
     for i, key in enumerate(filters.keys()):
         if filters[key] is not None:
             first_char = filters[key][0]
-            if first_char in ['<', '>']:
+            if first_char in ["<", ">"]:
                 args.append(f"{key} {first_char} ?{i + 1 + taille_data}")
                 filters[key] = filters[key][1:]
             else:
@@ -217,10 +227,13 @@ def update_data(conn: sqlite3.Connection, table:str, filters: dict, data: dict) 
     args = " AND ".join(args)
 
     try:
-        cursor.execute(f"UPDATE {table} SET {q_mark} WHERE {args}", tuple(list(data.values()) + list(filters.values())))
+        cursor.execute(
+            f"UPDATE {table} SET {q_mark} WHERE {args}",
+            tuple(list(data.values()) + list(filters.values())),
+        )
     except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
         return e
-    
+
     conn.commit()
 
     return None
@@ -280,8 +293,6 @@ def check_exists(conn: sqlite3.Connection, table: str, attr: tuple) -> bool:
     """
 
     cursor = conn.cursor()
-    cursor.execute(
-        f"SELECT * FROM {table} WHERE {attr[0]} = ?", (attr[1],)
-    )
+    cursor.execute(f"SELECT * FROM {table} WHERE {attr[0]} = ?", (attr[1],))
 
     return cursor.fetchone() is not None

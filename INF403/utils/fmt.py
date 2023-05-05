@@ -3,6 +3,7 @@
 
 # Author : Côme VINCENT, 2023
 
+
 def clear() -> None:
     """Clears the terminal screen, deletes scrollback buffer and
     moves the cursor to the top left corner of the screen."""
@@ -69,8 +70,7 @@ def bool_input(prompt: str) -> bool:
         exit(0)
 
     # Check if the input is valid
-    bool_input = ['true', '1', 't', 'y', 'yes', 'o',
-                  'false', '0', 'f', 'n', 'no', 'n']
+    bool_input = ["true", "1", "t", "y", "yes", "o", "false", "0", "f", "n", "no", "n"]
 
     while True:
         try:

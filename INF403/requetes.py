@@ -92,3 +92,16 @@ def information_type_transporteur(conn: Connection) -> bool:
     db.show_results(cursor)
 
     return True
+
+def information_transporteur_client(conn: Connection) -> bool:
+    cursor = conn.cursor()
+    cursor.execute("SELECT duns_transporteur, nom_transporteur, numero_commande, nom_client, date_commande_client AS Datedelacommande, livraison_commande AS livraisonPrévu\
+                    FROM Transporteurs JOIN Navires USING (duns_transporteur)\
+					                   JOIN Commandes USING (numero_commande)\
+					                   JOIN CommandesClients USING (numero_commande)\
+					                   JOIN Clients USING (numero_client);")
+    
+    # Affichage des données
+    db.show_results(cursor)
+
+    return True

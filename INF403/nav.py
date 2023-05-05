@@ -325,6 +325,7 @@ def combined_request(conn: Connection) -> bool:
                                   "Information sur le type d'hydrogène des commandes",
                                   "Information sur le nombre de commandes transportées par transporteur" +
                                   "selon le type d'hydrogène",
+                                  "Information sur le client et le transporteur, avec date de commande et livraison",
                                   "Retour au menu principale"])
 
     if choice == 1:
@@ -336,6 +337,8 @@ def combined_request(conn: Connection) -> bool:
     elif choice == 4:
         return requetes.information_type_transporteur(conn)
     elif choice == 5:
+        return requetes.information_transporteur_client(conn)
+    elif choice == 6:
         return False
 
 

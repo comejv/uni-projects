@@ -12,7 +12,7 @@ class App(tk.Tk):
         super().__init__()
 
         # Définition de la taille et du titre de la fenêtre
-        display.centerWindow(500, 650, self)
+        display.centerWindow(800, 800, self)
         self.title("Mission climat")
 
         # Configuration des colonnes pour l'affichage grid

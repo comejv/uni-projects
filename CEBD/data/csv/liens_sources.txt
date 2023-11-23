@@ -1,0 +1,6 @@
+https://public.opendatasoft.com/explore/dataset/correspondance-code-insee-code-postal/information/
+https://data.ademe.fr/datasets/ventilation
+https://data.ademe.fr/datasets/chauffage
+https://data.ademe.fr/datasets/isolation
+https://www.data.gouv.fr/fr/datasets/temperature-quotidienne-departementale-depuis-janvier-2018-1/
+https://public.opendatasoft.com/explore/dataset/anciennes-nouvelles-regions/table/?flg=fr-fr

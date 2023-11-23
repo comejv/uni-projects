@@ -180,6 +180,11 @@ class App(tk.Tk):
 # Boucle générale de l'application #
 ####################################
 
+def quit(event):
+    print("Fermeture de l'application")
+    app.quit()
+
 if __name__ == "__main__":
     app = App()
+    app.bind('<Control-c>', quit)
     app.mainloop()

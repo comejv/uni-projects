@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from ttkwidgets.autocomplete import AutocompleteEntry
 from utils import display
 from utils import db
 
@@ -20,23 +21,24 @@ class Window(tk.Toplevel):
         self.grid_rowconfigure(
             3, weight=10
         )  # On donne un poids plus important à la dernière ligne pour l'affichage du tableau
-        ttk.Label(
-            self,
-            text="On a repris le code de F2. Modifier l'interface pour proposer un choix de la région sans saisie manuelle (par exemple un proposer un menu déroulant avec les valeurs extraites de la base, ou toute autre idée).",
-            wraplength=500,
-            anchor="center",
-            font=("Helvetica", "10", "bold"),
-        ).grid(sticky="we", row=0, columnspan=3)
 
         # Affichage du label, de la case de saisie et du bouton valider
         ttk.Label(
             self,
-            text="Veuillez indiquer une région :",
+            text="Veuillez indiquer une région (autocompletion) :",
             anchor="center",
             font=("Helvetica", "10", "bold"),
         ).grid(row=1, column=0)
-        # TODO Q3 C'est cette partie que l'on souhaite changer pour un choix dynamique de la région
-        self.input = ttk.Entry(self)
+        # On récupère les différentes régions de la base de données
+        cursor = db.data.cursor()
+        result = cursor.execute(
+            """SELECT nom_region FROM Regions ORDER BY nom_region"""
+        )
+        regions = []
+        for row in result:
+            regions.append(row[0])
+        # On crée un menu déroulant avec les régions récupérées et autocomplete
+        self.input = AutocompleteEntry(self, completevalues=regions)
         self.input.grid(row=1, column=1)
         self.input.bind(
             "<Return>", self.searchRegion
@@ -66,7 +68,6 @@ class Window(tk.Toplevel):
     # La fonction prend un argument optionnel event car elle peut être appelée de deux manières :
     # Soit via le bouton Valider, dans ce cas aucun event n'est fourni
     # Soit via le bind qui a été fait sur la case de saisie quand on appuie sur Entrée, dans ce cas bind fournit un event (que l'on utilise pas ici)
-    # TODO Q3 Modifier la fonction searchRegion pour un choix dynamique de la région
     def searchRegion(self, event=None):
         # On vide le treeView (pour rafraichir les données si quelque chose était déjà présent)
         self.treeView.delete(*self.treeView.get_children())

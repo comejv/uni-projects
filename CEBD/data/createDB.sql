@@ -1,5 +1,3 @@
-
-
 CREATE TABLE Departements (
     code_departement TEXT,
     nom_departement TEXT,

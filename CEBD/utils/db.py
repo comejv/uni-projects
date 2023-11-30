@@ -77,7 +77,7 @@ def insertDB():
         read_csv_file(
             "data/csv/ZonesClimatiques.csv",
             ";",
-            "update Departements set zone_climatique = ? where code_departement = ?",
+            "update Departements set zone_climatique_departement = ? where code_departement = ?",
             ["zone_climatique", "code_departement"],
         )
 
@@ -96,6 +96,7 @@ def insertDB():
             "delete from Regions where code_region = ? and ? <> ?",
             ["Anciens Code", "Anciens Code", "Nouveau Code"],
         )
+        
         print(
             "Les erreurs UNIQUE constraint sont normales car on insère une seule fois les Regions et les Départemments"
         )
@@ -104,8 +105,24 @@ def insertDB():
         read_csv_file(
             "data/csv/Mesures.csv",
             ";",
-            "insert into Mesures values ('{}','{}', {}, {}, {})",
+            "insert into Mesures (code_departement, date_mesure, temperature_min_mesure, temperature_max_mesure, temperature_moy_mesure) values (?, ?, ?, ?, ?)",
             ["code_insee_departement", "date_obs", "tmin", "tmax", "tmoy"],
+        )
+
+        # Insertion des communes
+        read_csv_file(
+            "data/csv/Communes.csv",
+            ";",
+            "insert into Communes (nom_commune, code_departement, arrondissement_commune, canton_commune, population_commune, superficie_commune, altitude_moy_commune) values (?, ?, ?, ?, ?, ?, ?)",
+            [
+                "Commune",
+                "Code Département",
+                "Code Arrondissement",
+                "Code Canton",
+                "Population",
+                "Superficie",
+                "Altitude Moyenne",
+            ],
         )
 
     except Exception as e:
@@ -149,7 +166,7 @@ def read_csv_file(csvFile, separator, query, columns):
                     row[columns[i]] = row[columns[i]].replace("'", "''")
                 tab.append(row[columns[i]])
             # Utilisation de tuple pour utiliser la méthode d'insertion VALUE (?, ?, ...,?)
-            # print(query.format(*tab))
+            # print(query, tab)
             cursor.execute(query, tuple(tab))
         except IntegrityError as err:
             print(err)

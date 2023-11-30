@@ -62,7 +62,7 @@ class Window(tk.Toplevel):
                        temperature_moy_mesure as moyenne,
                        temperature_min_mesure as minimum,
                        temperature_max_mesure as maximum
-                FROM Departements LEFT JOIN Mesures USING (code_departement)
+                FROM Departements JOIN Mesures USING (code_departement)
                 ORDER BY code_departement
             """
             cursor = db.data.cursor()

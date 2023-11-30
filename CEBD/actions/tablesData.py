@@ -69,7 +69,7 @@ class Window(tk.Toplevel):
             "zone_climatique",
         )
         query = """
-            SELECT code_departement, nom_departement, code_region, zone_climatique
+            SELECT code_departement, nom_departement, code_region, zone_climatique_departement
             FROM Departements
             ORDER BY code_departement
         """

@@ -137,8 +137,7 @@ def read_csv_file(csvFile, separator, query, columns):
     # Lecture du fichier CSV csvFile avec le séparateur separator
     # pour chaque ligne, exécution de query en la formatant avec les colonnes columns
     df = pandas.read_csv(csvFile, sep=separator)
-    df = df.where(pandas.notnull(df), "null")
-
+    df = df.where(pandas.notnull(df), None)
     cursor = data.cursor()
     for ix, row in df.iterrows():
         try:
@@ -148,12 +147,8 @@ def read_csv_file(csvFile, separator, query, columns):
                 if isinstance(row[columns[i]], str):
                     row[columns[i]] = row[columns[i]].replace("'", "''")
                 tab.append(row[columns[i]])
-
-            formatedQuery = query.format(*tab)
-
-            # On affiche la requête pour comprendre la construction ou débugger !
-            # print(formatedQuery)
-
-            cursor.execute(formatedQuery)
+            # Utilisation de tuple pour utiliser la méthode d'insertion VALUE (?, ?, ...,?)
+            # print(query.format(*tab))
+            cursor.execute(query, tuple(tab))
         except IntegrityError as err:
             print(err)

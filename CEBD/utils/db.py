@@ -48,11 +48,12 @@ def insertDB():
         # ATTENTION : les attributs dans la BD sont généralement différents des noms de colonnes dans le CSV
         # Exemple : date_mesure dans la BD et date_obs dans le CSV
 
+        # Insertion des régions
         # On ajoute les anciennes régions
         read_csv_file(
             "data/csv/Communes.csv",
             ";",
-            "insert into Regions values ({},'{}')",
+            "insert into Regions values (?,?)",
             ["Code Région", "Région"],
         )
 
@@ -60,7 +61,7 @@ def insertDB():
         read_csv_file(
             "data/csv/AnciennesNouvellesRegions.csv",
             ";",
-            "insert into Regions values ({},'{}')",
+            "insert into Regions values (?,?)",
             ["Nouveau Code", "Nom Officiel Région Majuscule"],
         )
 
@@ -68,7 +69,7 @@ def insertDB():
         read_csv_file(
             "data/csv/Communes.csv",
             ";",
-            "insert into Departements values ('{}','{}', {},'')",
+            "insert into Departements (code_departement, nom_departement, code_region) values (?, ?, ?)",
             ["Code Département", "Département", "Code Région"],
         )
 
@@ -76,7 +77,7 @@ def insertDB():
         read_csv_file(
             "data/csv/ZonesClimatiques.csv",
             ";",
-            "update Departements set zone_climatique = '{}' where code_departement = '{}'",
+            "update Departements set zone_climatique = ? where code_departement = ?",
             ["zone_climatique", "code_departement"],
         )
 
@@ -84,7 +85,7 @@ def insertDB():
         read_csv_file(
             "data/csv/AnciennesNouvellesRegions.csv",
             ";",
-            "update Departements set code_region = {} where code_region = {}",
+            "update Departements set code_region = ? where code_region = ?",
             ["Nouveau Code", "Anciens Code"],
         )
 
@@ -92,7 +93,7 @@ def insertDB():
         read_csv_file(
             "data/csv/AnciennesNouvellesRegions.csv",
             ";",
-            "delete from Regions where code_region = {} and {} <> {}",
+            "delete from Regions where code_region = ? and ? <> ?",
             ["Anciens Code", "Anciens Code", "Nouveau Code"],
         )
         print(

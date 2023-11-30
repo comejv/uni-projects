@@ -53,7 +53,7 @@ CREATE TABLE Isolations (
     isolant_isolation TEXT,
     epaisseur_isolation INTEGER,
     surface_isolation INTEGER,
-    CONSTRAINT pk_isolations PRIMARY KEY (numero_travaux, poste_isolation),
+    CONSTRAINT pk_isolations PRIMARY KEY (numero_travaux),
     CONSTRAINT fk_isolations FOREIGN KEY (numero_travaux) REFERENCES Travaux(numero_travaux)
 );
 

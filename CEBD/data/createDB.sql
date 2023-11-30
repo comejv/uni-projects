@@ -1,16 +1,17 @@
-CREATE TABLE Departements (
-    code_departement TEXT,
-    nom_departement TEXT,
-    code_region INTEGER,
-    zone_climatique TEXT,
-    CONSTRAINT pk_departements PRIMARY KEY (code_departement),
-    CONSTRAINT fk_region FOREIGN KEY (code_region) REFERENCES Regions(code_region)
-);
-
 CREATE TABLE Regions (
     code_region INTEGER,
     nom_region TEXT,
     CONSTRAINT pk_regions PRIMARY KEY (code_region)
+);
+
+CREATE TABLE Departements (
+    code_insee_departement TEXT,
+    nom_departement TEXT,
+    code_departement TEXT,
+    code_region INTEGER,
+    zone_climatique_departement TEXT,
+    CONSTRAINT pk_departements PRIMARY KEY (code_insee_departement),
+    CONSTRAINT fk_region FOREIGN KEY (code_region) REFERENCES Regions(code_region)
 );
 
 CREATE TABLE Mesures (

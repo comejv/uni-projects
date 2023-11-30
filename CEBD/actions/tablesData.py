@@ -107,7 +107,7 @@ class Window(tk.Toplevel):
             FROM Communes
             ORDER BY nom_commune, code_departement
         """
-        tree = display.createTreeViewDisplayQuery(tab3, columns, query, 250)
+        tree = display.createTreeViewDisplayQuery(tab4, columns, query, 250)
         scrollbar = ttk.Scrollbar(tab3, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=scrollbar.set)
         tree.grid(row=0, sticky="nswe")
@@ -133,7 +133,75 @@ class Window(tk.Toplevel):
             FROM Travaux
             ORDER BY numero_travaux, code_departement
         """
-        tree = display.createTreeViewDisplayQuery(tab3, columns, query, 250)
+
+        tree = display.createTreeViewDisplayQuery(tab5, columns, query, 250)
+        scrollbar = ttk.Scrollbar(tab3, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        tree.grid(row=0, sticky="nswe")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # Isolations
+        columns = ("numero_travaux", 
+                   "poste_isolation", 
+                   "isolant_isolation", 
+                   "epaisseur_isolation", 
+                   "surface_isolation")
+
+        query = """
+            SELECT numero_travaux,
+                   poste_isolation, 
+                   isolant_isolation, 
+                   epaisseur_isolation, 
+                   surface_isolation
+            FROM Isolations
+            ORDER BY numero_travaux
+        """
+
+        tree = display.createTreeViewDisplayQuery(tab6, columns, query, 250)
+        scrollbar = ttk.Scrollbar(tab3, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        tree.grid(row=0, sticky="nswe")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # Chauffage
+        columns = ("numero_travaux", 
+                   "energie_chauffage_avant_travaux", 
+                   "energie_chauffage_installee", 
+                   "generateur_chauffage", 
+                   "type_chaudiere_chauffage")
+
+        query = """
+            SELECT numero_travaux,
+                   energie_chauffage_avt_chauffage, 
+                   energie_chauffage_inst_chauffage, 
+                   generateur_chauffage, 
+                   type_chaudiere_chauffage
+            FROM Chauffages
+            ORDER BY numero_travaux
+        """
+
+        tree = display.createTreeViewDisplayQuery(tab7, columns, query, 250)
+        scrollbar = ttk.Scrollbar(tab3, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        tree.grid(row=0, sticky="nswe")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # Photovoltaïque
+        columns = ("numero_travaux", 
+                   "poste_isolation", 
+                   "isolant_isolation", 
+                   "epaisseur_isolation", 
+                   "surface_isolation")
+
+        query = """
+            SELECT numero_travaux,
+                   puissance_installee_photovoltaique, 
+                   type_panneau_photovoltaique
+            FROM Photovoltaiques
+            ORDER BY numero_travaux
+        """
+
+        tree = display.createTreeViewDisplayQuery(tab8, columns, query, 250)
         scrollbar = ttk.Scrollbar(tab3, orient="vertical", command=tree.yview)
         tree.configure(yscrollcommand=scrollbar.set)
         tree.grid(row=0, sticky="nswe")

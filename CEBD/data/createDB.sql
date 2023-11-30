@@ -24,6 +24,7 @@ CREATE TABLE Mesures (
 );
 
 CREATE TABLE Communes (
+    code_commune INTEGER,
     nom_commune TEXT,
     code_departement TEXT,
     arrondissement_commune INTEGER,
@@ -31,7 +32,7 @@ CREATE TABLE Communes (
     population_commune INTEGER,
     superficie_commune INTEGER,
     altitude_moy_commune INTEGER,
-    CONSTRAINT pk_communes PRIMARY KEY (nom_commune, code_departement),
+    CONSTRAINT pk_communes PRIMARY KEY (code_departement, code_commune),
     CONSTRAINT fk_communes FOREIGN KEY (code_departement) REFERENCES Departements(code_departement)
 );
 

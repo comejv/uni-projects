@@ -90,7 +90,7 @@ class Window(tk.Toplevel):
                             cursor3 = db.data.cursor()
                             result3 = cursor3.execute(
                                 """
-                                SELECT ROUND(avg(temperature_moy_mesure), 2) AS moyenne, min(temperature_min_mesure) AS minimum, max(temperature_min_mesure) AS maximum
+                                SELECT ROUND(avg(temperature_moy_mesure), 2) AS moyenne, min(temperature_min_mesure) AS minimum, max(temperature_max_mesure) AS maximum
                             FROM Mesures
                             WHERE Mesures.code_departement = ? AND strftime('%Y', date_mesure) = ?
                             """,

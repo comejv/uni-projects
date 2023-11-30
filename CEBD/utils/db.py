@@ -169,4 +169,5 @@ def read_csv_file(csvFile, separator, query, columns):
             # print(query, tab)
             cursor.execute(query, tuple(tab))
         except IntegrityError as err:
+            print(query, tab)
             print(err)

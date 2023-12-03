@@ -48,8 +48,12 @@ class Window(tk.Toplevel):
             cursor = db.data.cursor()
             temp_result = cursor.execute(temp_query).fetchall()
             cout_result = cursor.execute(cout_query).fetchall()
-            months, temperatures = zip(*temp_result)
-            months, couts = zip(*cout_result)
+            try:
+                months, temperatures = zip(*temp_result)
+                months, couts = zip(*cout_result)
+            except ValueError:
+                print("Erreur : pas assez de données")
+                return
 
         except Exception as e:
             print("Erreur : " + repr(e))

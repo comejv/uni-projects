@@ -83,7 +83,6 @@ class Window(tk.Toplevel):
 
         except Exception as e:
             print("Erreur : " + repr(e))
-        else:
             # Pour chaque département...
             for dept in result:
                 # On récupère les années où il y a des mesures pour ce département

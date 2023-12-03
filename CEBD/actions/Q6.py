@@ -33,15 +33,23 @@ class Window(tk.Toplevel):
     def printgraph(self):
         try:
             tab = []
-            query = """
+            temp_query = """
                     SELECT strftime('%m', date_mesure) AS month, AVG(temperature_min_mesure) AS avg_temperature
                     FROM Mesures
                     WHERE code_departement = '38' AND strftime('%Y', date_mesure) = '2022'
                     GROUP BY month;
                 """
+            cout_query = """
+                    SELECT strftime('%m', date_travaux) AS month, SUM(cout_total_ht_travaux) AS cout_total_mensuel
+                    FROM Travaux
+                    WHERE code_departement = '38' AND strftime('%Y', date_travaux) = '2022'
+                    GROUP BY month;
+                """
             cursor = db.data.cursor()
-            result = cursor.execute(query).fetchall()
-            months, temperatures = zip(*result)
+            temp_result = cursor.execute(temp_query).fetchall()
+            cout_result = cursor.execute(cout_query).fetchall()
+            months, temperatures = zip(*temp_result)
+            months, couts = zip(*cout_result)
 
         except Exception as e:
             print("Erreur : " + repr(e))
@@ -49,6 +57,7 @@ class Window(tk.Toplevel):
 
         # Plot the data
         plt.plot(months, temperatures, label="Average Temperature")
+        plt.plot(months, couts, label="Total cost")
         plt.xlabel("Month")
         plt.ylabel("Value")
         plt.title("Correlation of temperatures and costs in Isère / 2022")

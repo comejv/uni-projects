@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import IntegrityError
 import pandas
+from dateutil import parser
 
 # Pointeur sur la base de données
 data = sqlite3.connect("data/climat_france.db")
@@ -144,7 +145,7 @@ def insertDB():
     # Insertion des travaux isolation
     print("Insertion des Isolations")
     df = pandas.read_csv("data/csv/Isolation.csv", sep=";")
-    query_travaux = "INSERT INTO Travaux (numero_travaux, code_departement, cout_total_ht_travaux, cout_induit_ht_travaux, annee_travaux, annee_constr_travaux, type_logement_travaux) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    query_travaux = "INSERT INTO Travaux (numero_travaux, code_departement, cout_total_ht_travaux, cout_induit_ht_travaux, date_travaux, annee_constr_travaux, type_logement_travaux) VALUES (?, ?, ?, ?, ?, ?, ?)"
     query_isolation = "INSERT INTO Isolations (numero_travaux, poste_isolation, isolant_isolation, epaisseur_isolation, surface_isolation) VALUES (?, ?, ?, ?, ?)"
 
     enum_postes_isolation = ["COMBLES PERDUES", "ITI", "ITE", "RAMPANTS", "SARKING", "TOITURE TERRASE", "PLANCHER BAS"]
@@ -155,10 +156,15 @@ def insertDB():
             row["code_departement"],
             row["cout_total_ht"],
             row["cout_induit_ht"],
-            row["annee_travaux"],
+            row["date_x"],
             row["annee_construction"],
             row["type_logement"],
         ]
+        if not pandas.isnull(att_travaux[3]):
+            try:
+                att_travaux[3] = parser.parse(str(att_travaux[3])).strftime("%Y-%m-%d")
+            except parser._parser.ParserError:
+                att_travaux[3] = None
         att_isolation = [
             row["poste_isolation"],
             row["isolant"],
@@ -195,10 +201,15 @@ def insertDB():
             row["code_departement"],
             row["cout_total_ht"],
             row["cout_induit_ht"],
-            row["annee_travaux"],
+            row["date_x"],
             row["annee_construction"],
             row["type_logement"],
         ]
+        if not pandas.isnull(att_travaux[3]):
+            try:
+                att_travaux[3] = parser.parse(str(att_travaux[3])).strftime("%Y-%m-%d")
+            except parser._parser.ParserError:
+                att_travaux[3] = None
         att_chauffage = [
             row["energie_chauffage_avt_travaux"],
             row["energie_chauffage_installee"],
@@ -232,13 +243,18 @@ def insertDB():
     enum_panneau = ["MONOCRISTALLIN", "POLYCRISTALLIN"]
     for _, row in df.iterrows():
         att_travaux = [
-            row["code_departement"],
+            str(row["code_departement"]),
             row["cout_total_ht"],
             row["cout_induit_ht"],
-            row["annee_travaux"],
+            row["date_x"],
             row["annee_construction"],
             row["type_logement"],
         ]
+        if not pandas.isnull(att_travaux[3]):
+            try:
+                att_travaux[3] = parser.parse(str(att_travaux[3])).strftime("%Y-%m-%d")
+            except parser._parser.ParserError:
+                att_travaux[3] = None
         att_photovoltaique = [
             row["puissance_installee"],
             row["type_panneaux"],
@@ -290,5 +306,5 @@ def read_csv_file(csvFile, separator, query, columns):
             # print(query, tab)
             cursor.execute(query, tuple(tab))
         except IntegrityError as err:
-            print(err)
+            # print(err)
             pass

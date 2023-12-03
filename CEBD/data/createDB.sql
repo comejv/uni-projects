@@ -41,7 +41,7 @@ CREATE TABLE Travaux (
     code_departement TEXT,
     cout_total_ht_travaux FLOAT,
     cout_induit_ht_travaux FLOAT,
-    annee_travaux DATE,
+    date_travaux DATE,
     annee_constr_travaux DATE,
     type_logement_travaux TEXT,
     CONSTRAINT pk_travaux PRIMARY KEY (numero_travaux),

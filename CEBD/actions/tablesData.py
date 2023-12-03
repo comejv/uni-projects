@@ -118,7 +118,7 @@ class Window(tk.Toplevel):
                    "code_departement", 
                    "cout_total_ht_travaux", 
                    "cout_induit_ht_travaux", 
-                   "annee_travaux", 
+                   "date_travaux", 
                    "annee_constr_travaux", 
                    "type_logement_travaux")
 
@@ -127,7 +127,7 @@ class Window(tk.Toplevel):
                    code_departement, 
                    cout_total_ht_travaux, 
                    cout_induit_ht_travaux, 
-                   annee_travaux, 
+                   date_travaux, 
                    annee_constr_travaux, 
                    type_logement_travaux
             FROM Travaux

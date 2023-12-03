@@ -188,10 +188,8 @@ class Window(tk.Toplevel):
 
         # Photovoltaïque
         columns = ("numero_travaux", 
-                   "poste_isolation", 
-                   "isolant_isolation", 
-                   "epaisseur_isolation", 
-                   "surface_isolation")
+                   "puissance_installee", 
+                   "type_panneau")
 
         query = """
             SELECT numero_travaux,

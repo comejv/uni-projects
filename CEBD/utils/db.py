@@ -96,25 +96,27 @@ def insertDB():
             "delete from Regions where code_region = ? and ? <> ?",
             ["Anciens Code", "Anciens Code", "Nouveau Code"],
         )
-        
+
         print(
             "Les erreurs UNIQUE constraint sont normales car on insère une seule fois les Regions et les Départemments"
         )
         print("Insertion de mesures en cours...cela peut prendre un peu de temps")
         # On ajoute les mesures
         read_csv_file(
-            "data/csv/Mesures.csv",
+            "data/csv/MesuresSmall.csv",
             ";",
             "insert into Mesures (code_departement, date_mesure, temperature_min_mesure, temperature_max_mesure, temperature_moy_mesure) values (?, ?, ?, ?, ?)",
             ["code_insee_departement", "date_obs", "tmin", "tmax", "tmoy"],
         )
 
         # Insertion des communes
+        print("Insertion des communes...")
         read_csv_file(
             "data/csv/Communes.csv",
             ";",
-            "insert into Communes (nom_commune, code_departement, arrondissement_commune, canton_commune, population_commune, superficie_commune, altitude_moy_commune) values (?, ?, ?, ?, ?, ?, ?)",
+            "insert into Communes (code_commune, nom_commune, code_departement, arrondissement_commune, canton_commune, population_commune, superficie_commune, altitude_moy_commune) values (?, ?, ?, ?, ?, ?, ?, ?)",
             [
+                "Code Commune",
                 "Commune",
                 "Code Département",
                 "Code Arrondissement",
@@ -133,8 +135,127 @@ def insertDB():
         )
     else:
         data.commit()
-        print("Un jeu de test a été inséré dans la base avec succès.")
+        print("Insertion de Région, Département, Mesure et Commune réussie.")
 
+    idx = 0
+
+    enums_types_logements = ["INDIVIDUEL", "COLLECTIF"]
+
+    # Insertion des travaux isolation
+    print("Insertion des Isolations")
+    df = pandas.read_csv("data/csv/Isolation.csv", sep=";")
+    query_travaux = "INSERT INTO Travaux (numero_travaux, code_departement, cout_total_ht_travaux, cout_induit_ht_travaux, annee_travaux, annee_constr_travaux, type_logement_travaux) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    query_isolation = "INSERT INTO Isolations (numero_travaux, poste_isolation, isolant_isolation, epaisseur_isolation, surface_isolation) VALUES (?, ?, ?, ?, ?)"
+
+    enum_postes_isolation = ["COMBLES PERDUES", "ITI", "ITE", "RAMPANTS", "SARKING", "TOITURE TERRASE", "PLANCHER BAS"]
+    enum_types_isolant = ["AUTRES", "LAINE VEGETALE", "LAINE MINERALE", "PLASTIQUES"]
+    
+    for _, row in df.iterrows():
+        att_travaux = [
+            row["code_departement"],
+            row["cout_total_ht"],
+            row["cout_induit_ht"],
+            row["annee_travaux"],
+            row["annee_construction"],
+            row["type_logement"],
+        ]
+        att_isolation = [
+            row["poste_isolation"],
+            row["isolant"],
+            row["epaisseur"],
+            row["surface"],
+        ]
+        if att_travaux[5] not in enums_types_logements:
+            att_travaux[5] = None
+        if att_isolation[0] not in enum_postes_isolation:
+            att_isolation[0] = None
+        if att_isolation[1] not in enum_types_isolant:
+            att_isolation[1] = None
+        try:
+            cursor = data.cursor()
+            cursor.execute(query_travaux, tuple([idx] + att_travaux))
+            cursor.execute(query_isolation, tuple([idx] + att_isolation))
+        except IntegrityError as err:
+            data.rollback()
+            print("Insertion fail with values ", [idx] + att_travaux + att_isolation, " : ", err)
+        else:
+            idx += 1
+            data.commit()
+    print("Insertion des Isolations réussie.")
+
+    # Insertion des travaux chauffage
+    print("Insertion des Chauffages...")
+    df = pandas.read_csv("data/csv/Chauffage.csv", sep=";")
+    query_chauffage = "INSERT INTO Chauffages (numero_travaux, energie_chauffage_avt_chauffage, energie_chauffage_inst_chauffage, generateur_chauffage, type_chaudiere_chauffage) VALUES (?, ?, ?, ?, ?)"
+    enum_energie_chauffage = ["ELECTRICITE", "GAZ", "FIOUL", "BOIS", "AUTRES"]
+    enum_generateur = ["CHAUDIERE", "PAC", "POELE", "INSERT", "RADIATEUR", "AUTRES"]
+    enum_chaudiere = ["A CONDENSATION", "AIR-AIR", "AIR-EAU", "GEOTHERMIE", "AUTRES"] 
+    for _, row in df.iterrows():
+        att_travaux = [
+            row["code_departement"],
+            row["cout_total_ht"],
+            row["cout_induit_ht"],
+            row["annee_travaux"],
+            row["annee_construction"],
+            row["type_logement"],
+        ]
+        att_chauffage = [
+            row["energie_chauffage_avt_travaux"],
+            row["energie_chauffage_installee"],
+            row["generateur"],
+            row["type_chaudiere"],
+        ]
+        if att_travaux[5] not in enums_types_logements:
+            att_travaux[5] = None
+        if att_chauffage[0] not in enum_energie_chauffage:
+            att_chauffage[0] = None
+        if att_chauffage[2] not in enum_generateur:
+            att_chauffage[2] = None
+        if att_chauffage[3] not in enum_chaudiere:
+            att_chauffage[3] = None
+        try:
+            cursor = data.cursor()
+            cursor.execute(query_travaux, tuple([idx] + att_travaux))
+            cursor.execute(query_chauffage, tuple([idx] + att_chauffage))
+        except IntegrityError as err:
+            data.rollback()
+            print("Insertion fail with values ", [idx] + att_travaux + att_chauffage, " : ", err)
+        else:
+            idx += 1
+            data.commit()
+    print("Insertion des Chauffages réussie.")
+
+    # Insertion des travaux photovolataïque
+    print("Insertion des Photovoltaique...")
+    df = pandas.read_csv("data/csv/Photovoltaique.csv", sep=";")
+    query_photovoltaique = "INSERT INTO Photovoltaiques (numero_travaux, puissance_installee_photovoltaique, type_panneau_photovoltaique) VALUES (?, ?, ?)"
+    enum_panneau = ["MONOCRISTALLIN", "POLYCRISTALLIN"]
+    for _, row in df.iterrows():
+        att_travaux = [
+            row["code_departement"],
+            row["cout_total_ht"],
+            row["cout_induit_ht"],
+            row["annee_travaux"],
+            row["annee_construction"],
+            row["type_logement"],
+        ]
+        att_photovoltaique = [
+            row["puissance_installee"],
+            row["type_panneaux"],
+        ]
+        if att_travaux[5] not in enums_types_logements:
+            att_travaux[5] = None
+        try:
+            cursor = data.cursor()
+            cursor.execute(query_travaux, tuple([idx] + att_travaux))
+            cursor.execute(query_photovoltaique, tuple([idx] + att_photovoltaique))
+        except IntegrityError as err:
+            data.rollback()
+            print("Insertion fail with values ", [idx] + att_travaux + att_photovoltaique, " : ", err)
+        else:
+            idx += 1
+            data.commit()
+    print("Insertion des Photovoltaiques réussie.")
 
 # En cas de clic sur le bouton de suppression de la base
 def deleteDB():
@@ -169,5 +290,5 @@ def read_csv_file(csvFile, separator, query, columns):
             # print(query, tab)
             cursor.execute(query, tuple(tab))
         except IntegrityError as err:
-            print(query, tab)
-            print(err)
+            # print(err)
+            pass

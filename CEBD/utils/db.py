@@ -110,6 +110,7 @@ def insertDB():
         )
 
         # Insertion des communes
+        print("Insertion des communes...")
         read_csv_file(
             "data/csv/Communes.csv",
             ";",
@@ -137,6 +138,7 @@ def insertDB():
         print("Insertion de Région, Département, Mesure et Commune réussie.")
 
     # Insertion des travaux isolation
+    print("Insertion des Isolations")
     df = pandas.read_csv("data/csv/Isolation.csv", sep=";")
     query_travaux = "INSERT INTO Travaux (numero_travaux, code_departement, cout_total_ht_travaux, cout_induit_ht_travaux, annee_travaux, annee_constr_travaux, type_logement_travaux) VALUES (?, ?, ?, ?, ?, ?, ?)"
     query_isolation = "INSERT INTO Isolations (numero_travaux, poste_isolation, isolant_isolation, epaisseur_isolation, surface_isolation) VALUES (?, ?, ?, ?, ?)"
@@ -162,13 +164,14 @@ def insertDB():
             cursor.execute(query_isolation, tuple([idx] + att_isolation))
         except IntegrityError as err:
             data.rollback()
-            print(err)
+            print("Insertion fail with values ", att_travaux + att_isolation, " : ", err)
         else:
             idx += 1
             data.commit()
     print("Insertion des Isolations réussie.")
 
     # Insertion des travaux chauffage
+    print("Insertion des Chauffages...")
     df = pandas.read_csv("data/csv/Chauffage.csv", sep=";")
     query_chauffage = "INSERT INTO Chauffages (numero_travaux, energie_chauffage_avt_chauffage, energie_chauffage_inst_chauffage, generateur_chauffage, type_chaudiere_chauffage) VALUES (?, ?, ?, ?, ?)"
     for _, row in df.iterrows():
@@ -192,12 +195,40 @@ def insertDB():
             cursor.execute(query_chauffage, tuple([idx] + att_chauffage))
         except IntegrityError as err:
             data.rollback()
-            print(err)
+            print("Insertion fail with values ", att_travaux + att_chauffage, " : ", err)
         else:
             idx += 1
             data.commit()
     print("Insertion des Chauffages réussie.")
 
+    # Insertion des travaux photovolataïque
+    print("Insertion des Photovoltaique...")
+    df = pandas.read_csv("data/csv/Photovoltaique.csv", sep=";")
+    query_photovoltaique = "INSERT INTO Photovoltaiques (numero_travaux, puissance_installee_photovoltaique, type_panneau_photovoltaique) VALUES (?, ?, ?)"
+    for _, row in df.iterrows():
+        att_travaux = [
+            row["code_departement"],
+            row["cout_total_ht"],
+            row["cout_induit_ht"],
+            row["annee_travaux"],
+            row["annee_construction"],
+            row["type_logement"],
+        ]
+        att_photovoltaique = [
+            row["puissance_installee"],
+            row["type_panneaux"],
+        ]
+        try:
+            cursor = data.cursor()
+            cursor.execute(query_travaux, tuple([idx] + att_travaux))
+            cursor.execute(query_photovoltaique, tuple([idx] + att_photovoltaique))
+        except IntegrityError as err:
+            data.rollback()
+            print(err)
+        else:
+            idx += 1
+            data.commit()
+    print("Insertion fail with values ", att_travaux + att_photovoltaique, " : ", err)
 
 # En cas de clic sur le bouton de suppression de la base
 def deleteDB():

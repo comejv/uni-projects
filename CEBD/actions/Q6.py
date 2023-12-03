@@ -47,21 +47,13 @@ class Window(tk.Toplevel):
             cursor = db.data.cursor()
             temp_result = cursor.execute(temp_query).fetchall()
             cout_result = cursor.execute(cout_query).fetchall()
-            try:
-                months_temp, temperatures = zip(*temp_result)
-                months_cout, couts = zip(*cout_result)
-            except ValueError:
-                print("Erreur : pas assez de données")
-                # Show a window that says no values
-                ttk.Label(
-                    self,
-                    text="Erreur : pas assez de données",
-                    wraplength=500,
-                    anchor="center",
-                    font=("Helvetica", "10", "bold"),
-                ).grid(sticky="we", row=1)
-                return
-
+            # On choisit d'afficher le graphique même si les données sont vides
+            if temp_result == []:
+                temp_result = [[0, 0]]
+            if cout_result == []:
+                cout_result = [[0, 0]]
+            months_temp, temperatures = zip(*temp_result)
+            months_cout, couts = zip(*cout_result)
         except Exception as e:
             print("Erreur : " + repr(e))
             return

@@ -32,7 +32,6 @@ class Window(tk.Toplevel):
 
     def printgraph(self):
         try:
-            tab = []
             temp_query = """
                     SELECT strftime('%m', date_mesure) AS month, AVG(temperature_min_mesure) AS avg_temperature
                     FROM Mesures
@@ -49,10 +48,18 @@ class Window(tk.Toplevel):
             temp_result = cursor.execute(temp_query).fetchall()
             cout_result = cursor.execute(cout_query).fetchall()
             try:
-                months, temperatures = zip(*temp_result)
-                months, couts = zip(*cout_result)
+                months_temp, temperatures = zip(*temp_result)
+                months_cout, couts = zip(*cout_result)
             except ValueError:
                 print("Erreur : pas assez de données")
+                # Show a window that says no values
+                ttk.Label(
+                    self,
+                    text="Erreur : pas assez de données",
+                    wraplength=500,
+                    anchor="center",
+                    font=("Helvetica", "10", "bold"),
+                ).grid(sticky="we", row=1)
                 return
 
         except Exception as e:
@@ -60,10 +67,23 @@ class Window(tk.Toplevel):
             return
 
         # Plot the data
-        plt.plot(months, temperatures, label="Average Temperature")
-        plt.plot(months, couts, label="Total cost")
-        plt.xlabel("Month")
-        plt.ylabel("Value")
+        fig, ax1 = plt.subplots()
+
+        color = "tab:red"
+        ax1.set_xlabel("Month")
+        ax1.set_ylabel("Average Temperature", color=color)
+        ax1.plot(months_temp, temperatures, color=color)
+        ax1.tick_params(axis="y", labelcolor=color)
+
+        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+        color = "tab:blue"
+        ax2.set_ylabel(
+            "Total cost", color=color
+        )  # we already handled the x-label with ax1
+        ax2.plot(months_cout, couts, color=color)
+        ax2.tick_params(axis="y", labelcolor=color)
+
+        fig.tight_layout()  # otherwise the right y-label is slightly clipped
         plt.title("Correlation of temperatures and costs in Isère / 2022")
-        plt.legend()
         plt.show()

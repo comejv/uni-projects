@@ -103,7 +103,7 @@ def insertDB():
         print("Insertion de mesures en cours...cela peut prendre un peu de temps")
         # On ajoute les mesures
         read_csv_file(
-            "data/csv/MesuresSmall.csv",
+            "data/csv/Mesures.csv",
             ";",
             "insert into Mesures (code_departement, date_mesure, temperature_min_mesure, temperature_max_mesure, temperature_moy_mesure) values (?, ?, ?, ?, ?)",
             ["code_insee_departement", "date_obs", "tmin", "tmax", "tmoy"],
@@ -290,5 +290,5 @@ def read_csv_file(csvFile, separator, query, columns):
             # print(query, tab)
             cursor.execute(query, tuple(tab))
         except IntegrityError as err:
-            # print(err)
+            print(err)
             pass

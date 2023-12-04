@@ -3,47 +3,6 @@ from utils import display
 from tkinter import ttk
 from utils import db
 
-"""
-CREATE TABLE Travaux (
-    numero_travaux INTEGER,
-    code_departement TEXT,
-    cout_total_ht_travaux FLOAT,
-    cout_induit_ht_travaux FLOAT,
-    date_travaux DATE,
-    annee_constr_travaux DATE,
-    type_logement_travaux TEXT,
-    CONSTRAINT pk_travaux PRIMARY KEY (numero_travaux),
-    CONSTRAINT fk_travaux FOREIGN KEY (code_departement) REFERENCES Departements(code_departement)
-);
-CREATE TABLE Isolations (
-    numero_travaux INTEGER,
-    poste_isolation TEXT,
-    isolant_isolation TEXT,
-    epaisseur_isolation INTEGER,
-    surface_isolation INTEGER,
-    CONSTRAINT pk_isolations PRIMARY KEY (numero_travaux),
-    CONSTRAINT fk_isolations FOREIGN KEY (numero_travaux) REFERENCES Travaux(numero_travaux)
-);
-
-CREATE TABLE Chauffages (
-    numero_travaux INTEGER,
-    energie_chauffage_avt_chauffage TEXT,
-    energie_chauffage_inst_chauffage TEXT,
-    generateur_chauffage TEXT,
-    type_chaudiere_chauffage TEXT,
-    CONSTRAINT pk_chauffages PRIMARY KEY (numero_travaux),
-    CONSTRAINT fk_chauffages FOREIGN KEY (numero_travaux) REFERENCES Travaux(numero_travaux)
-);
-
-CREATE TABLE Photovoltaiques (
-    numero_travaux INTEGER,
-    puissance_installee_photovoltaique INTEGER,
-    type_panneau_photovoltaique TEXT,
-    CONSTRAINT pk_photovoltaiques PRIMARY KEY (numero_travaux),
-    CONSTRAINT fk_photovoltaiques FOREIGN KEY (numero_travaux) REFERENCES Travaux(numero_travaux)
-);
-"""
-
 
 class Window(tk.Toplevel):
     def __init__(self, parent):

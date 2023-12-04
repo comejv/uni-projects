@@ -95,13 +95,15 @@ class Window(tk.Toplevel):
         # TODO Q4 Afficher les données des nouvelles tables
 
         # Communes
-        columns = ("nom_commune", 
-                   "code_departement", 
-                   "arrondissement_commune", 
-                   "canton_commune", 
-                   "population_commune", 
-                   "superficie_commune", 
-                   "altitude_moy_commune")
+        columns = (
+            "nom_commune",
+            "code_departement",
+            "arrondissement_commune",
+            "canton_commune",
+            "population_commune",
+            "superficie_commune",
+            "altitude_moy_commune",
+        )
         query = """
             SELECT nom_commune, code_departement, arrondissement_commune, canton_commune, population_commune, superficie_commune, altitude_moy_commune
             FROM Communes
@@ -114,13 +116,15 @@ class Window(tk.Toplevel):
         scrollbar.grid(row=0, column=1, sticky="ns")
 
         # Travaux
-        columns = ("numero_travaux", 
-                   "code_departement", 
-                   "cout_total_ht_travaux", 
-                   "cout_induit_ht_travaux", 
-                   "date_travaux", 
-                   "annee_constr_travaux", 
-                   "type_logement_travaux")
+        columns = (
+            "numero_travaux",
+            "code_departement",
+            "cout_total_ht_travaux",
+            "cout_induit_ht_travaux",
+            "date_travaux",
+            "annee_constr_travaux",
+            "type_logement_travaux",
+        )
 
         query = """
             SELECT numero_travaux,
@@ -141,11 +145,13 @@ class Window(tk.Toplevel):
         scrollbar.grid(row=0, column=1, sticky="ns")
 
         # Isolations
-        columns = ("numero_travaux", 
-                   "poste_isolation", 
-                   "isolant_isolation", 
-                   "epaisseur_isolation", 
-                   "surface_isolation")
+        columns = (
+            "numero_travaux",
+            "poste_isolation",
+            "isolant_isolation",
+            "epaisseur_isolation",
+            "surface_isolation",
+        )
 
         query = """
             SELECT numero_travaux,
@@ -164,11 +170,13 @@ class Window(tk.Toplevel):
         scrollbar.grid(row=0, column=1, sticky="ns")
 
         # Chauffage
-        columns = ("numero_travaux", 
-                   "energie_chauffage_avant_travaux", 
-                   "energie_chauffage_installee", 
-                   "generateur_chauffage", 
-                   "type_chaudiere_chauffage")
+        columns = (
+            "numero_travaux",
+            "energie_chauffage_avant_travaux",
+            "energie_chauffage_installee",
+            "generateur_chauffage",
+            "type_chaudiere_chauffage",
+        )
 
         query = """
             SELECT numero_travaux,
@@ -187,9 +195,7 @@ class Window(tk.Toplevel):
         scrollbar.grid(row=0, column=1, sticky="ns")
 
         # Photovoltaïque
-        columns = ("numero_travaux", 
-                   "puissance_installee", 
-                   "type_panneau")
+        columns = ("numero_travaux", "puissance_installee", "type_panneau")
 
         query = """
             SELECT numero_travaux,

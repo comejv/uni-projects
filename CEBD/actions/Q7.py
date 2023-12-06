@@ -27,23 +27,6 @@ class Window(tk.Toplevel):
             self, text="Modifier travaux Isolation", command=self.updateIsolation
         ).grid(column=0, row=2)
 
-        self.enums_types_logements = ["INDIVIDUEL", "COLLECTIF"]
-        self.enum_postes_isolation = [
-            "COMBLES PERDUES",
-            "ITI",
-            "ITE",
-            "RAMPANTS",
-            "SARKING",
-            "TOITURE TERRASE",
-            "PLANCHER BAS",
-        ]
-        self.enum_types_isolant = [
-            "AUTRES",
-            "LAINE VEGETALE",
-            "LAINE MINERALE",
-            "PLASTIQUES",
-        ]
-
     def addIsolation(self):
         window = AddWindow(self)
         window.grab_set()
@@ -68,6 +51,23 @@ class AddWindow(tk.Toplevel):
             anchor="center",
             font=("Helvetica", "10", "bold"),
         ).grid(sticky="we", row=0)
+
+        self.enums_types_logements = ["INDIVIDUEL", "COLLECTIF"]
+        self.enum_postes_isolation = [
+            "COMBLES PERDUES",
+            "ITI",
+            "ITE",
+            "RAMPANTS",
+            "SARKING",
+            "TOITURE TERRASE",
+            "PLANCHER BAS",
+        ]
+        self.enum_types_isolant = [
+            "AUTRES",
+            "LAINE VEGETALE",
+            "LAINE MINERALE",
+            "PLASTIQUES",
+        ]
 
         # Département
         cursor = db.data.cursor()

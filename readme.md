@@ -104,3 +104,9 @@ SUM:                            88           1117           1142          10469
 > Projet logiciel
 
 [**INF404 - Projet**](https://github.com/euxem/Projet_shrek) : interpréteur d'un langage que nous avons créé, dont le but est d'ajouter un paradigme de programmation fonctionnelle au langage graphique dot qui n'est que déclaratif. Stocké sur un dépôt de mon binôme, [Euxem](https://github.com/euxem).
+
+## PROG5 ![](https://img.shields.io/badges/-C-red)
+
+> Projet logiciel
+
+[**ARM-SIMULATOR**](https://github.com/comejv/ARM-SIM) : Ce projet vise à développer un simulateur pour un sous-ensemble du jeu d'instructions ARMv5. Le simulateur est conçu pour exécuter un code machine écrit pour le jeu d'instructions ARMv5 sur une machine hôte avec un jeu d'instructions différent. Bien que l'architecture hôte cible principale soit Intel x86 (32 bits) ou x86-64 (64 bits), le code du simulateur est écrit de manière portative et peut être compilé et exécuté sur d'autres architectures. Projet réalisé en équipe de 6 personnes.

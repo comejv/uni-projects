@@ -1,0 +1,10 @@
+shell
+tests/systests
+tests/systestsres/*
+.gdb*
+.vscode
+obj
+doc/hmtl/
+doc/latex/
+.cache/
+compile_commands.json

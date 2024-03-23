@@ -1,0 +1,6 @@
+# due to how we show jobs info this test will fail but is actually ok
+cat /dev/random > /dev/null &
+pgrep -f cat | xargs kill -SIGTSTP
+pgrep -f cat | xargs kill -SIGCONT
+pgrep -f cat | xargs kill -SIGTERM
+ps | wc -l

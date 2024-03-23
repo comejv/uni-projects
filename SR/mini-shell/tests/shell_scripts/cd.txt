@@ -1,0 +1,21 @@
+# test file for internal cd command
+
+mkdir -p __test
+cd __test
+mkdir -p test/nested/dir
+cd test/nested/dir
+pwd
+cd ../../..
+pwd
+pwd
+cd ..
+rm -r __test
+pwd
+cd .
+pwd
+cd
+pwd
+cd ~
+pwd
+exit
+echo "this should not be printed"

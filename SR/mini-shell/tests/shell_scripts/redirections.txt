@@ -1,0 +1,5 @@
+mkdir __test
+ls > __test/ls 
+cat < __test/ls 
+grep Makefile < __test/ls > __test/grep
+rm -r __test

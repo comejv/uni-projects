@@ -109,4 +109,12 @@ SUM:                            88           1117           1142          10469
 
 > Projet logiciel
 
-[**ARM-SIMULATOR**](https://github.com/comejv/ARM-SIM) : Ce projet vise à développer un simulateur pour un sous-ensemble du jeu d'instructions ARMv5. Le simulateur est conçu pour exécuter un code machine écrit pour le jeu d'instructions ARMv5 sur une machine hôte avec un jeu d'instructions différent. Bien que l'architecture hôte cible principale soit Intel x86 (32 bits) ou x86-64 (64 bits), le code du simulateur est écrit de manière portative et peut être compilé et exécuté sur d'autres architectures. Projet réalisé en équipe de 6 personnes.
+[**ARM-SIMULATOR**](https://github.com/comejv/ARM-SIM) : ce projet vise à développer un simulateur pour un sous-ensemble du jeu d'instructions ARMv5. Le simulateur est conçu pour exécuter un code machine écrit pour le jeu d'instructions ARMv5 sur une machine hôte avec un jeu d'instructions différent. Bien que l'architecture hôte cible principale soit Intel x86 (32 bits) ou x86-64 (64 bits), le code du simulateur est écrit de manière portative et peut être compilé et exécuté sur d'autres architectures. Projet réalisé en équipe de 6 personnes.
+
+## Systèmes et réseaux ![](https://img.shields.io/badges/-C-red)
+
+> Projets en cours de semestre
+
+[**MINI-SHELL**](SR/mini-shell) : création d'un shell capable de gérer l'exécution de programmes et commandes internes, de mettre des tâches en arrière plan et de les ramener au premier plan ou de les suspendre.
+
+[**FTP**](SR/FTP) : [à venir] serveur et client FTP.

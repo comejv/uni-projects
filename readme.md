@@ -119,4 +119,6 @@ SUM:                            88           1117           1142          10469
 
 [**FTP**](https://github.com/Luminosaa/FTP) : serveur et client FTP capable de gérer plusieurs connections, avec répartition de la charge entre plusieurs serveurs avec une architecture maître esclave.
 
+## PROG6 ![](https://img.shields.io/badge/Java-ED8B00)
+
 [**KUBE**](https://github.com/comejv/kube) : Implémentation java d'un jeu deplateau avec interface graphique avec swing, intelligence artificielle pour pouvoir afronter l'ordinateur et intégration réseau pour jouer en ligne.

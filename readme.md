@@ -118,3 +118,5 @@ SUM:                            88           1117           1142          10469
 [**MINI-SHELL**](SR/mini-shell) : création d'un shell capable de gérer l'exécution de programmes et commandes internes, de mettre des tâches en arrière plan et de les ramener au premier plan ou de les suspendre.
 
 [**FTP**](https://github.com/Luminosaa/FTP) : serveur et client FTP capable de gérer plusieurs connections, avec répartition de la charge entre plusieurs serveurs avec une architecture maître esclave.
+
+[**KUBE**](https://github.com/comejv/kube) : Implémentation java d'un jeu deplateau avec interface graphique avec swing, intelligence artificielle pour pouvoir afronter l'ordinateur et intégration réseau pour jouer en ligne.

@@ -1,6 +1,6 @@
 <p align="center">
 <img src="https://img.shields.io/github/languages/count/comejv/uni-projects" alt="GitHub language count">
-<img src ="https://img.shields.io/github/languages/top/comejv/uni-projects" alt="GitHub top language">
+<img src="https://img.shields.io/github/languages/top/comejv/uni-projects" alt="GitHub top language">
 <img src="https://img.shields.io/github/repo-size/comejv/uni-projects" alt="GitHub repo size">
 <img src ="https://img.shields.io/github/last-commit/comejv/uni-projects" alt="GitHub last commit">
 </p>
@@ -11,40 +11,37 @@
 
 Pour cloner une partie de ce dépôt, utilisez mon scripte [sparse-clone](https://github.com/comejv/utils-and-games/tree/main/git-sparse-clone).
 
-Info : certains projets sont stockés dans un dépôt séparé : [utils-and-games](https://github.com/comejv/utils-and-games).
+Info : certains projets sont stockés dans un dépôt séparé :
 
 <p align="center" href="https://github.com/comejv/utils-and-games">
 <img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/comejv/utils-and-games.png" width="460px">
 </p>
 
+Ou dans leur propre dépôt, accessible via un lien plus bas dans cette page.
+
 ***
 
 ## Stats du dépôt
-
-<p align="center" href="https://raw.githubusercontent.com/comejv/uni-projects/main/diagram.svg">
-<kbd>
-<img src="./diagram.svg" alt="A diagram of this repository" width="70%">
-</kbd>
-</p>
 
 ```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               45            599            579           7512
+C                               72            599            979          11253
 Python                          13            190            317           2079
 C/C++ Header                    20            212            210            471
 SQL                              4              8             21            202
 make                             3             59             15             89
 Markdown                         3             49              0            116
+Java                            70            753           2587          13435
 -------------------------------------------------------------------------------
-SUM:                            88           1117           1142          10469
+SUM:                           185           1870           4129          27529
 -------------------------------------------------------------------------------
 ```
 
 ***
 
-## INF101 ![](https://img.shields.io/badge/-python-blue)
+## INF101 ![](https://img.shields.io/badge/python-blue)
 
 > Méthodes informatiques et techniques de programmation
 
@@ -52,7 +49,7 @@ SUM:                            88           1117           1142          10469
 
 ***
 
-## INF201 ![](https://img.shields.io/badge/-oCaml-orange)
+## INF201 ![](https://img.shields.io/badge/oCaml-orange)
 
 > Algorithmique et programmation fonctionnelle
 
@@ -60,7 +57,7 @@ SUM:                            88           1117           1142          10469
 
 ***
 
-## INF203 ![](https://img.shields.io/badge/-C-red)
+## INF203 ![](https://img.shields.io/badge/C-red)
 
 > Système et environnement de programmation
 
@@ -68,7 +65,7 @@ SUM:                            88           1117           1142          10469
 
 ***
 
-## INF301 ![](https://img.shields.io/badge/-C-red)
+## INF301 ![](https://img.shields.io/badge/C-red)
 
 > Algorithmique et programmation impérative 
 
@@ -77,7 +74,7 @@ SUM:                            88           1117           1142          10469
 
 ***
 
-## INF304 ![](https://img.shields.io/badge/-C-red)
+## INF304 ![](https://img.shields.io/badge/C-red)
 
 > Bases du développement logiciel : modularisation, tests
 
@@ -85,7 +82,7 @@ SUM:                            88           1117           1142          10469
 
 ***
 
-## INF402 ![](https://img.shields.io/badge/-python-blue) ![](https://img.shields.io/badge/-C-red)
+## INF402 ![](https://img.shields.io/badge/python-blue) ![](https://img.shields.io/badge/C-red)
 
 > Introduction à la logique
 
@@ -93,25 +90,25 @@ SUM:                            88           1117           1142          10469
 
 ***
 
-## INF403 ![](https://img.shields.io/badge/-python-blue) ![](https://img.shields.io/badge/-sql-yellow)
+## INF403 ![](https://img.shields.io/badge/python-blue) ![](https://img.shields.io/badge/sql-yellow)
 
 > Gestion de données relationnelles et applications
 
 [**INF403 - Projet**](INF403/) : application de gestion d'une base de données pour une entreprise produisant et vendant de l'hydrogène liquide.
 
-## INF404 ![](https://img.shields.io/badge/-C-red)
+## INF404 ![](https://img.shields.io/badge/C-red)
 
 > Projet logiciel
 
 [**INF404 - Projet**](https://github.com/euxem/Projet_shrek) : interpréteur d'un langage que nous avons créé, dont le but est d'ajouter un paradigme de programmation fonctionnelle au langage graphique dot qui n'est que déclaratif. Stocké sur un dépôt de mon binôme, [Euxem](https://github.com/euxem).
 
-## PROG5 ![](https://img.shields.io/badges/-C-red)
+## PROG5 ![](https://img.shields.io/badge/C-red)
 
 > Projet logiciel
 
 [**ARM-SIMULATOR**](https://github.com/comejv/ARM-SIM) : ce projet vise à développer un simulateur pour un sous-ensemble du jeu d'instructions ARMv5. Le simulateur est conçu pour exécuter un code machine écrit pour le jeu d'instructions ARMv5 sur une machine hôte avec un jeu d'instructions différent. Bien que l'architecture hôte cible principale soit Intel x86 (32 bits) ou x86-64 (64 bits), le code du simulateur est écrit de manière portative et peut être compilé et exécuté sur d'autres architectures. Projet réalisé en équipe de 6 personnes.
 
-## Systèmes et réseaux ![](https://img.shields.io/badges/-C-red)
+## Systèmes et réseaux ![](https://img.shields.io/badge/C-red)
 
 > Projets en cours de semestre
 

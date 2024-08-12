@@ -9,7 +9,7 @@
 
 > **NB** : La plupart des projets ont été réalisés en binôme avec [Euxem](https://github.com/euxem).
 
-Pour cloner une partie de ce dépôt, utilisez mon scripte [sparse-clone](https://github.com/comejv/utils-and-games/tree/main/git-sparse-clone).
+Pour cloner une partie de ce dépôt, utilisez mon script [sparse-clone](https://github.com/comejv/utils-and-games/tree/main/git-sparse-clone).
 
 Info : certains projets sont stockés dans un dépôt séparé :
 
@@ -69,7 +69,7 @@ SUM:                           185           1870           4129          27529
 
 > Algorithmique et programmation impérative 
 
-- [**APP2 - Curiosity**](INF301/APP2/) : intèpreteur d'instructions pour un robot qui se déplace dans un terrain en 2D (test et génération des terrains en [INF304](INF304))
+- [**APP2 - Curiosity**](INF301/APP2/) : intepréteur d'instructions pour un robot qui se déplace dans un terrain en 2D (test et génération des terrains en [INF304](INF304))
 - [**APP3 - Arbre phylogénétique**](INF301/APP3/) : création, lecture et manipulation d'arbres phylogénétiques
 
 ***

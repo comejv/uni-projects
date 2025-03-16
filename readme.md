@@ -116,17 +116,17 @@ SUM:                           185           1870           4129          27529
 
 [**FTP**](https://github.com/Luminosaa/FTP): FTP server and client capable of handling multiple connections, with load balancing between multiple servers using a master-slave architecture.
 
-## PROG6 [![Java](https://img.shields.io/badge/Java-%23ED8B00.svg?logo=openjdk&logoColor=white)](#)
-
-[**KUBE**](https://github.com/comejv/kube): Java implementation of a board game with a Swing graphical interface, artificial intelligence to compete against the computer, and network integration for online play.
-
-## MOCA [![OCaml](https://img.shields.io/badge/OCaml-EC6813?logo=ocaml&logoColor=fff)](#)
+## MOCA [![C](https://img.shields.io/badge/C-00599C?logo=c&logoColor=white)](#)
 
 > Semester project
 
 [**Project**](https://github.com/comejv/MOCA): Project for refactoring and improving an existing code base. The goal was to apply good development practices and use various tools to improve code quality, security, and performance. Among the improvements made: project modularization, creation of makefiles, implementation of unit tests with CUTest, correction of memory leaks with Valgrind and ASAN, performance optimization with gprof, and addition of documentation with Doxygen. The project also integrated advanced techniques such as the use of static and dynamic libraries, code coverage with gcov, and dynamic analysis with AFL.
 
-## Compilation
+## PROG6 [![Java](https://img.shields.io/badge/Java-%23ED8B00.svg?logo=openjdk&logoColor=white)](#)
+
+[**KUBE**](https://github.com/comejv/kube): Java implementation of a board game with a Swing graphical interface, artificial intelligence to compete against the computer, and network integration for online play.
+
+## Compilation [![OCaml](https://img.shields.io/badge/OCaml-EC6813?logo=ocaml&logoColor=fff)](#)
 
 > Semester project
 
